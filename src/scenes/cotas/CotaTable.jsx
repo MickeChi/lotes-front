@@ -7,7 +7,7 @@ import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 
-const FraccionTable = () => {
+const CotaTable = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const columns = [
@@ -70,7 +70,7 @@ const FraccionTable = () => {
 
   return (
     <Box m="20px">
-      <Header subtitle="Fracciones" />
+      <Header subtitle="Cotas" />
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -106,4 +106,4 @@ const FraccionTable = () => {
   );
 };
 
-export default FraccionTable;
+export default CotaTable;

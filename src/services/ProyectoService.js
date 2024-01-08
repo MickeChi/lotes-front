@@ -1,4 +1,4 @@
-import axiosClient from 'src/utils/axiosClient.js';
+import axiosClient from "../utils/axiosClient.js";
 
 class ProyectoService {
 

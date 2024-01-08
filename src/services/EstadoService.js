@@ -1,4 +1,4 @@
-import estadosMx from 'src/helpers/estadosMx';
+import estadosMx from "../utils/estadosMx.js"
 
 //import { ID_APLICACION, API_BASE } from 'src/constants';
 

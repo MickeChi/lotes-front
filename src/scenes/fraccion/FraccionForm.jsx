@@ -1,5 +1,5 @@
 import {Autocomplete, Backdrop, Box, Button, CircularProgress, Paper, TextField, useTheme} from "@mui/material";
-import {Field, Formik} from "formik";
+import {Formik} from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
@@ -10,7 +10,7 @@ import {useNavigate} from "react-router-dom";
 import EstadoService from "../../services/EstadoService.js";
 import MunicipiosService from "../../services/MunicipiosService.js";
 
-const ProyectoCreatePage = () => {
+const FraccionForm = () => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -45,8 +45,6 @@ const ProyectoCreatePage = () => {
 
     }, [estadosSeleccionado]);
 
-
-
     const handleFormSubmit = (values) => {
         console.log("crear proyecto: ", values);
         setOpenLoader(true);
@@ -73,196 +71,139 @@ const ProyectoCreatePage = () => {
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
-            <Header title="NUEVO PROYECTO" subtitle="Crear un nuevo proyecto" />
+            <Header subtitle="Nueva Fracción"/>
+            <Formik
+                onSubmit={handleFormSubmit}
+                initialValues={initialValues}
+                validationSchema={checkoutSchema}
+            >
+                {({
+                      values,
+                      errors,
+                      touched,
+                      handleBlur,
+                      handleChange,
+                      handleSubmit,
+                      setFieldValue
+                  }) => (
+                    <form onSubmit={handleSubmit}>
+                        <Box
+                            display="grid"
+                            gap="30px"
+                            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+                            sx={{
+                                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+                            }}
+                        >
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Fracción"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.fraccion}
+                                name="fraccion"
+                                error={!!touched.fraccion && !!errors.fraccion}
+                                helperText={touched.fraccion && errors.fraccion}
+                                color="secondary"
+                                sx={{ gridColumn: "span 2" }}
+                            />
 
-            <Paper sx={{
-                backgroundColor: `${colors.primary[400]}`,
-                my: { xs: 3, md: 3 }, p: { xs: 2, md: 3 }
-            }}>
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Número Catastral"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.numeroCatastral}
+                                name="numeroCatastral"
+                                error={!!touched.numeroCatastral && !!errors.numeroCatastral}
+                                helperText={touched.numeroCatastral && errors.numeroCatastral}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Finca"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.finca}
+                                name="finca"
+                                error={!!touched.finca && !!errors.finca}
+                                helperText={touched.finca && errors.finca}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Tablaje"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.tablaje}
+                                name="tablaje"
+                                error={!!touched.tablaje && !!errors.tablaje}
+                                helperText={touched.tablaje && errors.tablaje}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Colonia"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.colonia}
+                                name="colonia"
+                                error={!!touched.colonia && !!errors.colonia}
+                                helperText={touched.colonia && errors.colonia}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Folio Electrónico"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.folioElectronico}
+                                name="folioElectronico"
+                                error={!!touched.folioElectronico && !!errors.folioElectronico}
+                                helperText={touched.folioElectronico && errors.folioElectronico}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Superficie de Terreno"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.superficieTerreno}
+                                name="superficieTerreno"
+                                error={!!touched.superficieTerreno && !!errors.superficieTerreno}
+                                helperText={touched.superficieTerreno && errors.superficieTerreno}
+                                sx={{ gridColumn: "span 2" }}
+                            />
 
 
-                <Formik
-                    onSubmit={handleFormSubmit}
-                    initialValues={initialValues}
-                    validationSchema={checkoutSchema}
-                >
-                    {({
-                          values,
-                          errors,
-                          touched,
-                          handleBlur,
-                          handleChange,
-                          handleSubmit,
-                          setFieldValue
-                      }) => (
-                        <form onSubmit={handleSubmit}>
-                            <Box
-                                display="grid"
-                                gap="30px"
-                                gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-                                sx={{
-                                    "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-                                }}
-                            >
-                                <TextField
-                                    fullWidth
-                                    variant="filled"
-                                    type="text"
-                                    label="Título"
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
-                                    value={values.titulo}
-                                    name="titulo"
-                                    error={!!touched.titulo && !!errors.titulo}
-                                    helperText={touched.titulo && errors.titulo}
-                                    color="secondary"
-                                    sx={{ gridColumn: "span 4" }}
-                                />
 
-                                <Autocomplete
-                                    id="estado"
-                                    name="estado"
-                                    options={estados}
-                                    getOptionLabel={option => option}
-                                    sx={{ gridColumn: "span 2" }}
-                                    onChange={(e, value) => {
-                                        setFieldValue(
-                                            "estado",
-                                            value !== null ? value : initialValues.estado
-                                        );
-                                        setEstadosSeleccionado(value);
-                                        if(value === null){
-                                            setFieldValue("municipio", initialValues.municipio);
-                                            setMunicipioSeleccionado(initialValues.municipio);
-                                        }
-                                    }}
-                                    renderInput={params => (
-                                        <TextField
-                                            label="Seleccion el estado"
-                                            fullWidth
-                                            variant="filled"
-                                            type="text"
-                                            name="estado"
-                                            color="secondary"
-                                            onBlur={handleBlur}
-                                            onChange={handleChange}
-                                            error={!!touched.estado && !!errors.estado}
-                                            helperText={touched.estado && errors.estado}
-                                            {...params}
-                                        />
-                                    )}
-                                />
-
-                                <Autocomplete
-                                    id="municipio"
-                                    name="municipio"
-                                    options={municipios}
-                                    getOptionLabel={option => option}
-                                    inputValue={municipioSeleccionado}
-                                    sx={{ gridColumn: "span 2" }}
-                                    onChange={(e, value) => {
-                                        setFieldValue(
-                                            "municipio",
-                                            value !== null ? value : initialValues.municipio
-                                        );
-                                        setMunicipioSeleccionado(value !== null ? value : initialValues.municipio);
-                                    }}
-                                    renderInput={params => (
-                                        <TextField
-                                            label="Seleccion el municipio"
-                                            fullWidth
-                                            variant="filled"
-                                            type="text"
-                                            name="municipio"
-                                            color="secondary"
-                                            onBlur={handleBlur}
-                                            onChange={handleChange}
-                                            error={!!touched.municipio && !!errors.municipio}
-                                            helperText={touched.municipio && errors.municipio}
-                                            {...params}
-                                        />
-                                    )}
-                                />
-
-                                <TextField
-                                    fullWidth
-                                    variant="filled"
-                                    type="text"
-                                    label="Subtotal"
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
-                                    value={values.subtotal}
-                                    name="subtotal"
-                                    error={!!touched.subtotal && !!errors.subtotal}
-                                    helperText={touched.subtotal && errors.subtotal}
-                                    sx={{ gridColumn: "span 2" }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    variant="filled"
-                                    type="text"
-                                    label="Total fracciones"
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
-                                    value={values.totalFracciones}
-                                    name="totalFracciones"
-                                    error={!!touched.totalFracciones && !!errors.totalFracciones}
-                                    helperText={touched.totalFracciones && errors.totalFracciones}
-                                    sx={{ gridColumn: "span 2" }}
-                                />
-
-                                <TextField
-                                    fullWidth
-                                    variant="filled"
-                                    type="text"
-                                    label="Uso"
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
-                                    value={values.uso}
-                                    name="uso"
-                                    error={!!touched.uso && !!errors.uso}
-                                    helperText={touched.uso && errors.uso}
-                                    sx={{ gridColumn: "span 1" }}
-                                />
-
-                                <TextField
-                                    fullWidth
-                                    variant="filled"
-                                    type="text"
-                                    label="Clase"
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
-                                    value={values.clase}
-                                    name="clase"
-                                    error={!!touched.clase && !!errors.clase}
-                                    helperText={touched.clase && errors.clase}
-                                    sx={{ gridColumn: "span 1" }}
-                                />
-
-                                <TextField
-                                    fullWidth
-                                    variant="filled"
-                                    type="text"
-                                    label="Punto de partida"
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
-                                    value={values.puntoPartida}
-                                    name="puntoPartida"
-                                    error={!!touched.puntoPartida && !!errors.puntoPartida}
-                                    helperText={touched.puntoPartida && errors.puntoPartida}
-                                    sx={{ gridColumn: "span 1" }}
-                                />
-
-                            </Box>
-                            <Box display="flex" justifyContent="end" mt="20px">
-                                <Button type="submit" color="secondary" variant="contained">
-                                    Guardar
-                                </Button>
-                            </Box>
-                        </form>
-                    )}
-                </Formik>
-            </Paper>
+                        </Box>
+                        <Box display="flex" justifyContent="end" mt="20px">
+                            <Button type="submit" color="secondary" variant="contained">
+                                Guardar
+                            </Button>
+                        </Box>
+                    </form>
+                )}
+            </Formik>
         </Box>
     );
 };
@@ -271,25 +212,46 @@ const phoneRegExp =
     /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
 const checkoutSchema = yup.object().shape({
-    titulo: yup.string().required("required"),
-    estado: yup.string().required("required"),
-    municipio: yup.string().required("required"),
-    subtotal: yup.number().required("required"),
-    totalFracciones: yup.number().required("required"),
+    //id:yup.string().required("required"),
+    fraccion: yup.number().required("required"),
+    numeroCatastral: yup.number().required("required"),
+    finca: yup.string().required("required"),
+    tablaje: yup.string().required("required"),
+    colonia: yup.string().required("required"),
+    folioElectronico: yup.string().required("required"),
+    superficieTerreno: yup.number().required("required"),
+    superficieConstruccion: yup.number().required("required"),
+    valorCatastral: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
-    puntoPartida: yup.string().required("required")
+    proyectoId: yup.number().required("required"),
+    //cotas: yup.string().required("required"),
+    tipoColindancia: yup.string().required("required"),
+    colindanciaProyecto: yup.bool().required("required"),
+    numeroParcela: yup.number().required("required"),
+    descripcion: yup.string().required("required")
 
 });
 const initialValues = {
-    titulo: "",
-    estado: "",
-    municipio: "",
-    subtotal: "",
-    totalFracciones: "",
-    uso: "",
-    clase: "",
-    puntoPartida: ""
+    "id":"",
+    "fraccion":"",
+    "numeroCatastral":"",
+    "finca":"",
+    "tablaje":"",
+    "colonia":"",
+    "folioElectronico":"",
+    "superficieTerreno":"",
+    "superficieConstruccion":"",
+    "valorCatastral":"",
+    "uso":"",
+    "clase":"",
+    "proyecto":"",
+    "proyectoId":"",
+    "cotas":"",
+    "tipoColindancia":"",
+    "colindanciaProyecto":"",
+    "numeroParcela":"",
+    "descripcion":""
 };
 
-export default ProyectoCreatePage;
+export default FraccionForm;

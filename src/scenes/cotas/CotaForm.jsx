@@ -1,4 +1,14 @@
-import {Autocomplete, Backdrop, Box, Button, CircularProgress, Paper, TextField, useTheme} from "@mui/material";
+import {
+    Autocomplete,
+    Backdrop,
+    Box,
+    Button,
+    CircularProgress,
+    Paper,
+    TextField,
+    Typography,
+    useTheme
+} from "@mui/material";
 import {Formik} from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -9,8 +19,9 @@ import {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import EstadoService from "../../services/EstadoService.js";
 import MunicipiosService from "../../services/MunicipiosService.js";
+import ColindanciaTransList from "./ColindanciaTransList.jsx";
 
-const FraccionForm = () => {
+const CotaForm = () => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -20,6 +31,10 @@ const FraccionForm = () => {
     const [estadosSeleccionado, setEstadosSeleccionado] = useState(null);
     const [municipios, setMunicipios] = useState([]);
     const [municipioSeleccionado, setMunicipioSeleccionado] = useState("");
+    const [fracciones, setFracciones] = useState([]);
+    const [fraccionSeleccionado, setFraccionSeleccionado] = useState(null);
+
+
 
     useEffect(() => {
         const obtenerEstados = () => {
@@ -71,7 +86,30 @@ const FraccionForm = () => {
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
-            <Header subtitle="Nueva Fracción"/>
+            <Header subtitle="Nueva Cota"/>
+            <Box mb="30px">
+                <Autocomplete
+                    id="fraccion"
+                    name="fraccion"
+                    options={fracciones}
+                    getOptionLabel={option => option.fraccion}
+                    sx={{ gridColumn: "span 4" }}
+                    onChange={(e, value) => {
+                        setFraccionSeleccionado(value);
+                    }}
+                    renderInput={params => (
+                        <TextField
+                            label="Seleccion la fracción"
+                            fullWidth
+                            variant="filled"
+                            type="text"
+                            name="fraccion"
+                            color="secondary"
+                            {...params}
+                        />
+                    )}
+                />
+            </Box>
             <Formik
                 onSubmit={handleFormSubmit}
                 initialValues={initialValues}
@@ -95,6 +133,8 @@ const FraccionForm = () => {
                                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
                             }}
                         >
+
+
                             <TextField
                                 fullWidth
                                 variant="filled"
@@ -245,6 +285,12 @@ const FraccionForm = () => {
                             />
 
                         </Box>
+                        <Box mt="20px">
+                            <Typography variant="h6"  sx={{ mb: "15px" }}>
+                                Seleccione las colindancias
+                            </Typography>
+                            <ColindanciaTransList/>
+                        </Box>
                         <Box display="flex" justifyContent="end" mt="20px">
                             <Button type="submit" color="secondary" variant="contained">
                                 Guardar
@@ -282,4 +328,4 @@ const initialValues = {
     puntoPartida: ""
 };
 
-export default FraccionForm;
+export default CotaForm;

@@ -1,13 +1,13 @@
 import {Autocomplete, Backdrop, Box, CircularProgress, Grid, TextField, Typography, useTheme} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme.jsx";
-import { mockDataTeam } from "../../data/mockData";
+import { mockDataTeam } from "../../data/mockData.js";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
-import Header from "../../components/Header";
-import CotaForm from "../cotas/CotaForm.jsx";
-import CotaTable from "../cotas/CotaTable.jsx";
+import Header from "../../components/Header.jsx";
+import CotaForm from "./CotaForm.jsx";
+import CotaTable from "./CotaTable.jsx";
 import {useState} from "react";
 
 const CotaTab = () => {

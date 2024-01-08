@@ -1,11 +1,12 @@
 import axios from 'axios';
 
 const axiosClient = axios.create();
-
+console.log("api: ", import.meta.env.VITE_APP_API_BASE)
 axiosClient.interceptors.request.use(
     config => {
         config.headers['Content-Type'] = 'application/json';
-        config.baseURL = process.env.REACT_APP_API_BASE;
+        config.baseURL = import.meta.env.VITE_APP_API_BASE;
+
         return config;
     },
     error => {

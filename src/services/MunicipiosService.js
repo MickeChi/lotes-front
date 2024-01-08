@@ -1,5 +1,5 @@
-import estadosMunicipiosMx from './../helpers/estadosMunicipiosMx';
-import estadosMx from 'src/helpers/estadosMx';
+import estadosMunicipiosMx from "../utils/estadosMunicipiosMx.js"
+import estadosMx from "../utils/estadosMx.js"
 
 class MunicipiosService {
   
