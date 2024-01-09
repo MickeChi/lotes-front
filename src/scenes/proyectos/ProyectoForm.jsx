@@ -201,6 +201,7 @@ const ProyectoForm = (props) => {
                                 onChange={handleChange}
                                 value={values.subtotal}
                                 name="subtotal"
+                                color="secondary"
                                 error={!!touched.subtotal && !!errors.subtotal}
                                 helperText={touched.subtotal && errors.subtotal}
                                 sx={{ gridColumn: "span 2" }}
@@ -214,6 +215,7 @@ const ProyectoForm = (props) => {
                                 onChange={handleChange}
                                 value={values.totalFracciones}
                                 name="totalFracciones"
+                                color="secondary"
                                 error={!!touched.totalFracciones && !!errors.totalFracciones}
                                 helperText={touched.totalFracciones && errors.totalFracciones}
                                 sx={{ gridColumn: "span 2" }}
@@ -228,6 +230,7 @@ const ProyectoForm = (props) => {
                                 onChange={handleChange}
                                 value={values.uso}
                                 name="uso"
+                                color="secondary"
                                 error={!!touched.uso && !!errors.uso}
                                 helperText={touched.uso && errors.uso}
                                 sx={{ gridColumn: "span 1" }}
@@ -242,6 +245,7 @@ const ProyectoForm = (props) => {
                                 onChange={handleChange}
                                 value={values.clase}
                                 name="clase"
+                                color="secondary"
                                 error={!!touched.clase && !!errors.clase}
                                 helperText={touched.clase && errors.clase}
                                 sx={{ gridColumn: "span 1" }}
@@ -256,6 +260,7 @@ const ProyectoForm = (props) => {
                                 onChange={handleChange}
                                 value={values.puntoPartida}
                                 name="puntoPartida"
+                                color="secondary"
                                 error={!!touched.puntoPartida && !!errors.puntoPartida}
                                 helperText={touched.puntoPartida && errors.puntoPartida}
                                 sx={{ gridColumn: "span 1" }}

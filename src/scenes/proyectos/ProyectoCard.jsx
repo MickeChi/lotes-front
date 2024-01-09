@@ -41,6 +41,7 @@ const ProyectoCard = ({proy}) =>{
                                  justifyContent: "flex-end",
                                  alignItems: "flex-start",
                              }}>
+
                     <Link to={`/proyectos/show/${proyinfo.id}`}>
                         <Button size="medium" color="secondary" variant="contained">Ver</Button>
                     </Link>
