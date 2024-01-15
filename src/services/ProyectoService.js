@@ -1,25 +1,38 @@
 import axiosClient from "../utils/axiosClient.js";
 
-class ProyectoService {
-
-    getProyectos(request) {
-        return axiosClient.get(`proyecto`, {
-            params: request
-        });
-    }
-
-    getProyecto(id) {
-        return axiosClient.get(`proyecto/${id}`);
-    }
-
-    updateProyecto(request) {
-        return axiosClient.put(`proyecto/${request.id}`, request);
-    }
-
-    addProyecto(request) {
-        return axiosClient.post(`proyecto`, request);
-    }
-
+const getAll = (request) =>{
+    return axiosClient.get(`proyecto`, {
+        params: request
+    });
 }
 
-export default new ProyectoService();
+const getById = (id) => {
+    return axiosClient.get(`proyecto/${id}`);
+}
+
+const update = (request) => {
+    return axiosClient.put(`proyecto/${request.id}`, request);
+}
+
+const create = (request) => {
+    return axiosClient.post(`proyecto`, request);
+}
+
+const remove = (id) => {
+    return axiosClient.get(`proyecto/${id}`);
+}
+
+const getFraccionesDoc = (id) => {
+    return axiosClient.get(`proyecto/generate-fracciones-doc/${id}`);
+}
+
+const ProyectoService = {
+    getAll,
+    getById,
+    update,
+    create,
+    remove,
+    getFraccionesDoc
+}
+
+export default ProyectoService;

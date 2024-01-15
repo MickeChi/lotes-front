@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import Card from '@mui/material/Card';
@@ -9,6 +8,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
+import {useSelector} from "react-redux";
+import {useEffect, useState} from "react";
 
 function not(a, b) {
     return a.filter((value) => b.indexOf(value) === -1);
@@ -22,14 +23,45 @@ function union(a, b) {
     return [...a, ...not(b, a)];
 }
 
-export default function ColindanciaTransList() {
-    const [checked, setChecked] = React.useState([]);
-    const [left, setLeft] = React.useState([0, 1, 2, 3, 4, 5, 6, 7]);
-    const [right, setRight] = React.useState([]);
+export default function ColindanciaTransList({onChange, colindanciasSelected}) {
+    const fracciones = useSelector(state => state.fracciones.fracciones);
+
+    const [checked, setChecked] = useState([]);
+    const [left, setLeft] = useState([]);
+    const [right, setRight] = useState([]);
 
     const leftChecked = intersection(checked, left);
     const rightChecked = intersection(checked, right);
 
+    useEffect(() => {
+        if(fracciones){
+            setLeft(fracciones);
+        }
+    }, []);
+
+    useEffect(() => {
+        console.log("colindanciasSelected: ", colindanciasSelected);
+        if(colindanciasSelected.length > 0){
+            let checkedCols = fracciones.filter(f => {
+                let existId = colindanciasSelected.find(cs => cs === f.id);
+                return existId !== undefined;
+            });
+            console.log("colindancias Checked right: ", colindanciasSelected);
+            if(checkedCols.length > 0){
+                //setChecked(checkedCols);
+                let initLeft = fracciones;
+                let leftCheck = intersection(checkedCols, initLeft);
+                setRight(leftCheck);
+                setLeft(not(initLeft, leftCheck));
+                setChecked(not(checkedCols, leftCheck));
+            }
+        }
+    }, [colindanciasSelected]);
+
+    useEffect(() => {
+        console.log("Change Right: ", right);
+        onChange(right);
+    }, [right]);
     const handleToggle = (value) => () => {
         const currentIndex = checked.indexOf(value);
         const newChecked = [...checked];
@@ -89,7 +121,7 @@ export default function ColindanciaTransList() {
             <Divider />
             <List
                 sx={{
-                    width: 200,
+                    width: 250,
                     height: 230,
                     bgcolor: '#3d475b',
                     overflow: 'auto',
@@ -99,11 +131,12 @@ export default function ColindanciaTransList() {
                 role="list"
             >
                 {items.map((value) => {
-                    const labelId = `transfer-list-all-item-${value}-label`;
+                    const labelId = `transfer-list-all-item-${value.id}-label`;
+                    const itemLabel = `Lote: ${value.lote} - Número catastral: ${value.numeroCatastral}`;
 
                     return (
                         <ListItem
-                            key={value}
+                            key={value.id}
                             role="listitem"
                             button
                             onClick={handleToggle(value)}
@@ -119,7 +152,7 @@ export default function ColindanciaTransList() {
                                     }}
                                 />
                             </ListItemIcon>
-                            <ListItemText id={labelId} primary={`Fracción ${value + 1}`} />
+                            <ListItemText id={labelId} primary={itemLabel} />
                         </ListItem>
                     );
                 })}
@@ -128,7 +161,7 @@ export default function ColindanciaTransList() {
     );
 
     return (
-        <Grid container spacing={2} justifyContent="left" alignItems="center">
+        <Grid container spacing={2} justifyContent="center" alignItems="center">
             <Grid item>{customList('Colindancias', left)}</Grid>
             <Grid item>
                 <Grid container direction="column" alignItems="center">

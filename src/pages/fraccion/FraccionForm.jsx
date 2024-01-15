@@ -1,11 +1,8 @@
 import {
     Autocomplete,
-    Backdrop,
     Box,
     Button,
-    CircularProgress, FormControl,
-    FormControlLabel, InputLabel,
-    Paper, Select,
+    FormControlLabel,
     TextField,
     useTheme
 } from "@mui/material";
@@ -14,71 +11,89 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import {tokens} from "../../theme.jsx";
-import ProyectoService from "../../services/ProyectoService.js";
-import {useState, useEffect} from "react";
-import {useNavigate} from "react-router-dom";
-import EstadoService from "../../services/EstadoService.js";
-import MunicipiosService from "../../services/MunicipiosService.js";
+import {useEffect, useState} from "react";
 import Checkbox from "@mui/material/Checkbox";
-import {CheckBox} from "@mui/icons-material";
-import {MenuItem} from "react-pro-sidebar";
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import {useDispatch} from "react-redux";
+import {setLoader} from "../../store/slices/generalSlice.js";
+import {createFraccion, updateFraccion} from "../../store/slices/fraccionSlice.js";
 
-const FraccionForm = () => {
+const initialValues = {
+    lote:"",
+    numeroCatastral:"",
+    finca:"",
+    tablaje:"",
+    colonia:"",
+    folioElectronico:"",
+    superficieTerreno:"",
+    superficieConstruccion:"",
+    valorCatastral:"",
+    uso:"",
+    clase:"",
+    tipoColindancia:"",
+    colindanciaProyecto: false,
+    numeroParcela:"",
+};
+
+const FraccionForm = ({proyectoId, fraccion}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const navigate = useNavigate();
-    const [openLoader, setOpenLoader] = useState(false);
+    const [formState, setFormState] = useState(initialValues);
+    const dispatch = useDispatch();
+    const [esEditar, setEsEditar] = useState(false);
+
     const tiposColindancias = ["PARCELA", "VIALIDAD", "LOTE"];
-    const [tipoColSeleccionado, setTipoColSeleccionado] = useState("");
+    const [tipoColSeleccionado, setTipoColSeleccionado] = useState(null);
 
     useEffect(() => {
-        /*const obtenerEstados = () => {
-            EstadoService.getNombreEstados().then((response) => {
-                setEstados(response);
-            });
-        };
-        obtenerEstados();*/
-    }, []);
+        if(fraccion){
+            console.log("fraccionForm: ", fraccion);
+            setEsEditar(true);
+            setFormState(fraccion);
+            setTipoColSeleccionado(fraccion.tipoColindancia);
+        }
+    }, [fraccion]);
 
     useEffect(() => {
+        console.log("form EsEditar: " + esEditar + ", formState: ", formState);
+    }, [esEditar]);
 
+    const handleFormSubmit = (values, actions) => {
+        const actionSubmit = esEditar ? updateFraccion : createFraccion;
+        if(!esEditar){
+            values.proyectoId = proyectoId;
+        }
+        console.log("esEditar: " + esEditar + ", fraccionRequest: ", values);
 
-    }, []);
-
-    const handleFormSubmit = (values) => {
-        console.log("crear proyecto: ", values);
-        /*setOpenLoader(true);
-        ProyectoService.addProyecto(values)
-            .then((response) => {
-                if (response.data) {
-                    console.log("Se creó el proyecto: ", response.data);
-                }
-                setOpenLoader(false);
-                navigate("/proyectos");
+        dispatch(setLoader(true));
+        dispatch(actionSubmit(values)).then(() => {
+            dispatch(setLoader(false));
+            console.log("initialValues: ", initialValues);
+            handleReset();
+            withReactContent(Swal).fire({
+                title: "Se guardó correctamente",
+                icon: "success"
             })
-            .catch((error) => {
-                console.log("Error: ", error);
-                setOpenLoader(false);
-            });
-
-         */
-
+        })
     };
 
+    const handleReset = () => {
+        console.log("cancelar form");
+        setFormState(initialValues);
+        setEsEditar(false);
+        setTipoColSeleccionado(null);
+    }
+
     return (
-        <Box m="20px">
-            <Backdrop
-                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                open={openLoader}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
+        <Box>
             <Header subtitle="Nueva Fracción"/>
             <Formik
                 onSubmit={handleFormSubmit}
-                initialValues={initialValues}
+                initialValues={ formState || initialValues}
                 validationSchema={checkoutSchema}
+                enableReinitialize
             >
                 {({
                       values,
@@ -102,13 +117,13 @@ const FraccionForm = () => {
                                 fullWidth
                                 variant="filled"
                                 type="text"
-                                label="Fracción"
+                                label="Lote"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
-                                value={values.fraccion}
-                                name="fraccion"
-                                error={!!touched.fraccion && !!errors.fraccion}
-                                helperText={touched.fraccion && errors.fraccion}
+                                value={values.lote}
+                                name="lote"
+                                error={!!touched.lote && !!errors.lote}
+                                helperText={touched.lote && errors.lote}
                                 color="secondary"
                                 sx={{ gridColumn: "span 2" }}
                             />
@@ -267,16 +282,13 @@ const FraccionForm = () => {
                                 name="tipoColindancia"
                                 options={tiposColindancias}
                                 getOptionLabel={option => option}
-                                inputValue={tipoColSeleccionado}
+                                value={tipoColSeleccionado}
                                 sx={{ gridColumn: "span 2" }}
                                 onChange={(e, value) => {
                                     setFieldValue(
-                                        "tipoColindancia",
-                                        value !== null ? value : initialValues.tipoColindancia
+                                        "tipoColindancia", value !== null ? value : initialValues.tipoColindancia
                                     );
-
-                                    setTipoColSeleccionado(value !== null ? value : initialValues.tipoColindancia);
-
+                                    setTipoColSeleccionado(value);
                                 }}
                                 renderInput={params => (
                                     <TextField
@@ -324,7 +336,12 @@ const FraccionForm = () => {
 
 
                         </Box>
-                        <Box display="flex" justifyContent="end" mt="20px">
+                        <Box display="flex" justifyContent="end" mt="20px" cellSpacing={2}>
+                            {esEditar && <Button color="warning" variant="contained" onClick={() => {
+                                handleReset()
+                            }}>
+                                Cancelar
+                            </Button>}&nbsp;&nbsp;
                             <Button type="submit" color="secondary" variant="contained">
                                 Guardar
                             </Button>
@@ -338,46 +355,22 @@ const FraccionForm = () => {
 
 
 const checkoutSchema = yup.object().shape({
-    //id:yup.string().required("required"),
-    fraccion: yup.number().required("required"),
+    lote: yup.number().required("required"),
     numeroCatastral: yup.number().required("required"),
     finca: yup.string().required("required"),
-    tablaje: yup.string().required("required"),
+    tablaje: yup.number().required("required"),
     colonia: yup.string().required("required"),
-    folioElectronico: yup.string().required("required"),
+    folioElectronico: yup.number().required("required"),
     superficieTerreno: yup.number().required("required"),
     superficieConstruccion: yup.number().required("required"),
     valorCatastral: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
-    //proyectoId: yup.number().required("required"),
-    //cotas: yup.string().required("required"),
     tipoColindancia: yup.string().required("required"),
     colindanciaProyecto: yup.bool().required("required"),
     numeroParcela: yup.number().required("required"),
-    //descripcion: yup.string().required("required")
 
 });
-const initialValues = {
-    //"id":"",
-    fraccion:"",
-    numeroCatastral:"",
-    finca:"",
-    tablaje:"",
-    colonia:"",
-    folioElectronico:"",
-    superficieTerreno:"",
-    superficieConstruccion:"",
-    valorCatastral:"",
-    uso:"",
-    clase:"",
-    //proyecto:"",
-    //proyectoId:"",
-    //cotas:"",
-    tipoColindancia:"",
-    colindanciaProyecto: false,
-    numeroParcela:"",
-    //descripcion:""
-};
+
 
 export default FraccionForm;

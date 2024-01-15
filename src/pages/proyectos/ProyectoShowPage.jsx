@@ -1,16 +1,11 @@
 import {
-    Backdrop,
     Box,
-    Button,
-    CircularProgress, Divider, Grid,
+    Divider, Grid,
     Paper,
     Tab,
     Tabs,
-    tabsClasses,
-    TextField,
     useTheme
 } from "@mui/material";
-import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
@@ -18,18 +13,20 @@ import {tokens} from "../../theme.jsx";
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import ProyectoService from "../../services/ProyectoService.js";
-import FraccionForm from "../fraccion/FraccionForm.jsx";
-import FraccionTable from "../fraccion/FraccionTable.jsx";
 import ProyectoForm from "./ProyectoForm.jsx";
-import CotaForm from "../cotas/CotaForm.jsx";
-import CotaTable from "../cotas/CotaTable.jsx";
+import {setLoader} from "../../store/slices/generalSlice.js";
+import {useDispatch} from "react-redux";
+import ProyectoDocumentos from "./ProyectoDocumentos.jsx";
+import FraccionTab from "../fraccion/FraccionTab.jsx";
+import CotaTab from "../cotas/CotaTab.jsx";
 
 const ProyectoShowPage = () => {
     const { proyectoId } = useParams();
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [openLoader, setOpenLoader] = useState(false);
+    const dispatch = useDispatch();
+
     const [proyecto, setProyecto] = useState(null);
 
     const [currentTab, setCurrentTab] = useState(1);
@@ -40,34 +37,24 @@ const ProyectoShowPage = () => {
 
     useEffect(() => {
         console.log("proyectoId: ", proyectoId);
-        setOpenLoader(true);
-        ProyectoService.getProyecto(proyectoId)
+        dispatch(setLoader(true));
+        ProyectoService.getById(proyectoId)
             .then((response) => {
                 if (response.data) {
                     setProyecto(response.data);
                 }
-                setOpenLoader(false);
+                dispatch(setLoader(false));
             }).catch((error) => {
-            setOpenLoader(false);
+            dispatch(setLoader(false));
             console.log("Error: ", error);
         });
 
     }, []);
 
 
-
-    const handleFormSubmit = (values) => {
-        console.log(values);
-    };
-
     return (
         <Box m="20px">
-            <Backdrop
-                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                open={openLoader}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
+
             {proyecto && <Header title={proyecto.titulo} subtitle="Administre su proyecto"/>}
 
             <Paper sx={{
@@ -89,49 +76,34 @@ const ProyectoShowPage = () => {
                     <Tab value={1} label="Proyecto" />
                     <Tab value={2} label="Fracciones" />
                     <Tab value={3} label="Cotas" />
-                    <Tab value={4} label="Cotas Proyecto" />
+                    <Tab value={4} label="Genera Documentos" />
                 </Tabs>
                 <Divider />
 
-                <Box>
+                <Box mt="20px">
 
                     {currentTab === 1 && (
                         <Grid container spacing={2}>
                             <Grid item xs={12}>
-                                {proyecto && <ProyectoForm proyecto={proyecto}/>}
+                                {proyecto && <ProyectoForm proyecto={proyecto} esEditar/>}
                             </Grid>
                         </Grid>
                     )}
 
                     {currentTab === 2 && (
-                        <Grid container>
-                            <Grid item md={6}>
-                                <FraccionForm/>
-                            </Grid>
-                            <Grid item md={6}>
-                                <FraccionTable/>
-                            </Grid>
-                        </Grid>
+                        <FraccionTab proyectoId={proyectoId}></FraccionTab>
                     )}
 
                     {currentTab === 3 && (
+                        <CotaTab proyectoId={proyectoId} />
+                    )}
+
+                    {currentTab === 4 && (
                         <Grid container>
-                            <Grid item md={6}>
-                                <CotaForm/>
-                            </Grid>
-                            <Grid item md={6}>
-                                <CotaTable/>
-                            </Grid>
+                            <ProyectoDocumentos proyectoId={proyectoId}/>
                         </Grid>
                     )}
 
-                    {currentTab === 4 && (<h1>CONTENT TAB4</h1>)}
-
-                    {/*
-                    {currentTab === 'grupos-listas' && <GruposListasTab />}
-                    {currentTab === 'tipos-listas' && <TiposListasTab />}
-                    {currentTab === 'tipos-usuarios' && <TiposUsuariosTab />}
-                    */}
                 </Box>
             </Paper>
         </Box>

@@ -4,22 +4,23 @@ import Header from "../../components/Header";
 import {CreateNewFolderOutlined} from "@mui/icons-material";
 import ProyectoCard from "./ProyectoCard.jsx";
 import {Link} from "react-router-dom";
-import {useEffect, useState} from "react";
-import ProyectoService from "../../services/ProyectoService.js";
+import {useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {getAllProyectos} from "../../store/slices/proyectoSlice.js";
+import {getAllNamesEstados, setLoader} from "../../store/slices/generalSlice.js";
 
 const Proyectos = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [proyectos, setProyectos] = useState([]);
+    const dispatch = useDispatch();
+    const proyectos = useSelector(state => state.proyectos.proyectos);
 
     useEffect(() => {
-        ProyectoService.getProyectos({})
-            .then((response) => {
-                if (response.data) {
-                    setProyectos(response.data);
-                }
-            }).catch((error) => {
-            console.log("Error: ", error);
+        dispatch(setLoader(true));
+        dispatch(getAllNamesEstados());
+        dispatch(getAllProyectos()).then((resp) => {
+            console.log("getAllProyectos - cargaGeneral: ", resp)
+            dispatch(setLoader(false));
         });
     }, []);
 
