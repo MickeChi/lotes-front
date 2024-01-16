@@ -41,20 +41,27 @@ export default function ColindanciaTransList({onChange, colindanciasSelected}) {
 
     useEffect(() => {
         console.log("colindanciasSelected: ", colindanciasSelected);
-        if(colindanciasSelected.length > 0){
+        const inicialiceTransList = () =>{
             let checkedCols = fracciones.filter(f => {
                 let existId = colindanciasSelected.find(cs => cs === f.id);
                 return existId !== undefined;
             });
             console.log("colindancias Checked right: ", colindanciasSelected);
             if(checkedCols.length > 0){
-                //setChecked(checkedCols);
                 let initLeft = fracciones;
                 let leftCheck = intersection(checkedCols, initLeft);
                 setRight(leftCheck);
                 setLeft(not(initLeft, leftCheck));
                 setChecked(not(checkedCols, leftCheck));
             }
+        }
+
+        if(colindanciasSelected.length > 0){
+            inicialiceTransList();
+        }else{
+            setLeft(fracciones);
+            setRight([]);
+            setChecked([]);
         }
     }, [colindanciasSelected]);
 

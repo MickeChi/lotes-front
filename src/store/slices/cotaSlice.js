@@ -24,8 +24,8 @@ export const getAllCotas = createAsyncThunk(
 
 export const updateCota = createAsyncThunk(
     "cotas/update",
-    async ({ id, data }) => {
-        const res = await CotaService.update(id, data);
+    async (request) => {
+        const res = await CotaService.update(request);
         return res.data;
     }
 );

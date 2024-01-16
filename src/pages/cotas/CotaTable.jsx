@@ -3,7 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme.jsx";
 import Header from "../../components/Header";
 import {useDispatch, useSelector} from "react-redux";
-import {Edit, Visibility} from "@mui/icons-material";
+import {Edit, Visibility, AllOut} from "@mui/icons-material";
 import {useEffect} from "react";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {getAllCotas, setCotas} from "../../store/slices/cotaSlice.js";
@@ -68,6 +68,9 @@ const CotaTable = ({fraccionId, handleEditRow}) => {
                         <Button color="warning" title="editar" onClick={()=>{
                             onClikEdit(row);
                         }}><Edit/></Button>
+                        <Button color="secondary" title="Ver colindancias" onClick={()=>{
+                            onClikEdit(row);
+                        }}><Visibility/></Button>
                     </ButtonGroup>
                 );
             },

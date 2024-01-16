@@ -13,8 +13,11 @@ import {tokens} from "../../theme.jsx";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
-import {createCota, getAllCotas, setCotas} from "../../store/slices/cotaSlice.js";
+import {createCota, getAllCotas, setCotas, updateCota} from "../../store/slices/cotaSlice.js";
 import ColindanciaTransList from "./ColindanciaTransList.jsx";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
+import {createFraccion, updateFraccion} from "../../store/slices/fraccionSlice.js";
 
 const initialValues = {
     "orden": "",
@@ -32,7 +35,6 @@ const CotaForm = ({cota, handleFraccionSelect}) => {
     const [formState, setFormState] = useState(initialValues);
     const dispatch = useDispatch();
     const fracciones = useSelector(state => state.fracciones.fracciones);
-    const [fraccionTxtSelect, setFraccionTxtSelect] = useState("");
     const [fraccionSelect, setFraccionSelect] = useState(null);
     const [esEditar, setEsEditar] = useState(false);
 
@@ -64,30 +66,43 @@ const CotaForm = ({cota, handleFraccionSelect}) => {
 
     useEffect(() => {
         console.log("useEfect fraccionSelect: ", fraccionSelect);
+        handleReset();
         handleFraccionSelect(fraccionSelect);
     }, [fraccionSelect]);
 
     const handleFormSubmit = (values, actions) => {
-        console.log("crear cota: ", values);
         if(colindanciasIds.length === 0){
             setColindanciasError(true);
             return;
         }
-        values.colindanciasIds = colindanciasIds;
-        console.log("Enviando cota...: ", values);
-        //values.colindancias = colindancias;
-        //values.fraccionId = fraccio;
-        dispatch(setLoader(true));
-        dispatch(createCota(values)).then(() => {
+        console.log("Submit cota...: ", values);
+        const actionSubmit = esEditar ? updateCota : createCota;
+        const valuesRequest = {...values, colindanciasIds: colindanciasIds}
+        console.log("esEditar: " + esEditar + ", cotaRequest: ", valuesRequest);
 
+        dispatch(setLoader(true));
+        dispatch(actionSubmit(valuesRequest)).then(() => {
             dispatch(setLoader(false));
-            console.log("initialValues: ", initialValues);
-            actions.resetForm();
-            setFormState(initialValues);
-            //actions.setSubmitting(false);
-            //actions.resetForm({values: initialValues});
+            handleReset();
+            withReactContent(Swal).fire({
+                title: "Se guardó correctamente",
+                icon: "success"
+            })
+
         })
     };
+
+    const handleReset = () => {
+        console.log("Reset form initialValues: ", initialValues);
+        setFormState({...initialValues, fraccionId: (fraccionSelect ? fraccionSelect.id : "")});
+        setEsEditar(false);
+        setTipoLineaSelect(null);
+        setOrientacionSelect(null);
+        setColindanciasError(false);
+        setColindanciasIds([]);
+        setColindsIdsSelect([]);
+    }
+
 
     const colindanciasHandler = (colindanciasSelect) => {
         console.log("colindanciasHandler: ", colindanciasSelect)
@@ -102,10 +117,11 @@ const CotaForm = ({cota, handleFraccionSelect}) => {
         <Box>
             <Header subtitle="Nueva Cota"/>
             <Formik
-                enableReinitialize
+
                 onSubmit={handleFormSubmit}
                 initialValues={formState || initialValues}
                 validationSchema={checkoutSchema}
+                enableReinitialize
             >
                 {({
                       values,
@@ -136,9 +152,6 @@ const CotaForm = ({cota, handleFraccionSelect}) => {
                                     setFieldValue(
                                         "fraccionId", value !== null ? value.id : initialValues.fraccionId
                                     );
-                                    //const fracSel = value !== null ? `Lote: ${value.lote} - Número catastral: ${value.numeroCatastral}` : "";
-                                    //console.log("autocompleteSelect: ", fracSel);
-                                    //setFraccionTxtSelect(fracSel);
                                     setFraccionSelect(value);
                                 }}
                                 renderInput={params => (
@@ -265,7 +278,12 @@ const CotaForm = ({cota, handleFraccionSelect}) => {
                                     colindancia</FormHelperText>
                             </FormControl>}
                         </Box>
-                        <Box display="flex" justifyContent="end" mt="20px">
+                        <Box display="flex" justifyContent="end" mt="20px" cellSpacing={2}>
+                            {esEditar && <Button color="warning" variant="contained" onClick={() => {
+                                handleReset()
+                            }}>
+                                Cancelar
+                            </Button>}&nbsp;&nbsp;
                             <Button type="submit" color="secondary" variant="contained">
                                 Guardar
                             </Button>
