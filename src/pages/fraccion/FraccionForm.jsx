@@ -31,46 +31,44 @@ const initialValues = {
     valorCatastral:"",
     uso:"",
     clase:"",
-    tipoColindancia:"",
+    tipoColindancia:"PARCELA",
     colindanciaProyecto: false,
     numeroParcela:"",
 };
 
-const FraccionForm = ({proyectoId, fraccion}) => {
+const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [formState, setFormState] = useState(initialValues);
+    const [formState, setFormState] = useState(fraccion || initialValues);
     const dispatch = useDispatch();
     const [esEditar, setEsEditar] = useState(false);
 
     const tiposColindancias = ["PARCELA", "VIALIDAD", "LOTE"];
     const [tipoColSeleccionado, setTipoColSeleccionado] = useState(null);
 
+    const usos = ["HABITACIONAL", "COMERCIAL", "COMUN"];
+    const [usoSeleccionado, setUsoSeleccionado] = useState(null);
+
     useEffect(() => {
         if(fraccion){
             console.log("fraccionForm: ", fraccion);
             setEsEditar(true);
             setFormState(fraccion);
-            setTipoColSeleccionado(fraccion.tipoColindancia);
+            setUsoSeleccionado(fraccion.uso);
         }
     }, [fraccion]);
 
-    useEffect(() => {
-        console.log("form EsEditar: " + esEditar + ", formState: ", formState);
-    }, [esEditar]);
-
     const handleFormSubmit = (values, actions) => {
         const actionSubmit = esEditar ? updateFraccion : createFraccion;
-        if(!esEditar){
-            values.proyectoId = proyectoId;
-        }
-        console.log("esEditar: " + esEditar + ", fraccionRequest: ", values);
+        const valuesRequest = {...values, proyectoId: proyectoId}
+
+        console.log("esEditar: " + esEditar + ", fraccionRequest: ", valuesRequest);
 
         dispatch(setLoader(true));
-        dispatch(actionSubmit(values)).then(() => {
+        dispatch(actionSubmit(valuesRequest)).then(() => {
             dispatch(setLoader(false));
-            console.log("initialValues: ", initialValues);
+            actions.resetForm();
             handleReset();
             withReactContent(Swal).fire({
                 title: "Se guardó correctamente",
@@ -80,10 +78,12 @@ const FraccionForm = ({proyectoId, fraccion}) => {
     };
 
     const handleReset = () => {
-        console.log("cancelar form");
+        console.log("Reset form initialValues: ", initialValues);
         setFormState(initialValues);
         setEsEditar(false);
         setTipoColSeleccionado(null);
+        setUsoSeleccionado(null);
+        handleEditRow(null);
     }
 
     return (
@@ -247,7 +247,37 @@ const FraccionForm = ({proyectoId, fraccion}) => {
                                 sx={{ gridColumn: "span 2" }}
                             />
 
-                            <TextField
+                            <Autocomplete
+                                id="uso"
+                                name="uso"
+                                options={usos}
+                                getOptionLabel={option => option}
+                                value={usoSeleccionado}
+                                sx={{ gridColumn: "span 2" }}
+                                onChange={(e, value) => {
+                                    setFieldValue(
+                                        "uso", value !== null ? value : initialValues.uso
+                                    );
+                                    setUsoSeleccionado(value);
+                                }}
+                                renderInput={params => (
+                                    <TextField
+                                        label="Seleccione uso"
+                                        fullWidth
+                                        variant="filled"
+                                        type="text"
+                                        name="uso"
+                                        color="secondary"
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        error={!!touched.uso && !!errors.uso}
+                                        helperText={touched.uso && errors.uso}
+                                        {...params}
+                                    />
+                                )}
+                            />
+
+                           {/* <TextField
                                 fullWidth
                                 variant="filled"
                                 type="text"
@@ -260,7 +290,7 @@ const FraccionForm = ({proyectoId, fraccion}) => {
                                 error={!!touched.uso && !!errors.uso}
                                 helperText={touched.uso && errors.uso}
                                 sx={{ gridColumn: "span 2" }}
-                            />
+                            />*/}
 
                             <TextField
                                 fullWidth
@@ -277,7 +307,7 @@ const FraccionForm = ({proyectoId, fraccion}) => {
                                 sx={{ gridColumn: "span 2" }}
                             />
 
-                            <Autocomplete
+                            {/*<Autocomplete
                                 id="tipoColindancia"
                                 name="tipoColindancia"
                                 options={tiposColindancias}
@@ -305,17 +335,17 @@ const FraccionForm = ({proyectoId, fraccion}) => {
                                         {...params}
                                     />
                                 )}
-                            />
+                            />*/}
 
 
-                            <FormControlLabel control={
+                            {/*<FormControlLabel control={
                                 <Checkbox color="secondary" checked={values.colindanciaProyecto} />
                             }
                                               name="colindanciaProyecto"
                                               onChange={handleChange}
                                               label="Colindancia proyecto"
                                               sx={{ gridColumn: "span 2" }}/>
-
+*/}
 
 
                             <TextField
@@ -357,18 +387,18 @@ const FraccionForm = ({proyectoId, fraccion}) => {
 const checkoutSchema = yup.object().shape({
     lote: yup.number().required("required"),
     numeroCatastral: yup.number().required("required"),
-    finca: yup.string().required("required"),
+    //finca: yup.string().required("required"),
     tablaje: yup.number().required("required"),
-    colonia: yup.string().required("required"),
-    folioElectronico: yup.number().required("required"),
+    //colonia: yup.string().required("required"),
+    //folioElectronico: yup.number().required("required"),
     superficieTerreno: yup.number().required("required"),
     superficieConstruccion: yup.number().required("required"),
-    valorCatastral: yup.number().required("required"),
+    //valorCatastral: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
-    tipoColindancia: yup.string().required("required"),
-    colindanciaProyecto: yup.bool().required("required"),
-    numeroParcela: yup.number().required("required"),
+    //tipoColindancia: yup.string().required("required"),
+    //colindanciaProyecto: yup.bool().required("required"),
+    //numeroParcela: yup.number().required("required"),
 
 });
 

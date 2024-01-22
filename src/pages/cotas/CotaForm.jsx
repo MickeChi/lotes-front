@@ -18,6 +18,8 @@ import ColindanciaTransList from "./ColindanciaTransList.jsx";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import {createFraccion, updateFraccion} from "../../store/slices/fraccionSlice.js";
+import Checkbox from "@mui/material/Checkbox";
+import {CheckBox, CheckBoxOutlineBlank} from "@mui/icons-material";
 
 const initialValues = {
     "orden": "",
@@ -28,61 +30,56 @@ const initialValues = {
     "colindanciasIds": []
 }
 
-const CotaForm = ({cota, handleFraccionSelect}) => {
+const icon = <CheckBoxOutlineBlank fontSize="small" />;
+const checkedIcon = <CheckBox fontSize="small" />;
+
+const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [formState, setFormState] = useState(initialValues);
+    const [formState, setFormState] = useState(cota || initialValues);
     const dispatch = useDispatch();
     const fracciones = useSelector(state => state.fracciones.fracciones);
     const [fraccionSelect, setFraccionSelect] = useState(null);
     const [esEditar, setEsEditar] = useState(false);
 
-
     const tiposLineas = ["RECTA", "CURVA"];
     const [tipoLineaSelect, setTipoLineaSelect] = useState(null);
-
     const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
     const [orientacionSelect, setOrientacionSelect] = useState(null);
-
-    const [colindanciasIds, setColindanciasIds] = useState([]);
-    const [colindanciasError, setColindanciasError] = useState(false);
-
-    const [colindsIdsSelect, setColindsIdsSelect] = useState([]);
-
+    const [colindanciasSelect, setColindanciasSelect] = useState([]);
 
     useEffect(() => {
         if(cota){
-            console.log("cotaForm: ", cota);
             setEsEditar(true);
             setFormState(cota);
             let fraccionSel = fracciones.find(f => f.id === cota.fraccionId);
             setFraccionSelect(fraccionSel === undefined ? null : fraccionSel);
             setOrientacionSelect(cota.orientacion);
             setTipoLineaSelect(cota.tipoLinea);
-            setColindsIdsSelect(cota.colindanciasIds);
+
+            let colsSelect = fracciones.filter(f => {
+                let existId = cota.colindanciasIds.find(cs => cs === f.id);
+                return existId !== undefined;
+            });
+            setColindanciasSelect(colsSelect);
         }
     }, [cota]);
 
     useEffect(() => {
-        console.log("useEfect fraccionSelect: ", fraccionSelect);
         handleReset();
         handleFraccionSelect(fraccionSelect);
     }, [fraccionSelect]);
 
     const handleFormSubmit = (values, actions) => {
-        if(colindanciasIds.length === 0){
-            setColindanciasError(true);
-            return;
-        }
-        console.log("Submit cota...: ", values);
         const actionSubmit = esEditar ? updateCota : createCota;
-        const valuesRequest = {...values, colindanciasIds: colindanciasIds}
+        const valuesRequest = {...values}
         console.log("esEditar: " + esEditar + ", cotaRequest: ", valuesRequest);
 
         dispatch(setLoader(true));
         dispatch(actionSubmit(valuesRequest)).then(() => {
             dispatch(setLoader(false));
+            actions.resetForm();
             handleReset();
             withReactContent(Swal).fire({
                 title: "Se guardó correctamente",
@@ -98,20 +95,10 @@ const CotaForm = ({cota, handleFraccionSelect}) => {
         setEsEditar(false);
         setTipoLineaSelect(null);
         setOrientacionSelect(null);
-        setColindanciasError(false);
-        setColindanciasIds([]);
-        setColindsIdsSelect([]);
+        setColindanciasSelect([]);
+        handleEditRow(null);
     }
 
-
-    const colindanciasHandler = (colindanciasSelect) => {
-        console.log("colindanciasHandler: ", colindanciasSelect)
-        let colindanciasIds = colindanciasSelect.map(c => c.id);
-        if(colindanciasIds.length > 0){
-            setColindanciasError(false);
-        }
-        setColindanciasIds(colindanciasIds);
-    }
 
     return (
         <Box>
@@ -119,7 +106,7 @@ const CotaForm = ({cota, handleFraccionSelect}) => {
             <Formik
 
                 onSubmit={handleFormSubmit}
-                initialValues={formState || initialValues}
+                initialValues={formState}
                 validationSchema={checkoutSchema}
                 enableReinitialize
             >
@@ -199,8 +186,6 @@ const CotaForm = ({cota, handleFraccionSelect}) => {
                                         "tipoLinea", value !== null ? value : initialValues.tipoLinea
                                     );
                                     setTipoLineaSelect(value);
-                                    //setTipoLineaSelect(value !== null ? value : initialValues.tipoLinea);
-
                                 }}
                                 renderInput={params => (
                                     <TextField
@@ -267,16 +252,55 @@ const CotaForm = ({cota, handleFraccionSelect}) => {
                                 helperText={touched.medida && errors.medida}
                                 sx={{ gridColumn: "span 2" }}
                             />
-                        </Box>
-                        <Box mt="20px">
-                            <Typography variant="h6"  sx={{ mb: "15px" }}>
-                                Seleccione las colindancias
-                            </Typography>
-                            <ColindanciaTransList onChange={colindanciasHandler} colindanciasSelected={colindsIdsSelect}/>
-                            {colindanciasError && <FormControl error variant="standard">
-                                <FormHelperText id="colindanciaTransList">Debe Seleccionar al menos una
-                                    colindancia</FormHelperText>
-                            </FormControl>}
+
+
+                            <Autocomplete
+                                multiple
+                                disableCloseOnSelect
+                                id="colindanciasIds"
+                                name="colindanciasIds"
+                                options={fracciones}
+                                getOptionLabel={option => `Lote: ${option.lote} - Número catastral: ${option.numeroCatastral}`}
+                                value={colindanciasSelect}
+                                sx={{ gridColumn: "span 4" }}
+                                onChange={(e, value) => {
+                                    let colIds = value !== null ? (value.map(v=> v.id)) : initialValues.colindanciasIds
+                                    console.log("colIds: ", colIds);
+                                    setFieldValue(
+                                        "colindanciasIds", colIds
+                                    );
+                                    setColindanciasSelect(value);
+                                }}
+                                renderOption={(props, option, { selected }) => (
+                                    <li {...props}>
+                                        <Checkbox
+                                            color="secondary"
+                                            icon={icon}
+                                            checkedIcon={checkedIcon}
+                                            style={{ marginRight: 8 }}
+                                            checked={selected}
+                                        />
+                                        {`Lote: ${option.lote} - Número catastral: ${option.numeroCatastral}`}
+                                    </li>
+                                )}
+                                renderInput={params => (
+                                    <TextField
+                                        label="Seleccione las colindancias"
+                                        fullWidth
+                                        variant="filled"
+                                        type="text"
+                                        name="colindanciasIds"
+                                        color="secondary"
+                                        placeholder="Colindancias"
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        error={!!touched.colindanciasIds && !!errors.colindanciasIds}
+                                        helperText={touched.colindanciasIds && errors.colindanciasIds}
+                                        {...params}
+                                    />
+                                )}
+                            />
+
                         </Box>
                         <Box display="flex" justifyContent="end" mt="20px" cellSpacing={2}>
                             {esEditar && <Button color="warning" variant="contained" onClick={() => {
@@ -303,7 +327,7 @@ const checkoutSchema = yup.object().shape({
     "orientacion": yup.string().required("required"),
     "medida": yup.number().required("required"),
     "fraccionId": yup.number().required("required"),
-    //"colindanciasIds": yup.array().min(1, "at least 1").required("required"),
+    "colindanciasIds": yup.array().min(1, "at least 1").required("required"),
 });
 
 

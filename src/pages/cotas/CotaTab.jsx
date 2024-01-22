@@ -5,15 +5,32 @@ import {tokens} from "../../theme.jsx";
 import {useNavigate} from "react-router-dom";
 import CotaForm from "./CotaForm.jsx";
 import CotaTable from "./CotaTable.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {setLoader} from "../../store/slices/generalSlice.js";
+import {getAllFracciones} from "../../store/slices/fraccionSlice.js";
+import {useDispatch, useSelector} from "react-redux";
 
 const CotaTab = ({proyectoId}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [fraccionIdSelect, setFraccionIdSelect] = useState(null);
     const [cotaUpdate, setCotaUpdate] = useState(null);
+    const fracciones = useSelector(state => state.fracciones.fracciones);
+
+
+    useEffect(() => {
+        if(fracciones.length === 0){
+            console.log("proyectoId: ", proyectoId);
+            dispatch(setLoader(true));
+            dispatch(getAllFracciones({proyectoId: proyectoId}))
+                .then(resp => {
+                    dispatch(setLoader(false));
+                });
+        }
+    }, [fracciones]);
 
     const handleFraccionSelect = (fraccionSelect) => {
         console.log("handleFraccionSelect: ", fraccionSelect);
@@ -28,7 +45,7 @@ const CotaTab = ({proyectoId}) => {
     return (
         <Grid container spacing={3}>
             <Grid item md={5}>
-                <CotaForm handleFraccionSelect={handleFraccionSelect} cota={cotaUpdate}/>
+                <CotaForm handleFraccionSelect={handleFraccionSelect} cota={cotaUpdate} handleEditRow={handlerEditCota}/>
             </Grid>
             <Grid item md={7}>
                 <CotaTable fraccionId={fraccionIdSelect} handleEditRow={handlerEditCota}/>

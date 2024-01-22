@@ -21,6 +21,7 @@ const initialValues = {
     titulo: "",
     estado: "",
     municipio: "",
+    localidad: "",
     subtotal: "",
     totalFracciones: "",
     uso: "",
@@ -39,6 +40,20 @@ const ProyectoForm = ({esEditar, proyecto}) => {
     const estados = useSelector(state => state.general.estados);
     const municipios = useSelector(state => state.general.municipios);
     const [contCargaMunicipio, setContCargaMunicipio] = useState(1);
+
+    const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
+    const [puntoPartidaSelect, setPuntoPartidaSelect] = useState(null);
+
+    const usos = ["HABITACIONAL", "COMERCIAL", "COMUN"];
+    const [usoSeleccionado, setUsoSeleccionado] = useState(null);
+
+    useEffect(() => {
+        if(proyecto){
+            setPuntoPartidaSelect(proyecto.puntoPartida);
+            setUsoSeleccionado(proyecto.uso);
+        }
+
+    }, [proyecto]);
 
     useEffect(() => {
         if(estados.length === 0){
@@ -190,6 +205,20 @@ const ProyectoForm = ({esEditar, proyecto}) => {
                             )}
                         />
 
+                        <TextField
+                            fullWidth
+                            variant="filled"
+                            type="text"
+                            label="Localidad"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            value={values.localidad}
+                            name="localidad"
+                            color="secondary"
+                            error={!!touched.localidad && !!errors.localidad}
+                            helperText={touched.localidad && errors.localidad}
+                            sx={{ gridColumn: "span 2" }}
+                        />
 
                         <TextField
                             fullWidth
@@ -220,7 +249,37 @@ const ProyectoForm = ({esEditar, proyecto}) => {
                             sx={{ gridColumn: "span 2" }}
                         />
 
-                        <TextField
+                        <Autocomplete
+                            id="uso"
+                            name="uso"
+                            options={usos}
+                            getOptionLabel={option => option}
+                            value={usoSeleccionado}
+                            sx={{ gridColumn: "span 2" }}
+                            onChange={(e, value) => {
+                                setFieldValue(
+                                    "uso", value !== null ? value : initialValues.uso
+                                );
+                                setUsoSeleccionado(value);
+                            }}
+                            renderInput={params => (
+                                <TextField
+                                    label="Seleccione uso"
+                                    fullWidth
+                                    variant="filled"
+                                    type="text"
+                                    name="uso"
+                                    color="secondary"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    error={!!touched.uso && !!errors.uso}
+                                    helperText={touched.uso && errors.uso}
+                                    {...params}
+                                />
+                            )}
+                        />
+
+                        {/*<TextField
                             fullWidth
                             variant="filled"
                             type="text"
@@ -233,7 +292,7 @@ const ProyectoForm = ({esEditar, proyecto}) => {
                             error={!!touched.uso && !!errors.uso}
                             helperText={touched.uso && errors.uso}
                             sx={{ gridColumn: "span 1" }}
-                        />
+                        />*/}
 
                         <TextField
                             fullWidth
@@ -250,7 +309,37 @@ const ProyectoForm = ({esEditar, proyecto}) => {
                             sx={{ gridColumn: "span 1" }}
                         />
 
-                        <TextField
+                        <Autocomplete
+                            id="puntoPartida"
+                            name="puntoPartida"
+                            options={orientaciones}
+                            getOptionLabel={option => option}
+                            value={puntoPartidaSelect}
+                            sx={{ gridColumn: "span 2" }}
+                            onChange={(e, value) => {
+                                setFieldValue(
+                                    "puntoPartida", value !== null ? value : initialValues.puntoPartida
+                                );
+                                setPuntoPartidaSelect(value);
+                            }}
+                            renderInput={params => (
+                                <TextField
+                                    label="Seleccione el punto de partida"
+                                    fullWidth
+                                    variant="filled"
+                                    type="text"
+                                    name="puntoPartida"
+                                    color="secondary"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    error={!!touched.puntoPartida && !!errors.puntoPartida}
+                                    helperText={touched.puntoPartida && errors.puntoPartida}
+                                    {...params}
+                                />
+                            )}
+                        />
+
+                       {/* <TextField
                             fullWidth
                             variant="filled"
                             type="text"
@@ -263,7 +352,7 @@ const ProyectoForm = ({esEditar, proyecto}) => {
                             error={!!touched.puntoPartida && !!errors.puntoPartida}
                             helperText={touched.puntoPartida && errors.puntoPartida}
                             sx={{ gridColumn: "span 1" }}
-                        />
+                        />*/}
 
                     </Box>
                     <Box display="flex" justifyContent="end" mt="20px">
