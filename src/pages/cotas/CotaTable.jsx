@@ -64,13 +64,13 @@ const CotaTable = ({fraccionId, handleEditRow}) => {
             flex: 1,
             renderCell: ({ row }) => {
                 return (
-                    <ButtonGroup variant="contained"  aria-label="outlined button group">
+                    <ButtonGroup size="small" variant="contained"  aria-label="outlined button group">
                         <Button color="warning" title="editar" onClick={()=>{
                             onClikEdit(row);
                         }}><Edit/></Button>
-                        <Button color="secondary" title="Ver colindancias" onClick={()=>{
+                        {/*<Button color="secondary" title="Ver colindancias" onClick={()=>{
                             onClikEdit(row);
-                        }}><Visibility/></Button>
+                        }}><Visibility/></Button>*/}
                     </ButtonGroup>
                 );
             },

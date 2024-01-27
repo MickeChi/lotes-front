@@ -2,7 +2,7 @@ import {Box, Button, ButtonGroup, useTheme} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme.jsx";
 import Header from "../../components/Header";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {getAllFracciones} from "../../store/slices/fraccionSlice.js";
@@ -13,6 +13,7 @@ const FraccionTable = ({proyectoId, handleEditRow}) => {
     const colors = tokens(theme.palette.mode);
     const dispatch = useDispatch();
     const fracciones = useSelector(state => state.fracciones.fracciones);
+    const [fraccionesTabla, setFraccionesTabla] = useState([]);
 
     useEffect(() => {
         console.log("proyectoId: ", proyectoId);
@@ -22,6 +23,14 @@ const FraccionTable = ({proyectoId, handleEditRow}) => {
                 dispatch(setLoader(false));
             })
     }, []);
+
+    useEffect(() => {
+        if(fracciones.length > 0){
+            let fraccTabla = fracciones.filter(f => !f.colindanciaProyecto);
+            setFraccionesTabla(fraccTabla);
+        }
+
+    }, [fracciones]);
 
     const columns = [
         {
@@ -120,7 +129,7 @@ const FraccionTable = ({proyectoId, handleEditRow}) => {
                     }
                 }}
             >
-                <DataGrid rows={fracciones} columns={columns} />
+                <DataGrid rows={fraccionesTabla} columns={columns} />
             </Box>
         </Box>
     );

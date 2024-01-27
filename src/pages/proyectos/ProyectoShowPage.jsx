@@ -51,6 +51,11 @@ const ProyectoShowPage = () => {
 
     }, []);
 
+    const handleEditProy = (proyEdit) => {
+        console.log("handlerEditProy: ", proyEdit);
+        setProyecto(proyEdit);
+    }
+
 
     return (
         <Box m="20px">
@@ -85,7 +90,7 @@ const ProyectoShowPage = () => {
                     {currentTab === 1 && (
                         <Grid container spacing={2}>
                             <Grid item xs={12}>
-                                {proyecto && <ProyectoForm proyecto={proyecto} esEditar/>}
+                                {proyecto && <ProyectoForm handleEditProy={handleEditProy} proyecto={proyecto} esEditar/>}
                             </Grid>
                         </Grid>
                     )}

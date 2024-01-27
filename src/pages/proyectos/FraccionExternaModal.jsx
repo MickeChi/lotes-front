@@ -1,48 +1,36 @@
 import {
     Autocomplete,
     Box,
-    Button, Card, CardActions, CardContent, FormControl, FormHelperText, Grid, Modal,
-    TextField, Typography,
+    Button, Card, CardActions, CardContent, Grid, Modal,
+    TextField,
     useTheme
 } from "@mui/material";
 import {Formik} from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import Header from "../../components/Header";
 import {tokens} from "../../theme.jsx";
 import {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {setLoader} from "../../store/slices/generalSlice.js";
-import {createCota, getAllCotas, setCotas, updateCota} from "../../store/slices/cotaSlice.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
-import {createFraccion, updateFraccion} from "../../store/slices/fraccionSlice.js";
-import Checkbox from "@mui/material/Checkbox";
-import {CheckBox, CheckBoxOutlineBlank} from "@mui/icons-material";
 import CardHeader from "@mui/material/CardHeader";
 
 const initialValues = {
+    "fraccionId": null,
+    "proyectoId": null,
+    "cotaId": null,
     "orden": "",
     "tipoLinea": "",
     "orientacion": "",
     "medida": "",
-    "fraccionId": "",
-    "descripcion": ""
+    "descripcion": "",
+    "colindanciaProyecto": true
 }
 
-
-
-const icon = <CheckBoxOutlineBlank fontSize="small" />;
-const checkedIcon = <CheckBox fontSize="small" />;
-
-const ProyectoCotaModal = ({cota, handleEditRow, openModal, onCloseModal, handleSubmitModal}) => {
+const FraccionExternaModal = ({fraccionExt, handleEditRow, openModal, onCloseModal, handleSubmitModal}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [formState, setFormState] = useState(cota || initialValues);
-    const dispatch = useDispatch();
-    const fracciones = useSelector(state => state.fracciones.fracciones);
-    const [fraccionSelect, setFraccionSelect] = useState(null);
+    const [formState, setFormState] = useState(fraccionExt || initialValues);
     const [esEditar, setEsEditar] = useState(false);
 
     const style = {
@@ -61,37 +49,35 @@ const ProyectoCotaModal = ({cota, handleEditRow, openModal, onCloseModal, handle
     const [tipoLineaSelect, setTipoLineaSelect] = useState(null);
     const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
     const [orientacionSelect, setOrientacionSelect] = useState(null);
-    const [colindanciasSelect, setColindanciasSelect] = useState([]);
 
     useEffect(() => {
-        if(cota){
+        console.log("useEffect fraccionModal: ", openModal)
+        return () => {
+            console.log("callback fraccionModal: ", openModal);
+            if(openModal){
+                console.log("RESET fraccionModal: ", openModal);
+                handleReset();
+            }
+        };
+    }, [openModal]);
+
+    useEffect(() => {
+        if(fraccionExt){
             setEsEditar(true);
-            setFormState(cota);
-            let fraccionSel = fracciones.find(f => f.id === cota.fraccionId);
-            setFraccionSelect(fraccionSel === undefined ? null : fraccionSel);
-            setOrientacionSelect(cota.orientacion);
-            setTipoLineaSelect(cota.tipoLinea);
-
-            let colsSelect = fracciones.filter(f => {
-                let existId = cota.colindanciasIds.find(cs => cs === f.id);
-                return existId !== undefined;
-            });
-            setColindanciasSelect(colsSelect);
+            setFormState(fraccionExt);
+            setOrientacionSelect(fraccionExt.orientacion);
+            setTipoLineaSelect(fraccionExt.tipoLinea);
         }
-    }, [cota]);
-
-    useEffect(() => {
-        handleReset();
-    }, [fraccionSelect]);
+    }, [fraccionExt]);
 
     const handleFormSubmit = (values, actions) => {
-        const actionSubmit = esEditar ? updateCota : createCota;
-        const id = values.fraccionId !== "" ? values.fraccionId : crypto.randomUUID();
-        const valuesRequest = {...values, fraccionId: id};
-        console.log("esEditar: " + esEditar + ", cotaRequest: ", valuesRequest);
+        const esCreate = values.esCreate === undefined ? true : values.esCreate;
+        const id = values.fraccionId !== null ? values.fraccionId : crypto.randomUUID();
+        const valuesRequest = {...values, fraccionId: id, esCreate: esCreate};
+        console.log("esEditar: " + esEditar + ", fraccionExtRequest: ", valuesRequest);
         handleSubmitModal(valuesRequest);
         actions.resetForm();
-        handleReset();
+        onCloseModal(false);
         withReactContent(Swal).fire({
             title: "Se agregó correctamente",
             icon: "success"
@@ -100,19 +86,14 @@ const ProyectoCotaModal = ({cota, handleEditRow, openModal, onCloseModal, handle
 
     const handleReset = () => {
         console.log("Reset form initialValues: ", initialValues);
-        //setFormState({...initialValues, fraccionId: (fraccionSelect ? fraccionSelect.id : "")});
         setFormState(initialValues);
         setEsEditar(false);
         setTipoLineaSelect(null);
         setOrientacionSelect(null);
-        //setColindanciasSelect([]);
         handleEditRow(null);
-        onCloseModal(false)
     }
 
     const handleCloseModal= () => onCloseModal(false);
-
-
 
     return (
         <div>
@@ -147,7 +128,7 @@ const ProyectoCotaModal = ({cota, handleEditRow, openModal, onCloseModal, handle
                                     <CardHeader sx={{
                                         borderBottom: '1px solid #555'
                                     }}
-                                        title="Agregar cota proyecto"
+                                        title="Agregar fraccionExt proyecto"
                                     />
                                     <CardContent>
                                         <Grid container spacing={3}>
@@ -230,8 +211,6 @@ const ProyectoCotaModal = ({cota, handleEditRow, openModal, onCloseModal, handle
                                                             "orientacion", value !== null ? value : initialValues.orientacion
                                                         );
                                                         setOrientacionSelect(value);
-                                                        //setOrientacionSelect(value !== null ? value : initialValues.orientacion);
-
                                                     }}
                                                     renderInput={params => (
                                                         <TextField
@@ -277,19 +256,16 @@ const ProyectoCotaModal = ({cota, handleEditRow, openModal, onCloseModal, handle
                                         borderTop: '1px solid #555'
                                     }}>
                                         {esEditar && <Button color="warning" variant="contained" onClick={() => {
-                                            handleReset()
+                                            onCloseModal(false);
                                         }}>
                                             Cancelar
                                         </Button>}&nbsp;&nbsp;
                                         <Button type="submit" color="secondary" variant="contained">
-                                            Agregar
+                                            { esEditar ? 'Actualizar' : 'Agregar'}
                                         </Button>
                                     </CardActions>
                                 </Card>
 
-                                {/*<Box display="flex" justifyContent="end" mt="20px" cellSpacing={2}>
-
-                                </Box>*/}
                             </form>
                         )}
                     </Formik>
@@ -300,7 +276,6 @@ const ProyectoCotaModal = ({cota, handleEditRow, openModal, onCloseModal, handle
         </div>
     );
 };
-
 
 const checkoutSchema = yup.object().shape({
     // "id": yup.string().required("required"),
@@ -313,4 +288,4 @@ const checkoutSchema = yup.object().shape({
 });
 
 
-export default ProyectoCotaModal;
+export default FraccionExternaModal;

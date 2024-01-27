@@ -51,11 +51,22 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
     const [usoSeleccionado, setUsoSeleccionado] = useState(null);
 
     useEffect(() => {
-        if(fraccion){
+        const generaFormStare = () =>{
             console.log("fraccionForm: ", fraccion);
+            const fraccionState = {...fraccion};
+            for(const key in fraccionState){
+                if(initialValues.hasOwnProperty(key) && (fraccionState[key] === null || fraccionState[key] === undefined)){
+                    fraccionState[key] = "";
+                }
+            }
+            console.log("fraccionState: ", fraccionState);
             setEsEditar(true);
-            setFormState(fraccion);
-            setUsoSeleccionado(fraccion.uso);
+            setFormState(fraccionState);
+            setUsoSeleccionado(fraccionState.uso);
+        }
+
+        if(fraccion){
+            generaFormStare();
         }
     }, [fraccion]);
 

@@ -8,44 +8,20 @@ import {useEffect, useState} from "react";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {getAllCotas, setCotas} from "../../store/slices/cotaSlice.js";
 import {Link} from "react-router-dom";
-import ProyectoCotaModal from "./ProyectoCotaModal.jsx";
+import FraccionExternaModal from "./FraccionExternaModal.jsx";
 import ModalDemo from "./ModalDemo.jsx";
 
-const ProyectoCotaTable = ({fraccionId, proyecto, onChange, cotasSelected}) => {
+const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const dispatch = useDispatch();
-    const cotas = useSelector(state => state.cotas.cotas);
-    const [openCotaModal, setOpenCotaModal] = useState(false);
-    const [cotaUpdate, setCotaUpdate] = useState(null);
-//   onChange={colindanciasHandler} colindanciasSelected={colindsIdsSelect}/>
-    const [cotasProyecto, setCotasProyecto] = useState([]);
+    //const dispatch = useDispatch();
+    //onChange={colindanciasHandler} colindanciasSelected={colindsIdsSelect}/>
+    const [fraccionesExtTable, setFraccionesExtTable] = useState([]);
     useEffect(() => {
-        console.log("cotasProyecto Change: ", cotasProyecto);
-        onChange(cotasProyecto);
+        console.log("fraccionesExternas Change: ", fraccionesExternas);
+        setFraccionesExtTable(fraccionesExternas);
 
-    }, [cotasProyecto]);
-
-
-    useEffect(() => {
-        const cargarCotas = ()=>{
-            dispatch(setLoader(true));
-            dispatch(getAllCotas({fraccionId: fraccionId})).then(resp => {
-                dispatch(setLoader(false));
-            })
-        }
-        if(fraccionId) {
-            cargarCotas();
-        }else{
-            dispatch(setCotas([]));
-        }
-
-    }, [fraccionId]);
-
-    useEffect(() => {
-        console.log("openCotaModal Change: ", openCotaModal);
-
-    }, [openCotaModal]);
+    }, [fraccionesExternas]);
 
     const columns = [
         {
@@ -82,52 +58,28 @@ const ProyectoCotaTable = ({fraccionId, proyecto, onChange, cotasSelected}) => {
             flex: 1,
             renderCell: ({ row }) => {
                 return (
-                    <ButtonGroup variant="contained"  aria-label="outlined button group">
+                    <ButtonGroup size="small" variant="contained"  aria-label="outlined button group">
                         <Button color="warning" title="editar" onClick={()=>{
-                            setCotaUpdate(row);
+                            onClikEdit(row);
                         }}><Edit/></Button>
-                        <Button color="secondary" title="Ver colindancias" onClick={()=>{
-                            setCotaUpdate(row);
-                        }}><Visibility/></Button>
+                        {/*<Button color="secondary" title="Ver colindancias" onClick={()=>{
+                            onClikEdit(row);
+                        }}><Visibility/></Button>*/}
                     </ButtonGroup>
                 );
             },
         },
     ];
 
-    const handleSubmitModal = (cotaForm) => {
-        console.log("handleSubmitModal", cotaForm);
-        setCotasProyecto([...cotasProyecto, cotaForm]);
-    }
-
-    const handlerEditCota = (cotaEdit) => {
-        console.log("handlerEditCota: ", cotaEdit);
-        setCotaUpdate(cotaEdit);
+    const onClikEdit = (fracExtEdit) => {
+        console.log("onClikEdit fracExtEdit", fracExtEdit)
+        handleEditRow(fracExtEdit);
     }
 
     return (
-        <Box>
-
-            <Box display="flex" justifyContent="space-between">
-                <Header subtitle="Cotas proyecto" />
-                <Box>
-                    <Button
-                        size="small"
-                        color="warning"
-                        variant="contained"
-                        onClick={() => {
-                            setOpenCotaModal(true);
-                        }}
-                    >
-                        <AddCircle sx={{ mr: "10px" }}/>
-                        Agregar cota
-                    </Button>
-                </Box>
-            </Box>
-
             <Box
                 //m="40px 0 0 0"
-                height="50vh"
+                height="40vh"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none",
@@ -157,17 +109,12 @@ const ProyectoCotaTable = ({fraccionId, proyecto, onChange, cotasSelected}) => {
                     }
                 }}
             >
-                <DataGrid rows={cotasProyecto} columns={columns} getRowId={(row) => row.fraccionId} />
-                <ProyectoCotaModal openModal={openCotaModal}
-                                   cota={cotaUpdate}
-                                   handleEditRow={() =>{}}
-                                   handleSubmitModal={handleSubmitModal}
-                                   onCloseModal={setOpenCotaModal}
+                <DataGrid rows={fraccionesExtTable}
+                          columns={columns}
+                          getRowId={(row) => row.fraccionId}
                 />
             </Box>
-
-        </Box>
     );
 };
 
-export default ProyectoCotaTable;
+export default FraccionExternaTable;

@@ -48,6 +48,27 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
     const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
     const [orientacionSelect, setOrientacionSelect] = useState(null);
     const [colindanciasSelect, setColindanciasSelect] = useState([]);
+    const [fraccionesForm, setFraccionesForm] = useState([]);
+    const [colindanciasForm, setColindanciasForm] = useState([]);
+
+
+    useEffect(() => {
+        if(fracciones.length > 0){
+            console.log("fracciones : ", fracciones);
+            let fraccsForm = fracciones.filter(f => !f.colindanciaProyecto);
+            console.log("fraccionesForm: ", fraccsForm);
+            setFraccionesForm(fraccsForm);
+
+            let colidsForm = [];
+            fracciones.forEach(f => {
+                let label = f.colindanciaProyecto ? f.descripcion : `Lote: ${f.lote} - Número catastral: ${f.numeroCatastral}`;
+                colidsForm.push({...f, label})
+            });
+            console.log("colindanciasForm: ", colidsForm);
+            setColindanciasForm(colidsForm);
+        }
+
+    }, [fracciones]);
 
     useEffect(() => {
         if(cota){
@@ -58,7 +79,7 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
             setOrientacionSelect(cota.orientacion);
             setTipoLineaSelect(cota.tipoLinea);
 
-            let colsSelect = fracciones.filter(f => {
+            let colsSelect = colindanciasForm.filter(f => {
                 let existId = cota.colindanciasIds.find(cs => cs === f.id);
                 return existId !== undefined;
             });
@@ -131,7 +152,7 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
                             <Autocomplete
                                 id="fraccionId"
                                 name="fraccionId"
-                                options={fracciones}
+                                options={fraccionesForm}
                                 getOptionLabel={option => `Lote: ${option.lote} - Número catastral: ${option.numeroCatastral}`}
                                 value={fraccionSelect}
                                 sx={{ gridColumn: "span 4" }}
@@ -259,8 +280,8 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
                                 disableCloseOnSelect
                                 id="colindanciasIds"
                                 name="colindanciasIds"
-                                options={fracciones}
-                                getOptionLabel={option => `Lote: ${option.lote} - Número catastral: ${option.numeroCatastral}`}
+                                options={colindanciasForm}
+                                getOptionLabel={option => option.label}
                                 value={colindanciasSelect}
                                 sx={{ gridColumn: "span 4" }}
                                 onChange={(e, value) => {
@@ -280,7 +301,7 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
                                             style={{ marginRight: 8 }}
                                             checked={selected}
                                         />
-                                        {`Lote: ${option.lote} - Número catastral: ${option.numeroCatastral}`}
+                                        {option.label}
                                     </li>
                                 )}
                                 renderInput={params => (
