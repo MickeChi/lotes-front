@@ -23,7 +23,7 @@ const remove = (id) => {
 }
 
 const getFraccionesDoc = (id) => {
-    return axiosClient.get(`proyecto/generate-fracciones-doc/${id}`);
+    return axiosClient.get(`proyecto/generate-proyecto-doc/${id}`);
 }
 
 const ProyectoService = {
