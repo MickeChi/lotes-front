@@ -25,6 +25,7 @@ export const getAllProyectos = createAsyncThunk(
 export const updateProyecto = createAsyncThunk(
     "proyectos/update",
     async (request) => {
+        console.log("proyectos/update slice: ", request);
         const res = await ProyectoService.update(request);
         return res.data;
     }

@@ -1,10 +1,20 @@
-import {Autocomplete, Box, Button, FormControl, FormHelperText, Grid, TextField, useTheme} from "@mui/material";
+import {
+    Autocomplete,
+    Box,
+    Button, FilledInput,
+    FormControl,
+    FormHelperText,
+    Grid, Input,
+    InputLabel,
+    TextField,
+    useTheme
+} from "@mui/material";
 import {Formik, isNaN} from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import {tokens} from "../../theme.jsx";
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {createProyecto, updateProyecto} from "../../store/slices/proyectoSlice.js";
@@ -30,7 +40,8 @@ const initialValues = {
     totalFracciones: "",
     uso: "",
     clase: "",
-    puntoPartida: ""
+    puntoPartida: "",
+    documento: ""
 };
 const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -413,6 +424,36 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 )}
                                             />
                                         </Grid>
+                                        <Grid item md={12}>
+                                            {/*<FormControl variant="filled">
+                                                <InputLabel htmlFor="component-filled">Name</InputLabel>
+                                                <FilledInput id="component-filled" defaultValue="Composed TextField" />
+                                            </FormControl>*/}
+                                            {/*<input id="file" name="file" type="file" onChange={(event) => {
+                                                //setfieldvalue("file", event.currenttarget.files[0]);
+                                            }}/>*/}
+
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="file"
+                                                label="Seleccione un archivo"
+                                                InputLabelProps={{ shrink: true }}
+                                                onBlur={handleBlur}
+                                                //onChange={handleChange}
+                                                //value={values.documento}
+                                                name="documento"
+                                                color="secondary"
+                                                error={!!touched.documento && !!errors.documento}
+                                                helperText={touched.documento && errors.documento}
+                                                sx={{ gridColumn: "span 2" }}
+                                                onChange={(e) => {
+                                                    setFieldValue("documento", e.currentTarget.files[0]);
+                                                    console.log("documento: ", e.currentTarget.files[0]);
+                                                    /*setPuntoPartidaSelect(value);*/
+                                                }}
+                                            />
+                                        </Grid>
                                     </Grid>
                                 </Grid>
 
@@ -461,9 +502,56 @@ const checkoutSchema = yup.object().shape({
     totalFracciones: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
-    puntoPartida: yup.string().required("required")
+    puntoPartida: yup.string().required("required"),
+    documento: yup.mixed()
+        //.required("required")
+        .nullable()
+        .notRequired()
+        .test("FILE_SIZE", "El tamaño del archivo es muy grande, maximo 15Mb",
+            value => !value || (value && value.size <= 15000000))
+        .test("FILE_FORMAT", "El tipo de archivo no es válido.",
+            value => !value || (value && ["application/pdf", "image/jpeg"].includes(value.type)))
+    /*.test("is-file-too-big", "File exceeds 10MB", () => {
+        let valid = true;
+        const files = fileRef?.current?.files;
+        console.log("yp files: ", files);
+        if (files) {
+            const fileArr = Array.from(files);
+            fileArr.forEach((file) => {
+                const size = file.size / 1024 / 1024;
+                if (size > 10) {
+                    valid = false;
+                }
+            });
+        }
+        return valid;
+    })
+    .test(
+        "is-file-of-correct-type",
+        "File is not of supported type",
+        () => {
+            let valid = true;
+            const files = fileRef?.current?.files;
+            if (files) {
+                const fileArr = Array.from(files);
+                fileArr.forEach((file) => {
+                    const type = file.type.split("/")[1];
+                    const validTypes = [
+                        "pdf"
+                    ];
+                    if (!validTypes.includes(type)) {
+                        valid = false;
+                    }
+                });
+            }
+            return valid;
+        }
+    )*/
 
 });
+
+
+
 
 
 export default ProyectoForm;
