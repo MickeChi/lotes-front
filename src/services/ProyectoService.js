@@ -21,9 +21,13 @@ const update = (request) => {
 }
 
 const create = (request) => {
-    //const formData = generateRequest(request);
-    //console.log("generateRequest create", formData);
-    return axiosClient.post(`proyecto`, request);
+    let formData = generateRequest(request);
+    console.log("generateReques t create", formData);
+    return axiosClient.post(`proyecto`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    });
 }
 
 const remove = (id) => {
@@ -37,7 +41,8 @@ const getFraccionesDoc = (id) => {
 const generateRequest = (request) => {
 
     let documento  = (typeof request["documento"] === "object") ? request["documento"] : null;
-    let proyecto = {...request, documento: null, createdAt: null, updatedAt: null}
+    let proyecto = {...request, createdAt: null, updatedAt: null}
+    delete proyecto.documento;
     proyecto.fraccionesExternas.map(f => {
         f.createdAt = null;
         f.updatedAt = null;

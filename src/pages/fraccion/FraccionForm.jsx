@@ -31,7 +31,7 @@ const initialValues = {
     valorCatastral:"",
     uso:"",
     clase:"",
-    tipoColindancia:"PARCELA",
+    tipoFraccion:"PARCELA",
     colindanciaProyecto: false,
     numeroParcela:"",
 };
@@ -44,14 +44,14 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
     const dispatch = useDispatch();
     const [esEditar, setEsEditar] = useState(false);
 
-    const tiposColindancias = ["PARCELA", "VIALIDAD", "LOTE"];
-    const [tipoColSeleccionado, setTipoColSeleccionado] = useState(null);
+    const tiposFraccion = ["PARCELA", "VIALIDAD", "LOTE"];
+    const [tipoFraccionSeleccionado, setTipoFraccionSeleccionado] = useState(null);
 
     const usos = ["HABITACIONAL", "COMERCIAL", "COMUN"];
     const [usoSeleccionado, setUsoSeleccionado] = useState(null);
 
     useEffect(() => {
-        const generaFormStare = () =>{
+        const generaFormState = () =>{
             console.log("fraccionForm: ", fraccion);
             const fraccionState = {...fraccion};
             for(const key in fraccionState){
@@ -63,10 +63,11 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
             setEsEditar(true);
             setFormState(fraccionState);
             setUsoSeleccionado(fraccionState.uso);
+            setTipoFraccionSeleccionado(fraccionState.tipoFraccion);
         }
 
         if(fraccion){
-            generaFormStare();
+            generaFormState();
         }
     }, [fraccion]);
 
@@ -92,7 +93,7 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
         console.log("Reset form initialValues: ", initialValues);
         setFormState(initialValues);
         setEsEditar(false);
-        setTipoColSeleccionado(null);
+        setTipoFraccionSeleccionado(null);
         setUsoSeleccionado(null);
         handleEditRow(null);
     }
@@ -288,21 +289,6 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
                                 )}
                             />
 
-                           {/* <TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                label="Uso"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.uso}
-                                name="uso"
-                                color="secondary"
-                                error={!!touched.uso && !!errors.uso}
-                                helperText={touched.uso && errors.uso}
-                                sx={{ gridColumn: "span 2" }}
-                            />*/}
-
                             <TextField
                                 fullWidth
                                 variant="filled"
@@ -318,18 +304,18 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
                                 sx={{ gridColumn: "span 2" }}
                             />
 
-                            {/*<Autocomplete
-                                id="tipoColindancia"
-                                name="tipoColindancia"
-                                options={tiposColindancias}
+                            <Autocomplete
+                                id="tipoFraccion"
+                                name="tipoFraccion"
+                                options={tiposFraccion}
                                 getOptionLabel={option => option}
-                                value={tipoColSeleccionado}
+                                value={tipoFraccionSeleccionado}
                                 sx={{ gridColumn: "span 2" }}
                                 onChange={(e, value) => {
                                     setFieldValue(
-                                        "tipoColindancia", value !== null ? value : initialValues.tipoColindancia
+                                        "tipoFraccion", value !== null ? value : initialValues.tipoFraccion
                                     );
-                                    setTipoColSeleccionado(value);
+                                    setTipoFraccionSeleccionado(value);
                                 }}
                                 renderInput={params => (
                                     <TextField
@@ -337,16 +323,16 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
                                         fullWidth
                                         variant="filled"
                                         type="text"
-                                        name="tipoColindancia"
+                                        name="tipoFraccion"
                                         color="secondary"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        error={!!touched.tipoColindancia && !!errors.tipoColindancia}
-                                        helperText={touched.tipoColindancia && errors.tipoColindancia}
+                                        error={!!touched.tipoFraccion && !!errors.tipoFraccion}
+                                        helperText={touched.tipoFraccion && errors.tipoFraccion}
                                         {...params}
                                     />
                                 )}
-                            />*/}
+                            />
 
 
                             {/*<FormControlLabel control={
@@ -407,7 +393,7 @@ const checkoutSchema = yup.object().shape({
     //valorCatastral: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
-    //tipoColindancia: yup.string().required("required"),
+    tipoFraccion: yup.string().required("required"),
     //colindanciaProyecto: yup.bool().required("required"),
     //numeroParcela: yup.number().required("required"),
 

@@ -71,9 +71,8 @@ const FraccionExternaModal = ({fraccionExt, handleEditRow, openModal, onCloseMod
     }, [fraccionExt]);
 
     const handleFormSubmit = (values, actions) => {
-        const esCreate = values.esCreate === undefined ? true : values.esCreate;
         const id = values.fraccionId !== null ? values.fraccionId : crypto.randomUUID();
-        const valuesRequest = {...values, fraccionId: id, esCreate: esCreate};
+        const valuesRequest = {...values, fraccionId: id};
         console.log("esEditar: " + esEditar + ", fraccionExtRequest: ", valuesRequest);
         handleSubmitModal(valuesRequest);
         actions.resetForm();

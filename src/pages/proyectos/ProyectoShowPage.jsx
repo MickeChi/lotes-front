@@ -41,7 +41,13 @@ const ProyectoShowPage = () => {
         ProyectoService.getById(proyectoId)
             .then((response) => {
                 if (response.data) {
-                    setProyecto(response.data);
+                    const proyectoState = {...response.data, documento: ""};
+                    for(const key in proyectoState){
+                        if( key === "localidad" && (proyectoState[key] === null || proyectoState[key] === undefined)){
+                            proyectoState[key] = "";
+                        }
+                    }
+                    setProyecto(proyectoState);
                 }
                 dispatch(setLoader(false));
             }).catch((error) => {

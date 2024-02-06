@@ -17,6 +17,7 @@ import {tokens} from "../../theme.jsx";
 import {useState, useEffect, useRef} from "react";
 import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {createProyecto, updateProyecto} from "../../store/slices/proyectoSlice.js";
 import {
     getAllNamesEstados,
@@ -59,6 +60,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const [fraccionesExternasError, setFraccionesExternasError] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [fraccionExtUpdate, setFraccionExtUpdate] = useState(null);
+    const [urlDocumento, setUrlDocumento] = useState(null);
 
     const regexpNums = /^\d*$/;
     const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
@@ -72,6 +74,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
             setPuntoPartidaSelect(proyecto.puntoPartida);
             setUsoSeleccionado(proyecto.uso);
             setFraccionesExternas(proyecto.fraccionesExternas);
+            setUrlDocumento(proyecto.nombreDocumento ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + proyecto.nombreDocumento : null);
         }
 
     }, [proyecto]);
@@ -177,7 +180,23 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
 
         <Grid container spacing={3}>
             <Grid item md={6}>
-                <Header subtitle={ esEditar ? "Editando Proyecto" : "Nuevo Proyecto"}/>
+                <Box display="flex" justifyContent="space-between">
+                    <Header subtitle={ esEditar ? "Editando Proyecto" : "Nuevo Proyecto"}/>
+                    {
+                        urlDocumento && (<Box>
+                            <a href={urlDocumento} target="_blank">
+                                <Button
+                                    size="small"
+                                    color="warning"
+                                    variant="contained"
+                                >
+                                    <OpenInNewIcon sx={{ mr: "10px" }}/>
+                                    Ver documento
+                                </Button>
+                            </a>
+                        </Box>)
+                    }
+                </Box>
             </Grid>
             <Grid item md={6}>
                 <Box display="flex" justifyContent="space-between">
