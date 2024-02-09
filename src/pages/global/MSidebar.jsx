@@ -20,6 +20,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import {LanOutlined} from "@mui/icons-material";
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -144,10 +145,10 @@ const MSidebar = () => {
                         fontWeight="bold"
                         sx={{ m: "10px 0 0 0" }}
                     >
-                      Ed Roh
+                      Nico S.
                     </Typography>
                       <Typography variant="h5" color={colors.greenAccent[500]}>
-                          VP Fancy Admin
+                          Administrador
                       </Typography>
                   </Box>
                 </Box>
@@ -161,20 +162,35 @@ const MSidebar = () => {
                   setSelected={setSelected}
               />
 
+                <Item
+                    title="Proyectos"
+                    to="/proyectos"
+                    icon={<LanOutlined />}
+                    selected={selected}
+                    setSelected={setSelected}
+                />
+
               <Typography
                   variant="h6"
                   color={colors.grey[300]}
                   sx={{ m: "15px 20px 5px 20px" }}
               >
-                Data
+                Acceso
               </Typography>
               <Item
-                  title="Manage Team"
-                  to="/team"
+                  title="Usuarios"
+                  to="/usuarios"
                   icon={<PeopleOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
               />
+                <Item
+                    title="Profile Form"
+                    to="/form"
+                    icon={<PersonOutlinedIcon />}
+                    selected={selected}
+                    setSelected={setSelected}
+                />
               <Item
                   title="Contacts Information"
                   to="/contacts"
@@ -189,7 +205,7 @@ const MSidebar = () => {
                   selected={selected}
                   setSelected={setSelected}
               />
-
+                {/*
               <Typography
                   variant="h6"
                   color={colors.grey[300]}
@@ -197,13 +213,7 @@ const MSidebar = () => {
               >
                 Pages
               </Typography>
-              <Item
-                  title="Profile Form"
-                  to="/form"
-                  icon={<PersonOutlinedIcon />}
-                  selected={selected}
-                  setSelected={setSelected}
-              />
+
               <Item
                   title="Calendar"
                   to="/calendar"
@@ -253,7 +263,7 @@ const MSidebar = () => {
                   icon={<MapOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
-              />
+              /> */}
             </Box>
           </Menu>
         </Sidebar>
