@@ -1,5 +1,39 @@
 import { tokens } from "../theme.jsx";
 
+export const mockDataFraccion = [
+  {
+    id: 1,
+    fraccion: 1,
+    numeroCatastral: 1243544,
+    folioElectronico: 35,
+    tipoColindancia: "LOTE",
+    access: "admin",
+  },
+  {
+    id: 2,
+    fraccion: 2,
+    numeroCatastral: 344545,
+    folioElectronico: 45433,
+    tipoColindancia: "LOTE",
+    access: "admin",
+  },
+  {
+    id: 3,
+    fraccion: 3,
+    numeroCatastral: 1166,
+    folioElectronico: 5851,
+    tipoColindancia: "LOTE",
+    access: "admin",
+  },
+  {
+    id: 4,
+    fraccion: 4,
+    numeroCatastral: 8812,
+    folioElectronico: 9915,
+    tipoColindancia: "LOTE",
+    access: "admin",
+  },
+];
 export const mockDataTeam = [
   {
     id: 1,
