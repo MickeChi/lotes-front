@@ -62,7 +62,7 @@ const Dashboard = () => {
       <Box m="20px">
         {/* HEADER */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
+          <Header title="DASHBOARD" subtitle="Bienvenido al dashboard" />
 
           <Box>
             <Button
@@ -75,7 +75,7 @@ const Dashboard = () => {
                 }}
             >
               <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-              Download Reports
+              Descargar Reporte
             </Button>
           </Box>
         </Box>
@@ -219,7 +219,7 @@ const Dashboard = () => {
                 p="15px"
             >
               <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-                Recent Transactions
+                Operaciones recientes
               </Typography>
             </Box>
             {mockTransactions.map((transaction, i) => (
@@ -263,7 +263,7 @@ const Dashboard = () => {
               p="30px"
           >
             <Typography variant="h5" fontWeight="600">
-              Campaign
+              Operaciones
             </Typography>
             <Box
                 display="flex"
@@ -277,9 +277,9 @@ const Dashboard = () => {
                   color={colors.greenAccent[500]}
                   sx={{ mt: "15px" }}
               >
-                $48,352 revenue generated
+                $48,352 Mxn por operación
               </Typography>
-              <Typography>Includes extra misc expenditures and costs</Typography>
+              <Typography>Total histórico</Typography>
             </Box>
           </Box>
           <Box
