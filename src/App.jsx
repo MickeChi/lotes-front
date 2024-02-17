@@ -1,4 +1,4 @@
-import {Routes, Route, BrowserRouter} from "react-router-dom";
+import {Routes, Route, BrowserRouter, HashRouter} from "react-router-dom";
 import {Backdrop, CircularProgress, CssBaseline, ThemeProvider} from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import {MSidebarProvider} from "./pages/global/MSidebarProvider.jsx";
@@ -21,7 +21,7 @@ function App() {
   //const [isSidebar, setIsSidebar] = useState(true);
 
   return (
-      <BrowserRouter>
+      <HashRouter>
         <ColorModeContext.Provider value={colorMode}>
           <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -56,7 +56,7 @@ function App() {
             </MSidebarProvider>
           </ThemeProvider>
         </ColorModeContext.Provider>
-      </BrowserRouter>
+      </HashRouter>
   );
 }
 
