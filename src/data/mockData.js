@@ -351,6 +351,37 @@ export const mockTransactions = [
   },
 ];
 
+export const mockBarDataCostos = [
+  {
+    operacion: "CREATE",
+    PROYECTOS: 137,
+    FRACCIONES: 96,
+    COTAS: 72,
+    DOCUMENTOS: 140,
+  },
+  {
+    operacion: "UPDATE",
+    PROYECTOS: 55,
+    FRACCIONES: 28,
+    COTAS: 58,
+    DOCUMENTOS: 29,
+  },
+  {
+    operacion: "DELETE",
+    PROYECTOS: 109,
+    FRACCIONES: 23,
+    COTAS: 34,
+    DOCUMENTOS: 152,
+  },
+  {
+    operacion: "GENERATE",
+    PROYECTOS: 133,
+    FRACCIONES: 52,
+    COTAS: 43,
+    DOCUMENTOS: 83,
+  }
+];
+
 export const mockBarData = [
   {
     country: "AD",
@@ -466,165 +497,182 @@ export const mockPieData = [
 
 export const mockLineData = [
   {
-    id: "japan",
+    id: "PROYECCTOS",
     color: tokens("dark").greenAccent[500],
     data: [
       {
-        x: "plane",
+        x: "CREATE",
         y: 101,
       },
       {
-        x: "helicopter",
+        x: "UPDATE",
         y: 75,
       },
       {
-        x: "boat",
+        x: "DELETE",
         y: 36,
       },
       {
-        x: "train",
+        x: "GENERATE",
         y: 216,
-      },
-      {
-        x: "subway",
-        y: 35,
-      },
-      {
-        x: "bus",
-        y: 236,
-      },
-      {
-        x: "car",
-        y: 88,
-      },
-      {
-        x: "moto",
-        y: 232,
-      },
-      {
-        x: "bicycle",
-        y: 281,
-      },
-      {
-        x: "horse",
-        y: 1,
-      },
-      {
-        x: "skateboard",
-        y: 35,
-      },
-      {
-        x: "others",
-        y: 14,
-      },
+      }
     ],
   },
   {
-    id: "france",
+    id: "FRACCIONES",
     color: tokens("dark").blueAccent[300],
     data: [
       {
-        x: "plane",
+        x: "CREATE",
         y: 212,
       },
       {
-        x: "helicopter",
+        x: "UPDATE",
         y: 190,
       },
       {
-        x: "boat",
+        x: "DELETE",
         y: 270,
       },
       {
-        x: "train",
+        x: "GENERATE",
         y: 9,
-      },
-      {
-        x: "subway",
-        y: 75,
-      },
-      {
-        x: "bus",
-        y: 175,
-      },
-      {
-        x: "car",
-        y: 33,
-      },
-      {
-        x: "moto",
-        y: 189,
-      },
-      {
-        x: "bicycle",
-        y: 97,
-      },
-      {
-        x: "horse",
-        y: 87,
-      },
-      {
-        x: "skateboard",
-        y: 299,
-      },
-      {
-        x: "others",
-        y: 251,
       },
     ],
   },
   {
-    id: "us",
+    id: "COTAS",
     color: tokens("dark").redAccent[200],
     data: [
       {
-        x: "plane",
+        x: "CREATE",
         y: 191,
       },
       {
-        x: "helicopter",
+        x: "UPDATE",
         y: 136,
       },
       {
-        x: "boat",
+        x: "DELETE",
         y: 91,
       },
       {
-        x: "train",
+        x: "GENERATE",
+        y: 190,
+      }
+    ],
+  },
+  {
+    id: "DOCUMENTOS",
+    color: tokens("dark").primary[200],
+    data: [
+      {
+        x: "CREATE",
+        y: 215,
+      },
+      {
+        x: "UPDATE",
+        y: 62,
+      },
+      {
+        x: "DELETE",
+        y: 432,
+      },
+      {
+        x: "GENERATE",
+        y: 55,
+      }
+    ],
+  },
+];
+
+export const mockLineData2 = [
+  {
+    id: "PROYECCTOS",
+    color: tokens("dark").greenAccent[500],
+    data: [
+      {
+        x: 234,
+        y: 101,
+      },
+      {
+        x: 124,
+        y: 75,
+      },
+      {
+        x: 134,
+        y: 36,
+      },
+      {
+        x: 54,
+        y: 216,
+      }
+    ],
+  },
+  {
+    id: "FRACCIONES",
+    color: tokens("dark").blueAccent[300],
+    data: [
+      {
+        x: 90,
+        y: 212,
+      },
+      {
+        x: 450,
         y: 190,
       },
       {
-        x: "subway",
-        y: 211,
+        x: 87,
+        y: 270,
       },
       {
-        x: "bus",
-        y: 152,
+        x: 102,
+        y: 9,
+      },
+    ],
+  },
+  {
+    id: "COTAS",
+    color: tokens("dark").redAccent[200],
+    data: [
+      {
+        x: 359,
+        y: 191,
       },
       {
-        x: "car",
-        y: 189,
+        x: 277,
+        y: 136,
       },
       {
-        x: "moto",
-        y: 152,
+        x: 89,
+        y: 91,
       },
       {
-        x: "bicycle",
-        y: 8,
+        x: 145,
+        y: 190,
+      }
+    ],
+  },
+  {
+    id: "DOCUMENTOS",
+    color: tokens("dark").primary[200],
+    data: [
+      {
+        x: 321,
+        y: 215,
       },
       {
-        x: "horse",
-        y: 197,
+        x: 289,
+        y: 62,
       },
       {
-        x: "skateboard",
-        y: 107,
+        x: 153,
+        y: 432,
       },
       {
-        x: "others",
-        y: 170,
-      },
+        x: 13,
+        y: 55,
+      }
     ],
   },
 ];

@@ -134,7 +134,7 @@ const MSidebar = () => {
                         alt="profile user"
                         width="100px"
                         height="100px"
-                        src={"/user.png"}
+                        src={"/usuario.png"}
                         style={{ cursor: "pointer", borderRadius: "50%" }}
                     />
                   </Box>
@@ -145,7 +145,7 @@ const MSidebar = () => {
                         fontWeight="bold"
                         sx={{ m: "10px 0 0 0" }}
                     >
-                      Nico S.
+                      UserName
                     </Typography>
                       <Typography variant="h5" color={colors.greenAccent[500]}>
                           Administrador
