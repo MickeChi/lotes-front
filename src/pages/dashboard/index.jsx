@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import {Box, Button, FormControl, IconButton, InputLabel, Select, Typography, useTheme} from "@mui/material";
 import { tokens } from "../../theme.jsx";
 import { mockTransactions } from "../../data/mockData";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
@@ -19,6 +19,10 @@ import {TiposIndicadores} from "../../utils/constantes.js";
 import indicadoresCommons from "../../utils/indicadoresCommons.js";
 import {AccountTree as AccountTreeIcon, LanOutlined, Microsoft, Api as ApiIcon, Description as DescriptionIcon} from "@mui/icons-material";
 import BarCostosChart from "../../components/BarCostosChart.jsx";
+import MenuItem from "@mui/material/MenuItem";
+import {DatePicker} from "@mui/x-date-pickers";
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import moment from "moment";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -64,7 +68,32 @@ const Dashboard = () => {
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Header title="DASHBOARD" subtitle="Bienvenido al dashboard" />
 
-          <Box>
+          <Box gap="10px" display="grid" gridTemplateColumns="repeat(3, 1fr)">
+            <DatePicker
+                defaultValue={moment().subtract(1, 'week')}
+                label="Fecha inicio"
+                slotProps={{
+                  openPickerIcon: { fontSize: 'large' },
+                  openPickerButton: { color: 'secondary' },
+                  textField: {
+                    variant: 'filled',
+                    color: 'secondary',
+                    size: 'small'
+                  },
+                }} />
+
+            <DatePicker
+                defaultValue={moment()}
+                label="Fecha fin"
+                slotProps={{
+                  openPickerIcon: { fontSize: 'large' },
+                  openPickerButton: { color: 'secondary' },
+                  textField: {
+                    variant: 'filled',
+                    color: 'secondary',
+                    size: 'small'
+                  },
+                }} />
             <Button
                 sx={{
                   backgroundColor: colors.blueAccent[700],
@@ -73,9 +102,10 @@ const Dashboard = () => {
                   fontWeight: "bold",
                   padding: "10px 20px",
                 }}
+                variant="contained"
             >
-              <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-              Descargar Reporte
+              <AutorenewIcon sx={{ mr: "10px" }} />
+              Actualizar
             </Button>
           </Box>
         </Box>

@@ -20,7 +20,7 @@ import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutl
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import {LanOutlined} from "@mui/icons-material";
+import {Business, LanOutlined} from "@mui/icons-material";
 import imgAvatar from '../../assets/usuario.png';
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -105,7 +105,7 @@ const MSidebar = () => {
                       ml="15px"
                   >
                     <Typography variant="h3" color={colors.grey[100]}>
-                      ADMINIS
+                      LOTIFICADOR
                     </Typography>
                     <IconButton
                         onClick={
@@ -146,10 +146,10 @@ const MSidebar = () => {
                         fontWeight="bold"
                         sx={{ m: "10px 0 0 0" }}
                     >
-                      UserName
+                        José María
                     </Typography>
                       <Typography variant="h5" color={colors.greenAccent[500]}>
-                          Administrador
+                          Notaría 47
                       </Typography>
                   </Box>
                 </Box>
@@ -157,7 +157,7 @@ const MSidebar = () => {
             <Box paddingLeft={collapsed ? undefined : "10%"}>
               <Item
                   title="Dashboard"
-                  to="/"
+                  to="/dashboard"
                   icon={<HomeOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
@@ -176,7 +176,7 @@ const MSidebar = () => {
                   color={colors.grey[300]}
                   sx={{ m: "15px 20px 5px 20px" }}
               >
-                Acceso
+                Administración
               </Typography>
               <Item
                   title="Usuarios"
@@ -185,23 +185,16 @@ const MSidebar = () => {
                   selected={selected}
                   setSelected={setSelected}
               />
-                <Item
-                    title="Profile Form"
-                    to="/form"
-                    icon={<PersonOutlinedIcon />}
-                    selected={selected}
-                    setSelected={setSelected}
-                />
               <Item
-                  title="Contacts Information"
-                  to="/contacts"
-                  icon={<ContactsOutlinedIcon />}
+                  title="Empresas"
+                  to="/empresas"
+                  icon={<Business />}
                   selected={selected}
                   setSelected={setSelected}
               />
               <Item
-                  title="Invoices Balances"
-                  to="/invoices"
+                  title="Reportes"
+                  to="/reportes"
                   icon={<ReceiptOutlinedIcon />}
                   selected={selected}
                   setSelected={setSelected}
