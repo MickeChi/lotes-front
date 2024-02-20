@@ -111,7 +111,7 @@ const ProyectoShowPage = () => {
 
                     {currentTab === 4 && (
                         <Grid container>
-                            <ProyectoDocumentos proyectoId={proyectoId}/>
+                            <ProyectoDocumentos proyectoTitulo={proyecto.titulo} proyectoId={proyectoId}/>
                         </Grid>
                     )}
 

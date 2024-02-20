@@ -1,37 +1,35 @@
 import {
-    Autocomplete,
-    Backdrop,
     Box, Button,
     ButtonGroup,
-    CircularProgress,
     Grid, Paper,
-    TextField,
     Typography,
     useTheme
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme.jsx";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header.jsx";
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import SaveIcon from '@mui/icons-material/Save';
-import CotaForm from "../cotas/CotaForm.jsx";
-import CotaTable from "../cotas/CotaTable.jsx";
-import {useState} from "react";
-import FolderSpecialIcon from '@mui/icons-material/FolderSpecial';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
+import {useEffect, useState} from "react";
 import {useDispatch} from "react-redux";
 import ProyectoService from "../../services/ProyectoService.js";
 import {setLoader} from "../../store/slices/generalSlice.js";
+import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 
 
-const ProyectoDocumentos = ({proyectoId}) => {
+const ProyectoDocumentos = ({proyectoId, proyectoTitulo}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const dispatch = useDispatch();
-    const [showText, setShowText] = useState(false);
+    const [tituloDoc, setTituloDoc] = useState("");
     const [docGenerado, setDocGenerado] = useState(null);
+
+    useEffect(() => {
+        if(proyectoId){
+
+            setTituloDoc("documentoProyecto_" + proyectoId);
+        }
+
+    }, []);
+
 
     const generaDocumento = () => {
         console.log("Generando proyecto: ", proyectoId);
@@ -41,29 +39,62 @@ const ProyectoDocumentos = ({proyectoId}) => {
 
             console.log("docGenerado: ", resp.data);
             setDocGenerado(resp.data);
-            setShowText(true);
         });
+    }
+
+    const descargaWord = (element, filename = '') => {
+        let preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+        let postHtml = "</body></html>";
+        let html = preHtml+document.getElementById(element).innerHTML+postHtml;
+
+        let blob = new Blob(['ufeff', html], {
+            type: 'application/msword'
+        });
+
+        let url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+        filename = filename?filename+'.doc':'document.doc';
+        let downloadLink = document.createElement("a");
+        document.body.appendChild(downloadLink);
+
+        if(navigator.msSaveOrOpenBlob ){
+            navigator.msSaveOrOpenBlob(blob, filename);
+        }else{
+            downloadLink.href = url;
+            downloadLink.download = filename;
+            downloadLink.click();
+        }
+        document.body.removeChild(downloadLink);
     }
 
     return (
         <Grid container>
             <Grid item md={12}>
                 <Box m="20px">
-                    <Header subtitle="Genera Documentos"/>
+                    <Header subtitle="Documento de proyecto"/>
                     <ButtonGroup variant="contained" aria-label="outlined secondary button group">
-                        <Button onClick={()=>{generaDocumento()}} color="secondary">Proyecto <UploadFileIcon/></Button>
-                       {/* <Button color="secondary">Proyecto <FolderSpecialIcon/></Button>
+                        <Button
+                            sx={{
+                                backgroundColor: colors.blueAccent[700],
+                                color: colors.grey[100]
+                            }}
+                            onClick={()=>{generaDocumento()}}
+                            color="secondary"><SettingsSuggestIcon/> Generar
+                        </Button>
+                        {docGenerado && <Button
+                            onClick={()=>{descargaWord('exportContent', tituloDoc)}} color="warning"><SimCardDownloadIcon/> Descargar</Button>}
+                        {/* <Button color="secondary">Proyecto <FolderSpecialIcon/></Button>
                         <Button color="secondary">Otros <FileCopyIcon/></Button>*/}
                     </ButtonGroup>
 
-                    <Paper sx={{
-                        backgroundColor: `${colors.primary[400]}`,
+                    {docGenerado && <Paper id="exportContent" sx={{
+                        backgroundColor: `#fff`,
+                        color: `#000`,
                         my: { xs: 3, md: 3 }, p: { xs: 2, md: 3 }
                     }}>
-                        {/*{showText && <Typography variant="h6" fontWeight="600" sx={{mt: "15px"}}>{docGenerado.fraccionesGeneradas}</Typography>}*/}
+                        <Typography variant="h4" fontWeight="600" sx={{mt: "15px"}}>{proyectoTitulo}</Typography>
 
                         {
-                            docGenerado && docGenerado.fraccionesTxt.map( f => {
+                            docGenerado.fraccionesTxt.map( f => {
                                 return (
                                     <Typography key={f.fraccionId} variant="h6" fontWeight="600" sx={{mt: "15px"}}>{f.fraccionTexto}</Typography>
                                 );
@@ -71,6 +102,7 @@ const ProyectoDocumentos = ({proyectoId}) => {
                         }
 
                     </Paper>
+                    }
 
                 </Box>
 
