@@ -51,9 +51,9 @@ const ProyectoDocumentos = ({proyectoId}) => {
                 <Box m="20px">
                     <Header subtitle="Genera Documentos"/>
                     <ButtonGroup variant="contained" aria-label="outlined secondary button group">
-                        <Button onClick={()=>{generaDocumento()}} color="secondary">Fracciones <UploadFileIcon/></Button>
-                        <Button color="secondary">Proyecto <FolderSpecialIcon/></Button>
-                        <Button color="secondary">Otros <FileCopyIcon/></Button>
+                        <Button onClick={()=>{generaDocumento()}} color="secondary">Proyecto <UploadFileIcon/></Button>
+                       {/* <Button color="secondary">Proyecto <FolderSpecialIcon/></Button>
+                        <Button color="secondary">Otros <FileCopyIcon/></Button>*/}
                     </ButtonGroup>
 
                     <Paper sx={{

@@ -40,6 +40,7 @@ const Proyectos = () => {
                                 fontWeight: "bold",
                                 padding: "10px 20px",
                             }}
+                            variant="contained"
                         >
                             <CreateNewFolderOutlined sx={{ mr: "10px" }} />
                             Nuevo proyecto
