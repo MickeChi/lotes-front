@@ -33,8 +33,8 @@ export const updateFraccion = createAsyncThunk(
 export const deleteFraccion = createAsyncThunk(
     "fracciones/delete",
     async ({ id }) => {
-        await FraccionService.remove(id);
-        return { id };
+        const res = await FraccionService.remove(id);
+        return res.data;
     }
 );
 
@@ -76,8 +76,8 @@ const fraccionSlice = createSlice({
                 state.fracciones = proysUp
             })
             .addCase(deleteFraccion.fulfilled, (state, action) => {
-                let index = state.findIndex(({id}) => id === action.payload.id);
-                state.splice(index, 1);
+                const proysUp = state.fracciones.filter(p=> p.id !== action.payload.id);
+                state.fracciones = proysUp
             })
             .addCase(setFraccionActivoById.fulfilled, (state, action) => {
                 state.fraccionActivo = action.payload

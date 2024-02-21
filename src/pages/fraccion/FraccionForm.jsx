@@ -68,6 +68,8 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
 
         if(fraccion){
             generaFormState();
+        }else{
+            handleReset();
         }
     }, [fraccion]);
 

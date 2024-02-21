@@ -6,6 +6,12 @@ import {useNavigate} from "react-router-dom";
 import FraccionForm from "./FraccionForm.jsx";
 import FraccionTable from "./FraccionTable.jsx";
 import {useState} from "react";
+import {setLoader} from "../../store/slices/generalSlice.js";
+import {deleteCota} from "../../store/slices/cotaSlice.js";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
+import {useDispatch} from "react-redux";
+import {deleteFraccion} from "../../store/slices/fraccionSlice.js";
 
 const FraccionTab = ({proyectoId}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -13,10 +19,37 @@ const FraccionTab = ({proyectoId}) => {
     const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
     const [fraccionUpdate, setFraccionUpdate] = useState(null);
+    const dispatch = useDispatch();
 
-    const handlerEditFraccion = (fraccionEdit) => {
-        setFraccionUpdate(fraccionEdit);
+
+    const handlerEditFraccion = (fraccionEdit, eliminar = false) => {
+
+        if(eliminar){
+            console.log("handlerEditFraccion ELIMINAR: ", fraccionEdit, eliminar);
+            handleDelete(fraccionEdit);
+        }else{
+            console.log("handlerEditFraccion: ", fraccionEdit);
+            setFraccionUpdate(fraccionEdit);
+
+        }
+
+
     }
+
+    const handleDelete = (fraccionDelete) => {
+        console.log("handleDelete: ", fraccionDelete);
+
+        dispatch(setLoader(true));
+        dispatch(deleteFraccion(fraccionDelete)).then((resp) => {
+            dispatch(setLoader(false));
+            setFraccionUpdate(null);
+            withReactContent(Swal).fire({
+                title: "Se eliminó correctamente",
+                icon: "success"
+            })
+
+        })
+    };
 
     return (
         <Grid container spacing={3}>

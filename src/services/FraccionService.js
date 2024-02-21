@@ -19,7 +19,7 @@ const create = (request) => {
 }
 
 const remove = (id) => {
-    return axiosClient.get(`fraccion/${id}`);
+    return axiosClient.delete(`fraccion/${id}`);
 }
 
 const FraccionService =  {

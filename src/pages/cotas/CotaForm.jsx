@@ -84,6 +84,8 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
                 return existId !== undefined;
             });
             setColindanciasSelect(colsSelect);
+        }else{
+            handleReset();
         }
     }, [cota]);
 
@@ -348,7 +350,7 @@ const checkoutSchema = yup.object().shape({
     "orientacion": yup.string().required("required"),
     "medida": yup.number().required("required"),
     "fraccionId": yup.number().required("required"),
-    "colindanciasIds": yup.array().min(1, "at least 1").required("required"),
+    "colindanciasIds": yup.array().min(1, "al menos 1").max(1, "máximo 1").required("required"),
 });
 
 

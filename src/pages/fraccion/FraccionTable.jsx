@@ -7,6 +7,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {getAllFracciones} from "../../store/slices/fraccionSlice.js";
 import {Edit} from "@mui/icons-material";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever.js";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
 
 const FraccionTable = ({proyectoId, handleEditRow}) => {
     const theme = useTheme();
@@ -79,16 +82,35 @@ const FraccionTable = ({proyectoId, handleEditRow}) => {
             flex: 1,
             renderCell: ({ row }) => {
                 return (
-                    <ButtonGroup variant="contained"  aria-label="outlined button group">
+                    <ButtonGroup size="small" variant="contained"  aria-label="outlined button group">
                         <Button color="warning" title="editar" onClick={()=>{
                             onClikEdit(row);
                         }}><Edit/></Button>
-                        {/*<Button color="error"><DeleteForever/></Button>*/}
+                        <Button color="error" title="Eliminar" onClick={()=>{
+                            alertaEliminar(row);
+                        }}><DeleteForeverIcon/></Button>
                     </ButtonGroup>
                 );
             },
         },
     ];
+
+    const alertaEliminar = (fraccionEdit) => {
+
+        console.log("alertaEliminar", fraccionEdit);
+        withReactContent(Swal).fire({
+            title: "¿Está seguro de eliminar?",
+            icon: "error",
+            showCancelButton: true,
+            confirmButtonText: "Eliminar",
+            denyButtonText: `Cancelar`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log("SE CONFIRMA ELIMINACIÓN")
+                handleEditRow(fraccionEdit, true);
+            }
+        });
+    }
 
     const onClikEdit = (fraccionEdit) => {
         handleEditRow(fraccionEdit);

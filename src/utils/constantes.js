@@ -8,3 +8,8 @@ export const TiposIndicadores = Object.freeze({
 });
 
 export const USUARIO_DEFAULT = 1;
+
+export const Estatus = Object.freeze({
+    DESACTIVADO: "DESACTIVADO",
+    ACTIVO: "ACTIVO"
+});
