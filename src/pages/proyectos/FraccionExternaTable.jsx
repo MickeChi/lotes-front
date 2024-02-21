@@ -10,6 +10,10 @@ import {getAllCotas, setCotas} from "../../store/slices/cotaSlice.js";
 import {Link} from "react-router-dom";
 import FraccionExternaModal from "./FraccionExternaModal.jsx";
 import ModalDemo from "./ModalDemo.jsx";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import {Estatus} from "../../utils/constantes.js";
 
 const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
     const theme = useTheme();
@@ -19,7 +23,8 @@ const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
     const [fraccionesExtTable, setFraccionesExtTable] = useState([]);
     useEffect(() => {
         console.log("fraccionesExternas Change: ", fraccionesExternas);
-        setFraccionesExtTable(fraccionesExternas);
+        let fraccionesActivas = fraccionesExternas.filter(f => f.estatus === Estatus.ACTIVO);
+        setFraccionesExtTable(fraccionesActivas);
 
     }, [fraccionesExternas]);
 
@@ -62,14 +67,31 @@ const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
                         <Button color="warning" title="editar" onClick={()=>{
                             onClikEdit(row);
                         }}><Edit/></Button>
-                        {/*<Button color="secondary" title="Ver colindancias" onClick={()=>{
-                            onClikEdit(row);
-                        }}><Visibility/></Button>*/}
+                        <Button color="error" title="Eliminar" onClick={()=>{
+                            alertaEliminar(row);
+                        }}><DeleteForeverIcon/></Button>
                     </ButtonGroup>
                 );
             },
         },
     ];
+
+    const alertaEliminar = (fraccionEdit) => {
+
+        console.log("alertaEliminar", fraccionEdit);
+        withReactContent(Swal).fire({
+            title: "¿Está seguro de eliminar?",
+            icon: "error",
+            showCancelButton: true,
+            confirmButtonText: "Eliminar",
+            denyButtonText: `Cancelar`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log("SE CONFIRMA ELIMINACIÓN")
+                handleEditRow(fraccionEdit, true);
+            }
+        });
+    }
 
     const onClikEdit = (fracExtEdit) => {
         console.log("onClikEdit fracExtEdit", fracExtEdit)

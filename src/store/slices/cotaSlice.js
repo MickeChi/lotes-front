@@ -33,8 +33,8 @@ export const updateCota = createAsyncThunk(
 export const deleteCota = createAsyncThunk(
     "cotas/delete",
     async ({ id }) => {
-        await CotaService.remove(id);
-        return { id };
+        const res = await CotaService.remove(id);
+        return res.data;
     }
 );
 
@@ -82,8 +82,8 @@ const cotaSlice = createSlice({
                 state.cotas = cotasUp
             })
             .addCase(deleteCota.fulfilled, (state, action) => {
-                let index = state.findIndex(({id}) => id === action.payload.id);
-                state.splice(index, 1);
+                const cotasUp = state.cotas.filter(p=> p.id !== action.payload.id)
+                state.cotas = cotasUp;
             })
             .addCase(setCotaActivoById.fulfilled, (state, action) => {
                 state.cotaActivo = action.payload

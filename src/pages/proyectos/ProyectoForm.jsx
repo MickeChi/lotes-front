@@ -31,6 +31,8 @@ import ProyectoColindanciaForm from "./FraccionExternaTable.jsx";
 import FraccionExternaTable from "./FraccionExternaTable.jsx";
 import {AddCircle} from "@mui/icons-material";
 import FraccionExternaModal from "./FraccionExternaModal.jsx";
+import {deleteFraccion} from "../../store/slices/fraccionSlice.js";
+import {Estatus} from "../../utils/constantes.js";
 
 const initialValues = {
     titulo: "",
@@ -168,11 +170,59 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         }
     }
 
-    const handlerEditFracExt = (fraccExtEdit) => {
-        console.log("handlerEditFracExt: ", fraccExtEdit);
-        setFraccionExtUpdate(fraccExtEdit);
-        setOpenModal(true);
+    const handlerEditFracExt = (fraccExtEdit, eliminar = false) => {
+
+        if(eliminar){
+            console.log("handlerEditFracExt DELETE: ", fraccExtEdit);
+            handleDelete(fraccExtEdit);
+        }else{
+            console.log("handlerEditFracExt: ", fraccExtEdit);
+            setFraccionExtUpdate(fraccExtEdit);
+            setOpenModal(true);
+
+        }
+
     }
+
+
+    const handleDelete = (fraccionDelete) => {
+        let fraccExtDel = {...fraccionDelete, estatus: Estatus.DESACTIVADO}
+        console.log("handleDelete: ", fraccExtDel);
+
+        let existeFext = fraccionesExternas.find(f => f.fraccionId === fraccExtDel.fraccionId);
+        let listaFraccionesExt = [];
+        if(existeFext !== undefined){
+            listaFraccionesExt = fraccionesExternas.map( f => {
+                if(f.fraccionId === fraccExtDel.fraccionId){
+                    f = fraccExtDel;
+                }
+                return f;
+            });
+            setFraccionesExternas(listaFraccionesExt);
+            setFraccionExtUpdate(false);
+
+            withReactContent(Swal).fire({
+                title: "Se eliminó correctamente",
+                icon: "success"
+            });
+
+            console.log("BEFORE FRACEXT DELETE: ", listaFraccionesExt);
+
+        }
+
+
+
+        /*dispatch(setLoader(true));
+        dispatch(deleteFraccion(fraccionDelete)).then((resp) => {
+            dispatch(setLoader(false));
+            setFraccionUpdate(null);
+            withReactContent(Swal).fire({
+                title: "Se eliminó correctamente",
+                icon: "success"
+            })
+
+        })*/
+    };
 
     const textoErrorCotas = fraccionesExternasError ? 'Agregue al menos una colindancia' : 'Colindancias externas del proyecto';
 

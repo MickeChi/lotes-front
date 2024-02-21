@@ -19,7 +19,7 @@ const create = (request) => {
 }
 
 const remove = (id) => {
-    return axiosClient.get(`cota/${id}`);
+    return axiosClient.delete(`cota/${id}`);
 }
 
 const CotaService =  {
