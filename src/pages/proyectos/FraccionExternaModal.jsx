@@ -13,6 +13,7 @@ import {useEffect, useState} from "react";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import CardHeader from "@mui/material/CardHeader";
+import {Estatus} from "../../utils/constantes.js";
 
 const initialValues = {
     "fraccionId": null,
@@ -23,7 +24,8 @@ const initialValues = {
     "orientacion": "",
     "medida": "",
     "descripcion": "",
-    "colindanciaProyecto": true
+    "colindanciaProyecto": true,
+    "estatus": Estatus.ACTIVO
 }
 
 const FraccionExternaModal = ({fraccionExt, handleEditRow, openModal, onCloseModal, handleSubmitModal}) => {

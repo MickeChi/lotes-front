@@ -18,6 +18,7 @@ import withReactContent from 'sweetalert2-react-content'
 import {useDispatch} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {createFraccion, updateFraccion} from "../../store/slices/fraccionSlice.js";
+import {Estatus} from "../../utils/constantes.js";
 
 const initialValues = {
     lote:"",
@@ -34,6 +35,7 @@ const initialValues = {
     tipoFraccion:"PARCELA",
     colindanciaProyecto: false,
     numeroParcela:"",
+    estatus: Estatus.ACTIVO
 };
 
 const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {

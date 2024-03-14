@@ -20,6 +20,7 @@ import Swal from "sweetalert2";
 import {createFraccion, updateFraccion} from "../../store/slices/fraccionSlice.js";
 import Checkbox from "@mui/material/Checkbox";
 import {CheckBox, CheckBoxOutlineBlank} from "@mui/icons-material";
+import {Estatus} from "../../utils/constantes.js";
 
 const initialValues = {
     "orden": "",
@@ -27,7 +28,8 @@ const initialValues = {
     "orientacion": "",
     "medida": "",
     "fraccionId": "",
-    "colindanciasIds": []
+    "colindanciasIds": [],
+    "estatus": Estatus.ACTIVO
 }
 
 const icon = <CheckBoxOutlineBlank fontSize="small" />;

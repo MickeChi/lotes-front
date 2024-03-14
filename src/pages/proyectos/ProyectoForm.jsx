@@ -44,7 +44,8 @@ const initialValues = {
     uso: "",
     clase: "",
     puntoPartida: "",
-    documento: ""
+    documento: "",
+    estatus: Estatus.ACTIVO
 };
 const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -129,7 +130,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         const fraccionesExt = fraccionesExternas.map(f =>{
             f.fraccionId = regexpNums.test(f.fraccionId) ? f.fraccionId : null;
             return f;
-        });
+        }).filter(f => !(f.fraccionId == null && f.estatus === Estatus.DESACTIVADO));
 
         const valuesRequest = {...values, fraccionesExternas: fraccionesExt}
         console.log("esEditar: " + esEditar + ", fraccionRequest: ", valuesRequest);
