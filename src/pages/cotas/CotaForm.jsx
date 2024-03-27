@@ -168,7 +168,7 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
                                 }}
                                 renderInput={params => (
                                     <TextField
-                                        label="Seleccion una fracción"
+                                        label="Seleccion una unidad"
                                         fullWidth
                                         variant="filled"
                                         type="text"

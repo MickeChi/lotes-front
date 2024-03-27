@@ -104,7 +104,7 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
 
     return (
         <Box>
-            <Header subtitle="Nueva Fracción"/>
+            <Header subtitle={ esEditar ? "Editando Unidad" : "Nueva Unidad"}/>
             <Formik
                 onSubmit={handleFormSubmit}
                 initialValues={ formState || initialValues}
@@ -158,7 +158,7 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
                                 helperText={touched.numeroCatastral && errors.numeroCatastral}
                                 sx={{ gridColumn: "span 2" }}
                             />
-                            <TextField
+                            {/*<TextField
                                 fullWidth
                                 variant="filled"
                                 type="text"
@@ -171,7 +171,7 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
                                 error={!!touched.finca && !!errors.finca}
                                 helperText={touched.finca && errors.finca}
                                 sx={{ gridColumn: "span 2" }}
-                            />
+                            />*/}
 
                             <TextField
                                 fullWidth

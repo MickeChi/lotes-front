@@ -118,7 +118,7 @@ const FraccionTable = ({proyectoId, handleEditRow}) => {
 
     return (
         <Box>
-            <Header subtitle="Fracciones" />
+            <Header subtitle="Unidades" />
             <Box
                 //m="40px 0 0 0"
                 height="75vh"
