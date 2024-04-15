@@ -85,7 +85,7 @@ const ProyectoShowPage = () => {
                     }}
                 >
                     <Tab value={1} label="Proyecto" />
-                    <Tab value={2} label="Fracciones" />
+                    <Tab value={2} label="Unidades" />
                     <Tab value={3} label="Cotas" />
                     <Tab value={4} label="Genera Documentos" />
                 </Tabs>
@@ -111,7 +111,7 @@ const ProyectoShowPage = () => {
 
                     {currentTab === 4 && (
                         <Grid container>
-                            <ProyectoDocumentos proyectoId={proyectoId}/>
+                            <ProyectoDocumentos proyectoTitulo={proyecto.titulo} proyectoId={proyectoId}/>
                         </Grid>
                     )}
 

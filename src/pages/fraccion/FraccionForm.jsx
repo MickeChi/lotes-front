@@ -18,6 +18,7 @@ import withReactContent from 'sweetalert2-react-content'
 import {useDispatch} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {createFraccion, updateFraccion} from "../../store/slices/fraccionSlice.js";
+import {Estatus} from "../../utils/constantes.js";
 
 const initialValues = {
     lote:"",
@@ -34,6 +35,7 @@ const initialValues = {
     tipoFraccion:"PARCELA",
     colindanciaProyecto: false,
     numeroParcela:"",
+    estatus: Estatus.ACTIVO
 };
 
 const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
@@ -68,6 +70,8 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
 
         if(fraccion){
             generaFormState();
+        }else{
+            handleReset();
         }
     }, [fraccion]);
 
@@ -100,7 +104,7 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
 
     return (
         <Box>
-            <Header subtitle="Nueva Fracción"/>
+            <Header subtitle={ esEditar ? "Editando Unidad" : "Nueva Unidad"}/>
             <Formik
                 onSubmit={handleFormSubmit}
                 initialValues={ formState || initialValues}
@@ -154,7 +158,7 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
                                 helperText={touched.numeroCatastral && errors.numeroCatastral}
                                 sx={{ gridColumn: "span 2" }}
                             />
-                            <TextField
+                            {/*<TextField
                                 fullWidth
                                 variant="filled"
                                 type="text"
@@ -167,7 +171,7 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
                                 error={!!touched.finca && !!errors.finca}
                                 helperText={touched.finca && errors.finca}
                                 sx={{ gridColumn: "span 2" }}
-                            />
+                            />*/}
 
                             <TextField
                                 fullWidth

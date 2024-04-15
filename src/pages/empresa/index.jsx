@@ -5,7 +5,7 @@ import { mockDataContacts } from "../../data/mockData";
 import Header from "../../components/Header";
 import { useTheme } from "@mui/material";
 
-const Contacts = () => {
+const Empresa = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -14,16 +14,9 @@ const Contacts = () => {
     { field: "registrarId", headerName: "Registrar ID" },
     {
       field: "name",
-      headerName: "Name",
+      headerName: "Razón Social",
       flex: 1,
       cellClassName: "name-column--cell",
-    },
-    {
-      field: "age",
-      headerName: "Age",
-      type: "number",
-      headerAlign: "left",
-      align: "left",
     },
     {
       field: "phone",
@@ -55,8 +48,8 @@ const Contacts = () => {
   return (
     <Box m="20px">
       <Header
-        title="CONTACTS"
-        subtitle="List of Contacts for Future Reference"
+        title="EMPRESAS"
+        subtitle="List de empresas"
       />
       <Box
         m="40px 0 0 0"
@@ -100,4 +93,4 @@ const Contacts = () => {
   );
 };
 
-export default Contacts;
+export default Empresa;

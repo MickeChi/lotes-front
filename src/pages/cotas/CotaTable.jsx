@@ -7,6 +7,10 @@ import {Edit, Visibility, AllOut} from "@mui/icons-material";
 import {useEffect} from "react";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {getAllCotas, setCotas} from "../../store/slices/cotaSlice.js";
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import {Estatus} from "../../utils/constantes.js";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
 
 const CotaTable = ({fraccionId, handleEditRow}) => {
     const theme = useTheme();
@@ -39,7 +43,7 @@ const CotaTable = ({fraccionId, handleEditRow}) => {
         },
         {
             field: "fraccionId",
-            headerName: "FraccionId",
+            headerName: "UnidadId",
             flex: 1,
             cellClassName: "name-column--cell",
         },
@@ -65,17 +69,34 @@ const CotaTable = ({fraccionId, handleEditRow}) => {
             renderCell: ({ row }) => {
                 return (
                     <ButtonGroup size="small" variant="contained"  aria-label="outlined button group">
-                        <Button color="warning" title="editar" onClick={()=>{
+                        <Button color="warning" title="Editar" onClick={()=>{
                             onClikEdit(row);
                         }}><Edit/></Button>
-                        {/*<Button color="secondary" title="Ver colindancias" onClick={()=>{
-                            onClikEdit(row);
-                        }}><Visibility/></Button>*/}
+                        <Button color="error" title="Eliminar" onClick={()=>{
+                            alertaEliminar(row);
+                        }}><DeleteForeverIcon/></Button>
                     </ButtonGroup>
                 );
             },
         },
     ];
+
+    const alertaEliminar = (cotaEdit) => {
+
+        console.log("alertaEliminar", cotaEdit);
+        withReactContent(Swal).fire({
+            title: "¿Está seguro de eliminar?",
+            icon: "error",
+            showCancelButton: true,
+            confirmButtonText: "Eliminar",
+            denyButtonText: `Cancelar`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log("SE CONFIRMA ELIMINACIÓN")
+                handleEditRow(cotaEdit, true);
+            }
+        });
+    }
 
     const onClikEdit = (cotaEdit) => {
         console.log("cotaEdit", cotaEdit)

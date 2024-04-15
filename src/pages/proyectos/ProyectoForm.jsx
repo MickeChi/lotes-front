@@ -31,6 +31,8 @@ import ProyectoColindanciaForm from "./FraccionExternaTable.jsx";
 import FraccionExternaTable from "./FraccionExternaTable.jsx";
 import {AddCircle} from "@mui/icons-material";
 import FraccionExternaModal from "./FraccionExternaModal.jsx";
+import {deleteFraccion} from "../../store/slices/fraccionSlice.js";
+import {Estatus} from "../../utils/constantes.js";
 
 const initialValues = {
     titulo: "",
@@ -42,7 +44,8 @@ const initialValues = {
     uso: "",
     clase: "",
     puntoPartida: "",
-    documento: ""
+    documento: "",
+    estatus: Estatus.ACTIVO
 };
 const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -127,7 +130,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         const fraccionesExt = fraccionesExternas.map(f =>{
             f.fraccionId = regexpNums.test(f.fraccionId) ? f.fraccionId : null;
             return f;
-        });
+        }).filter(f => !(f.fraccionId == null && f.estatus === Estatus.DESACTIVADO));
 
         const valuesRequest = {...values, fraccionesExternas: fraccionesExt}
         console.log("esEditar: " + esEditar + ", fraccionRequest: ", valuesRequest);
@@ -168,11 +171,59 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         }
     }
 
-    const handlerEditFracExt = (fraccExtEdit) => {
-        console.log("handlerEditFracExt: ", fraccExtEdit);
-        setFraccionExtUpdate(fraccExtEdit);
-        setOpenModal(true);
+    const handlerEditFracExt = (fraccExtEdit, eliminar = false) => {
+
+        if(eliminar){
+            console.log("handlerEditFracExt DELETE: ", fraccExtEdit);
+            handleDelete(fraccExtEdit);
+        }else{
+            console.log("handlerEditFracExt: ", fraccExtEdit);
+            setFraccionExtUpdate(fraccExtEdit);
+            setOpenModal(true);
+
+        }
+
     }
+
+
+    const handleDelete = (fraccionDelete) => {
+        let fraccExtDel = {...fraccionDelete, estatus: Estatus.DESACTIVADO}
+        console.log("handleDelete: ", fraccExtDel);
+
+        let existeFext = fraccionesExternas.find(f => f.fraccionId === fraccExtDel.fraccionId);
+        let listaFraccionesExt = [];
+        if(existeFext !== undefined){
+            listaFraccionesExt = fraccionesExternas.map( f => {
+                if(f.fraccionId === fraccExtDel.fraccionId){
+                    f = fraccExtDel;
+                }
+                return f;
+            });
+            setFraccionesExternas(listaFraccionesExt);
+            setFraccionExtUpdate(false);
+
+            withReactContent(Swal).fire({
+                title: "Se eliminó correctamente",
+                icon: "success"
+            });
+
+            console.log("BEFORE FRACEXT DELETE: ", listaFraccionesExt);
+
+        }
+
+
+
+        /*dispatch(setLoader(true));
+        dispatch(deleteFraccion(fraccionDelete)).then((resp) => {
+            dispatch(setLoader(false));
+            setFraccionUpdate(null);
+            withReactContent(Swal).fire({
+                title: "Se eliminó correctamente",
+                icon: "success"
+            })
+
+        })*/
+    };
 
     const textoErrorCotas = fraccionesExternasError ? 'Agregue al menos una colindancia' : 'Colindancias externas del proyecto';
 
@@ -243,7 +294,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
-                                                label="Título"
+                                                label="Nombre desarrollo"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 value={values.titulo}
@@ -338,7 +389,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
-                                                label="Subtotal"
+                                                label="Terreno exclusivo total"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 value={values.subtotal}
@@ -354,7 +405,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
-                                                label="Total fracciones"
+                                                label="Total unidades"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 value={values.totalFracciones}
@@ -456,7 +507,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="file"
-                                                label="Seleccione un archivo"
+                                                label="Seleccione autorización del proyecto"
                                                 InputLabelProps={{ shrink: true }}
                                                 onBlur={handleBlur}
                                                 //onChange={handleChange}
@@ -517,6 +568,7 @@ const checkoutSchema = yup.object().shape({
     titulo: yup.string().required("required"),
     estado: yup.string().required("required"),
     municipio: yup.string().required("required"),
+    localidad: yup.string().required("required"),
     subtotal: yup.number().required("required"),
     totalFracciones: yup.number().required("required"),
     uso: yup.string().required("required"),

@@ -20,6 +20,7 @@ import Swal from "sweetalert2";
 import {createFraccion, updateFraccion} from "../../store/slices/fraccionSlice.js";
 import Checkbox from "@mui/material/Checkbox";
 import {CheckBox, CheckBoxOutlineBlank} from "@mui/icons-material";
+import {Estatus} from "../../utils/constantes.js";
 
 const initialValues = {
     "orden": "",
@@ -27,7 +28,8 @@ const initialValues = {
     "orientacion": "",
     "medida": "",
     "fraccionId": "",
-    "colindanciasIds": []
+    "colindanciasIds": [],
+    "estatus": Estatus.ACTIVO
 }
 
 const icon = <CheckBoxOutlineBlank fontSize="small" />;
@@ -84,6 +86,8 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
                 return existId !== undefined;
             });
             setColindanciasSelect(colsSelect);
+        }else{
+            handleReset();
         }
     }, [cota]);
 
@@ -164,7 +168,7 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
                                 }}
                                 renderInput={params => (
                                     <TextField
-                                        label="Seleccion una fracción"
+                                        label="Seleccion una unidad"
                                         fullWidth
                                         variant="filled"
                                         type="text"
@@ -348,7 +352,7 @@ const checkoutSchema = yup.object().shape({
     "orientacion": yup.string().required("required"),
     "medida": yup.number().required("required"),
     "fraccionId": yup.number().required("required"),
-    "colindanciasIds": yup.array().min(1, "at least 1").required("required"),
+    "colindanciasIds": yup.array().min(1, "al menos 1").max(1, "máximo 1").required("required"),
 });
 
 
