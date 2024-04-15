@@ -43,7 +43,7 @@ const CotaTable = ({fraccionId, handleEditRow}) => {
         },
         {
             field: "fraccionId",
-            headerName: "FraccionId",
+            headerName: "UnidadId",
             flex: 1,
             cellClassName: "name-column--cell",
         },

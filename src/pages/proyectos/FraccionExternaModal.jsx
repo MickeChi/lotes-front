@@ -5,6 +5,8 @@ import {
     TextField,
     useTheme
 } from "@mui/material";
+import { v4 as randomUUID } from 'uuid';
+
 import {Formik} from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -73,7 +75,7 @@ const FraccionExternaModal = ({fraccionExt, handleEditRow, openModal, onCloseMod
     }, [fraccionExt]);
 
     const handleFormSubmit = (values, actions) => {
-        const id = values.fraccionId !== null ? values.fraccionId : crypto.randomUUID();
+        const id = values.fraccionId !== null ? values.fraccionId : randomUUID();
         const valuesRequest = {...values, fraccionId: id};
         console.log("esEditar: " + esEditar + ", fraccionExtRequest: ", valuesRequest);
         handleSubmitModal(valuesRequest);
@@ -129,7 +131,7 @@ const FraccionExternaModal = ({fraccionExt, handleEditRow, openModal, onCloseMod
                                     <CardHeader sx={{
                                         borderBottom: '1px solid #555'
                                     }}
-                                        title="Agregar fraccionExt proyecto"
+                                        title="Agregar colindancia proyecto"
                                     />
                                     <CardContent>
                                         <Grid container spacing={3}>

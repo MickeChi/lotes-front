@@ -21,7 +21,7 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import {Business, LanOutlined} from "@mui/icons-material";
-import imgAvatar from '../../assets/usuario.png';
+import imgAvatar from '../../assets/usuario2.jpg';
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);

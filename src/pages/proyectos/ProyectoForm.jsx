@@ -294,7 +294,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
-                                                label="Título"
+                                                label="Nombre desarrollo"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 value={values.titulo}
@@ -389,7 +389,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
-                                                label="Subtotal"
+                                                label="Terreno exclusivo total"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 value={values.subtotal}
@@ -405,7 +405,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
-                                                label="Total fracciones"
+                                                label="Total unidades"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 value={values.totalFracciones}
@@ -507,7 +507,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="file"
-                                                label="Seleccione un archivo"
+                                                label="Seleccione autorización del proyecto"
                                                 InputLabelProps={{ shrink: true }}
                                                 onBlur={handleBlur}
                                                 //onChange={handleChange}
@@ -568,6 +568,7 @@ const checkoutSchema = yup.object().shape({
     titulo: yup.string().required("required"),
     estado: yup.string().required("required"),
     municipio: yup.string().required("required"),
+    localidad: yup.string().required("required"),
     subtotal: yup.number().required("required"),
     totalFracciones: yup.number().required("required"),
     uso: yup.string().required("required"),
