@@ -17,7 +17,7 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import {useDispatch} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
-import {createFraccion, updateFraccion} from "../../store/slices/fraccionSlice.js";
+import {createUnidad, updateUnidad} from "../../store/slices/unidadSlice.js";
 import {Estatus} from "../../utils/constantes.js";
 
 const initialValues = {
@@ -32,54 +32,55 @@ const initialValues = {
     valorCatastral:"",
     uso:"",
     clase:"",
-    tipoFraccion:"PARCELA",
+    tipoUnidad:"PARCELA",
     colindanciaProyecto: false,
     numeroParcela:"",
+    documento: "",
     estatus: Estatus.ACTIVO
 };
 
-const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
+const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [formState, setFormState] = useState(fraccion || initialValues);
+    const [formState, setFormState] = useState(unidad || initialValues);
     const dispatch = useDispatch();
     const [esEditar, setEsEditar] = useState(false);
 
-    const tiposFraccion = ["PARCELA", "VIALIDAD", "LOTE"];
-    const [tipoFraccionSeleccionado, setTipoFraccionSeleccionado] = useState(null);
+    const tiposUnidad = ["PARCELA", "VIALIDAD", "LOTE"];
+    const [tipoUnidadSeleccionado, setTipoUnidadSeleccionado] = useState(null);
 
     const usos = ["HABITACIONAL", "COMERCIAL", "COMUN"];
     const [usoSeleccionado, setUsoSeleccionado] = useState(null);
 
     useEffect(() => {
         const generaFormState = () =>{
-            console.log("fraccionForm: ", fraccion);
-            const fraccionState = {...fraccion};
-            for(const key in fraccionState){
-                if(initialValues.hasOwnProperty(key) && (fraccionState[key] === null || fraccionState[key] === undefined)){
-                    fraccionState[key] = "";
+            console.log("unidadForm: ", unidad);
+            const unidadState = {...unidad};
+            for(const key in unidadState){
+                if(initialValues.hasOwnProperty(key) && (unidadState[key] === null || unidadState[key] === undefined)){
+                    unidadState[key] = "";
                 }
             }
-            console.log("fraccionState: ", fraccionState);
+            console.log("unidadState: ", unidadState);
             setEsEditar(true);
-            setFormState(fraccionState);
-            setUsoSeleccionado(fraccionState.uso);
-            setTipoFraccionSeleccionado(fraccionState.tipoFraccion);
+            setFormState(unidadState);
+            setUsoSeleccionado(unidadState.uso);
+            setTipoUnidadSeleccionado(unidadState.tipoUnidad);
         }
 
-        if(fraccion){
+        if(unidad){
             generaFormState();
         }else{
             handleReset();
         }
-    }, [fraccion]);
+    }, [unidad]);
 
     const handleFormSubmit = (values, actions) => {
-        const actionSubmit = esEditar ? updateFraccion : createFraccion;
+        const actionSubmit = esEditar ? updateUnidad : createUnidad;
         const valuesRequest = {...values, proyectoId: proyectoId}
 
-        console.log("esEditar: " + esEditar + ", fraccionRequest: ", valuesRequest);
+        console.log("esEditar: " + esEditar + ", unidadRequest: ", valuesRequest);
 
         dispatch(setLoader(true));
         dispatch(actionSubmit(valuesRequest)).then(() => {
@@ -97,7 +98,7 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
         console.log("Reset form initialValues: ", initialValues);
         setFormState(initialValues);
         setEsEditar(false);
-        setTipoFraccionSeleccionado(null);
+        setTipoUnidadSeleccionado(null);
         setUsoSeleccionado(null);
         handleEditRow(null);
     }
@@ -309,17 +310,17 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
                             />
 
                             <Autocomplete
-                                id="tipoFraccion"
-                                name="tipoFraccion"
-                                options={tiposFraccion}
+                                id="tipoUnidad"
+                                name="tipoUnidad"
+                                options={tiposUnidad}
                                 getOptionLabel={option => option}
-                                value={tipoFraccionSeleccionado}
+                                value={tipoUnidadSeleccionado}
                                 sx={{ gridColumn: "span 2" }}
                                 onChange={(e, value) => {
                                     setFieldValue(
-                                        "tipoFraccion", value !== null ? value : initialValues.tipoFraccion
+                                        "tipoUnidad", value !== null ? value : initialValues.tipoUnidad
                                     );
-                                    setTipoFraccionSeleccionado(value);
+                                    setTipoUnidadSeleccionado(value);
                                 }}
                                 renderInput={params => (
                                     <TextField
@@ -327,12 +328,12 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
                                         fullWidth
                                         variant="filled"
                                         type="text"
-                                        name="tipoFraccion"
+                                        name="tipoUnidad"
                                         color="secondary"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        error={!!touched.tipoFraccion && !!errors.tipoFraccion}
-                                        helperText={touched.tipoFraccion && errors.tipoFraccion}
+                                        error={!!touched.tipoUnidad && !!errors.tipoUnidad}
+                                        helperText={touched.tipoUnidad && errors.tipoUnidad}
                                         {...params}
                                     />
                                 )}
@@ -362,6 +363,27 @@ const FraccionForm = ({proyectoId, handleEditRow, fraccion}) => {
                                 error={!!touched.numeroParcela && !!errors.numeroParcela}
                                 helperText={touched.numeroParcela && errors.numeroParcela}
                                 sx={{ gridColumn: "span 2" }}
+                            />
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="file"
+                                label="Seleccione autorización del proyecto"
+                                InputLabelProps={{ shrink: true }}
+                                onBlur={handleBlur}
+                                //onChange={handleChange}
+                                //value={values.documento}
+                                name="documento"
+                                color="secondary"
+                                error={!!touched.documento && !!errors.documento}
+                                helperText={touched.documento && errors.documento}
+                                sx={{ gridColumn: "span 4" }}
+                                onChange={(e) => {
+                                    setFieldValue("documento", e.currentTarget.files[0]);
+                                    console.log("documento: ", e.currentTarget.files[0]);
+                                    /*setPuntoPartidaSelect(value);*/
+                                }}
                             />
 
 
@@ -397,11 +419,19 @@ const checkoutSchema = yup.object().shape({
     //valorCatastral: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
-    tipoFraccion: yup.string().required("required"),
+    tipoUnidad: yup.string().required("required"),
     //colindanciaProyecto: yup.bool().required("required"),
     //numeroParcela: yup.number().required("required"),
+    documento: yup.mixed()
+        //.required("required")
+        .nullable()
+        .notRequired()
+        .test("FILE_SIZE", "El tamaño del archivo es muy grande, maximo 15Mb",
+            value => !value || (value && value.size <= 15000000))
+        .test("FILE_FORMAT", "El tipo de archivo no es válido.",
+            value => !value || (value && ["application/pdf", "image/jpeg"].includes(value.type)))
 
 });
 
 
-export default FraccionForm;
+export default UnidadForm;

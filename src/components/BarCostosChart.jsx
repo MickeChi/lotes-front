@@ -59,7 +59,7 @@ const BarCostosChart = ({ isDashboard = false }) => {
           },
         },
       }}
-      keys={["PROYECTOS", "FRACCIONES", "COTAS", "DOCUMENTOS"]}
+      keys={["PROYECTOS", "UNIDADES", "COTAS", "DOCUMENTOS"]}
       indexBy="operacion"
       margin={{ top: 50, right: 150, bottom: 50, left: 60 }}
       padding={0.3}

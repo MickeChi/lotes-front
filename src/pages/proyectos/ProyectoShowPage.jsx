@@ -17,7 +17,7 @@ import ProyectoForm from "./ProyectoForm.jsx";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {useDispatch} from "react-redux";
 import ProyectoDocumentos from "./ProyectoDocumentos.jsx";
-import FraccionTab from "../fraccion/FraccionTab.jsx";
+import UnidadTab from "../unidad/UnidadTab.jsx";
 import CotaTab from "../cotas/CotaTab.jsx";
 
 const ProyectoShowPage = () => {
@@ -102,7 +102,7 @@ const ProyectoShowPage = () => {
                     )}
 
                     {currentTab === 2 && (
-                        <FraccionTab proyectoId={proyectoId}></FraccionTab>
+                        <UnidadTab proyectoId={proyectoId}></UnidadTab>
                     )}
 
                     {currentTab === 3 && (

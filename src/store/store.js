@@ -1,6 +1,6 @@
 import {configureStore} from "@reduxjs/toolkit";
 import proyectoReducer from "./slices/proyectoSlice.js";
-import fraccionReducer from "./slices/fraccionSlice.js";
+import unidadReducer from "./slices/unidadSlice.js";
 import generalSlice from "./slices/generalSlice.js";
 import cotaSlice from "./slices/cotaSlice.js";
 import operacionSlice from "./slices/operacionSlice.js";
@@ -9,7 +9,7 @@ const store = configureStore({
     reducer: {
         general: generalSlice,
         proyectos: proyectoReducer,
-        fracciones: fraccionReducer,
+        unidades: unidadReducer,
         cotas: cotaSlice,
         operaciones: operacionSlice
     },

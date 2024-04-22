@@ -1,60 +1,79 @@
-import {Box, Button, ButtonGroup, Typography, useTheme} from "@mui/material";
+import {Box, Button, ButtonGroup, useTheme} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme.jsx";
 import Header from "../../components/Header";
-import {useDispatch, useSelector} from "react-redux";
-import {Edit, Visibility, AllOut, CreateNewFolderOutlined, AddCircle} from "@mui/icons-material";
 import {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
-import {getAllCotas, setCotas} from "../../store/slices/cotaSlice.js";
-import {Link} from "react-router-dom";
-import FraccionExternaModal from "./FraccionExternaModal.jsx";
-import ModalDemo from "./ModalDemo.jsx";
+import {getAllUnidades} from "../../store/slices/unidadSlice.js";
+import {Edit} from "@mui/icons-material";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import {Estatus} from "../../utils/constantes.js";
 
-const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
+const UnidadTable = ({proyectoId, handleEditRow}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    //const dispatch = useDispatch();
-    //onChange={colindanciasHandler} colindanciasSelected={colindsIdsSelect}/>
-    const [fraccionesExtTable, setFraccionesExtTable] = useState([]);
-    useEffect(() => {
-        console.log("fraccionesExternas Change: ", fraccionesExternas);
-        let fraccionesActivas = fraccionesExternas.filter(f => f.estatus === Estatus.ACTIVO);
-        setFraccionesExtTable(fraccionesActivas);
+    const dispatch = useDispatch();
+    const unidades = useSelector(state => state.unidades.unidades);
+    const [unidadesTabla, setUnidadesTabla] = useState([]);
 
-    }, [fraccionesExternas]);
+    useEffect(() => {
+        console.log("proyectoId: ", proyectoId);
+        dispatch(setLoader(true));
+        dispatch(getAllUnidades({proyectoId: proyectoId}))
+            .then(resp => {
+                dispatch(setLoader(false));
+            })
+    }, []);
+
+    useEffect(() => {
+        if(unidades.length > 0){
+            let fraccTabla = unidades.filter(f => !f.colindanciaProyecto);
+            setUnidadesTabla(fraccTabla);
+        }
+
+    }, [unidades]);
 
     const columns = [
         {
-            field: "orden",
-            headerName: "Orden",
-            type: "number",
-            headerAlign: "left",
-            align: "left",
-        },
-        {
-            field: "descripcion",
-            headerName: "Descripción",
-            flex: 1,
-            cellClassName: "name-column--cell",
-        },
-        {
-            field: "tipoLinea",
-            headerName: "Tipo Linea",
+            field: "lote",
+            headerName: "Lote",
             flex: 1,
         },
         {
-            field: "orientacion",
-            headerName: "Rumbo",
+            field: "numeroCatastral",
+            headerName: "Num Catastral",
             flex: 1,
         },
         {
-            field: "medida",
-            headerName: "Distancia",
+            field: "folioElectronico",
+            headerName: "Folio electrónico",
+            flex: 1,
+        },
+        {
+            field: "superficieTerreno",
+            headerName: "Sup. terreno",
+            flex: 1,
+        },
+        {
+            field: "valorCatastral",
+            headerName: "Valor catastral",
+            flex: 1,
+        },
+        {
+            field: "uso",
+            headerName: "Uso",
+            flex: 1,
+        },
+        {
+            field: "clase",
+            headerName: "Clase",
+            flex: 1,
+        },
+        {
+            field: "tipoColindancia",
+            headerName: "Tipo colindancia",
             flex: 1,
         },
         {
@@ -76,9 +95,9 @@ const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
         },
     ];
 
-    const alertaEliminar = (fraccionEdit) => {
+    const alertaEliminar = (unidadEdit) => {
 
-        console.log("alertaEliminar", fraccionEdit);
+        console.log("alertaEliminar", unidadEdit);
         withReactContent(Swal).fire({
             title: "¿Está seguro de eliminar?",
             icon: "error",
@@ -88,20 +107,20 @@ const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 console.log("SE CONFIRMA ELIMINACIÓN")
-                handleEditRow(fraccionEdit, true);
+                handleEditRow(unidadEdit, true);
             }
         });
     }
 
-    const onClikEdit = (fracExtEdit) => {
-        console.log("onClikEdit fracExtEdit", fracExtEdit)
-        handleEditRow(fracExtEdit);
+    const onClikEdit = (unidadEdit) => {
+        handleEditRow(unidadEdit);
     }
 
     return (
+        <Box >
             <Box
                 //m="40px 0 0 0"
-                height="40vh"
+                height="75vh"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none",
@@ -131,12 +150,10 @@ const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
                     }
                 }}
             >
-                <DataGrid rows={fraccionesExtTable}
-                          columns={columns}
-                          getRowId={(row) => row.fraccionId}
-                />
+                <DataGrid rows={unidadesTabla} columns={columns} />
             </Box>
+        </Box>
     );
 };
 
-export default FraccionExternaTable;
+export default UnidadTable;

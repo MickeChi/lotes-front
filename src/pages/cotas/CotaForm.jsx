@@ -17,7 +17,7 @@ import {createCota, getAllCotas, setCotas, updateCota} from "../../store/slices/
 import ColindanciaTransList from "./ColindanciaTransList.jsx";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
-import {createFraccion, updateFraccion} from "../../store/slices/fraccionSlice.js";
+import {createUnidad, updateUnidad} from "../../store/slices/unidadSlice.js";
 import Checkbox from "@mui/material/Checkbox";
 import {CheckBox, CheckBoxOutlineBlank} from "@mui/icons-material";
 import {Estatus} from "../../utils/constantes.js";
@@ -27,7 +27,7 @@ const initialValues = {
     "tipoLinea": "",
     "orientacion": "",
     "medida": "",
-    "fraccionId": "",
+    "unidadId": "",
     "colindanciasIds": [],
     "estatus": Estatus.ACTIVO
 }
@@ -35,14 +35,14 @@ const initialValues = {
 const icon = <CheckBoxOutlineBlank fontSize="small" />;
 const checkedIcon = <CheckBox fontSize="small" />;
 
-const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
+const CotaForm = ({cota, handleUnidadSelect, handleEditRow}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [formState, setFormState] = useState(cota || initialValues);
     const dispatch = useDispatch();
-    const fracciones = useSelector(state => state.fracciones.fracciones);
-    const [fraccionSelect, setFraccionSelect] = useState(null);
+    const unidades = useSelector(state => state.unidades.unidades);
+    const [unidadSelect, setunidadSelect] = useState(null);
     const [esEditar, setEsEditar] = useState(false);
 
     const tiposLineas = ["RECTA", "CURVA"];
@@ -50,19 +50,19 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
     const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
     const [orientacionSelect, setOrientacionSelect] = useState(null);
     const [colindanciasSelect, setColindanciasSelect] = useState([]);
-    const [fraccionesForm, setFraccionesForm] = useState([]);
+    const [unidadesForm, setunidadesForm] = useState([]);
     const [colindanciasForm, setColindanciasForm] = useState([]);
 
 
     useEffect(() => {
-        if(fracciones.length > 0){
-            console.log("fracciones : ", fracciones);
-            let fraccsForm = fracciones.filter(f => !f.colindanciaProyecto);
-            console.log("fraccionesForm: ", fraccsForm);
-            setFraccionesForm(fraccsForm);
+        if(unidades.length > 0){
+            console.log("unidades : ", unidades);
+            let fraccsForm = unidades.filter(f => !f.colindanciaProyecto);
+            console.log("unidadesForm: ", fraccsForm);
+            setunidadesForm(fraccsForm);
 
             let colidsForm = [];
-            fracciones.forEach(f => {
+            unidades.forEach(f => {
                 let label = f.colindanciaProyecto ? f.descripcion : `Lote: ${f.lote} - Número catastral: ${f.numeroCatastral}`;
                 colidsForm.push({...f, label})
             });
@@ -70,14 +70,14 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
             setColindanciasForm(colidsForm);
         }
 
-    }, [fracciones]);
+    }, [unidades]);
 
     useEffect(() => {
         if(cota){
             setEsEditar(true);
             setFormState(cota);
-            let fraccionSel = fracciones.find(f => f.id === cota.fraccionId);
-            setFraccionSelect(fraccionSel === undefined ? null : fraccionSel);
+            let unidadSel = unidades.find(f => f.id === cota.unidadId);
+            setunidadSelect(unidadSel === undefined ? null : unidadSel);
             setOrientacionSelect(cota.orientacion);
             setTipoLineaSelect(cota.tipoLinea);
 
@@ -93,8 +93,8 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
 
     useEffect(() => {
         handleReset();
-        handleFraccionSelect(fraccionSelect);
-    }, [fraccionSelect]);
+        handleUnidadSelect(unidadSelect);
+    }, [unidadSelect]);
 
     const handleFormSubmit = (values, actions) => {
         const actionSubmit = esEditar ? updateCota : createCota;
@@ -116,7 +116,7 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
 
     const handleReset = () => {
         console.log("Reset form initialValues: ", initialValues);
-        setFormState({...initialValues, fraccionId: (fraccionSelect ? fraccionSelect.id : "")});
+        setFormState({...initialValues, unidadId: (unidadSelect ? unidadSelect.id : "")});
         setEsEditar(false);
         setTipoLineaSelect(null);
         setOrientacionSelect(null);
@@ -154,17 +154,17 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
                             }}
                         >
                             <Autocomplete
-                                id="fraccionId"
-                                name="fraccionId"
-                                options={fraccionesForm}
+                                id="unidadId"
+                                name="unidadId"
+                                options={unidadesForm}
                                 getOptionLabel={option => `Lote: ${option.lote} - Número catastral: ${option.numeroCatastral}`}
-                                value={fraccionSelect}
+                                value={unidadSelect}
                                 sx={{ gridColumn: "span 4" }}
                                 onChange={(e, value) => {
                                     setFieldValue(
-                                        "fraccionId", value !== null ? value.id : initialValues.fraccionId
+                                        "unidadId", value !== null ? value.id : initialValues.unidadId
                                     );
-                                    setFraccionSelect(value);
+                                    setunidadSelect(value);
                                 }}
                                 renderInput={params => (
                                     <TextField
@@ -172,12 +172,12 @@ const CotaForm = ({cota, handleFraccionSelect, handleEditRow}) => {
                                         fullWidth
                                         variant="filled"
                                         type="text"
-                                        name="fraccionId"
+                                        name="unidadId"
                                         color="secondary"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        error={!!touched.fraccionId && !!errors.fraccionId}
-                                        helperText={touched.fraccionId && errors.fraccionId}
+                                        error={!!touched.unidadId && !!errors.unidadId}
+                                        helperText={touched.unidadId && errors.unidadId}
                                         {...params}
                                     />
                                 )}
@@ -351,7 +351,7 @@ const checkoutSchema = yup.object().shape({
     "tipoLinea": yup.string().required("required"),
     "orientacion": yup.string().required("required"),
     "medida": yup.number().required("required"),
-    "fraccionId": yup.number().required("required"),
+    "unidadId": yup.number().required("required"),
     "colindanciasIds": yup.array().min(1, "al menos 1").max(1, "máximo 1").required("required"),
 });
 

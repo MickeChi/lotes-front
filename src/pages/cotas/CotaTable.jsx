@@ -12,7 +12,7 @@ import {Estatus} from "../../utils/constantes.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 
-const CotaTable = ({fraccionId, handleEditRow}) => {
+const CotaTable = ({unidadId, handleEditRow}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const dispatch = useDispatch();
@@ -21,17 +21,17 @@ const CotaTable = ({fraccionId, handleEditRow}) => {
     useEffect(() => {
         const cargarCotas = ()=>{
             dispatch(setLoader(true));
-            dispatch(getAllCotas({fraccionId: fraccionId})).then(resp => {
+            dispatch(getAllCotas({unidadId: unidadId})).then(resp => {
                 dispatch(setLoader(false));
             })
         }
-        if(fraccionId) {
+        if(unidadId) {
             cargarCotas();
         }else{
             dispatch(setCotas([]));
         }
 
-    }, [fraccionId]);
+    }, [unidadId]);
 
     const columns = [
         {
@@ -42,8 +42,8 @@ const CotaTable = ({fraccionId, handleEditRow}) => {
             align: "left",
         },
         {
-            field: "fraccionId",
-            headerName: "UnidadId",
+            field: "unidadId",
+            headerName: "unidadId",
             flex: 1,
             cellClassName: "name-column--cell",
         },

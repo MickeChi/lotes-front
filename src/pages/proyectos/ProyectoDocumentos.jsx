@@ -34,7 +34,7 @@ const ProyectoDocumentos = ({proyectoId, proyectoTitulo}) => {
     const generaDocumento = () => {
         console.log("Generando proyecto: ", proyectoId);
         dispatch(setLoader(true));
-        ProyectoService.getFraccionesDoc(proyectoId).then(resp => {
+        ProyectoService.getUnidadesDoc(proyectoId).then(resp => {
             dispatch(setLoader(false));
 
             console.log("docGenerado: ", resp.data);
@@ -94,9 +94,9 @@ const ProyectoDocumentos = ({proyectoId, proyectoTitulo}) => {
                         <Typography variant="h4" fontWeight="600" sx={{mt: "15px"}}>{proyectoTitulo}</Typography>
 
                         {
-                            docGenerado.fraccionesTxt.map( f => {
+                            docGenerado.unidadesTxt.map( f => {
                                 return (
-                                    <Typography key={f.fraccionId} variant="h6" fontWeight="600" sx={{mt: "15px"}}>{f.fraccionTexto}</Typography>
+                                    <Typography key={f.unidadId} variant="h6" fontWeight="600" sx={{mt: "15px"}}>{f.unidadTexto}</Typography>
                                 );
                             })
                         }

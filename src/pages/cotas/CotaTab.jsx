@@ -7,7 +7,7 @@ import CotaForm from "./CotaForm.jsx";
 import CotaTable from "./CotaTable.jsx";
 import {useEffect, useState} from "react";
 import {setLoader} from "../../store/slices/generalSlice.js";
-import {getAllFracciones} from "../../store/slices/fraccionSlice.js";
+import {getAllUnidades} from "../../store/slices/unidadSlice.js";
 import {useDispatch, useSelector} from "react-redux";
 import {Estatus} from "../../utils/constantes.js";
 import {createCota, deleteCota, updateCota} from "../../store/slices/cotaSlice.js";
@@ -20,25 +20,25 @@ const CotaTab = ({proyectoId}) => {
     const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [fraccionIdSelect, setFraccionIdSelect] = useState(null);
+    const [unidadIdSelect, setunidadIdSelect] = useState(null);
     const [cotaUpdate, setCotaUpdate] = useState(null);
-    const fracciones = useSelector(state => state.fracciones.fracciones);
+    const unidades = useSelector(state => state.unidades.unidades);
 
 
     useEffect(() => {
-        if(fracciones.length === 0){
+        if(unidades.length === 0){
             console.log("proyectoId: ", proyectoId);
             dispatch(setLoader(true));
-            dispatch(getAllFracciones({proyectoId: proyectoId}))
+            dispatch(getAllUnidades({proyectoId: proyectoId}))
                 .then(resp => {
                     dispatch(setLoader(false));
                 });
         }
-    }, [fracciones]);
+    }, [unidades]);
 
-    const handleFraccionSelect = (fraccionSelect) => {
-        console.log("handleFraccionSelect: ", fraccionSelect);
-        setFraccionIdSelect(fraccionSelect ? fraccionSelect.id : null);
+    const handleUnidadSelect = (unidadSelect) => {
+        console.log("handleUnidadSelect: ", unidadSelect);
+        setunidadIdSelect(unidadSelect ? unidadSelect.id : null);
     }
 
     const handlerEditCota = (cotaEdit, eliminar = false) => {
@@ -72,10 +72,10 @@ const CotaTab = ({proyectoId}) => {
     return (
         <Grid container spacing={3}>
             <Grid item md={5}>
-                <CotaForm handleFraccionSelect={handleFraccionSelect} cota={cotaUpdate} handleEditRow={handlerEditCota}/>
+                <CotaForm handleUnidadSelect={handleUnidadSelect} cota={cotaUpdate} handleEditRow={handlerEditCota}/>
             </Grid>
             <Grid item md={7}>
-                <CotaTable fraccionId={fraccionIdSelect} handleEditRow={handlerEditCota}/>
+                <CotaTable unidadId={unidadIdSelect} handleEditRow={handlerEditCota}/>
             </Grid>
 
             {/*<Dialog

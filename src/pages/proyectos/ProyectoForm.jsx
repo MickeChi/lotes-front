@@ -27,11 +27,11 @@ import {
 } from "../../store/slices/generalSlice.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
-import ProyectoColindanciaForm from "./FraccionExternaTable.jsx";
-import FraccionExternaTable from "./FraccionExternaTable.jsx";
+import ProyectoColindanciaForm from "./UnidadExternaTable.jsx";
+import UnidadExternaTable from "./UnidadExternaTable.jsx";
 import {AddCircle} from "@mui/icons-material";
-import FraccionExternaModal from "./FraccionExternaModal.jsx";
-import {deleteFraccion} from "../../store/slices/fraccionSlice.js";
+import UnidadExternaModal from "./UnidadExternaModal.jsx";
+import {deleteUnidad} from "../../store/slices/UnidadSlice.js";
 import {Estatus} from "../../utils/constantes.js";
 
 const initialValues = {
@@ -40,7 +40,7 @@ const initialValues = {
     municipio: "",
     localidad: "",
     subtotal: "",
-    totalFracciones: "",
+    totalUnidades: "",
     uso: "",
     clase: "",
     puntoPartida: "",
@@ -59,10 +59,10 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const estados = useSelector(state => state.general.estados);
     const municipios = useSelector(state => state.general.municipios);
     const [contCargaMunicipio, setContCargaMunicipio] = useState(1);
-    const [fraccionesExternas, setFraccionesExternas] = useState([]);
-    const [fraccionesExternasError, setFraccionesExternasError] = useState(false);
+    const [unidadesExternas, setUnidadesExternas] = useState([]);
+    const [unidadesExternasError, setUnidadesExternasError] = useState(false);
     const [openModal, setOpenModal] = useState(false);
-    const [fraccionExtUpdate, setFraccionExtUpdate] = useState(null);
+    const [unidadExtUpdate, setUnidadExtUpdate] = useState(null);
     const [urlDocumento, setUrlDocumento] = useState(null);
 
     const regexpNums = /^\d*$/;
@@ -76,7 +76,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         if(proyecto){
             setPuntoPartidaSelect(proyecto.puntoPartida);
             setUsoSeleccionado(proyecto.uso);
-            setFraccionesExternas(proyecto.fraccionesExternas);
+            setUnidadesExternas(proyecto.unidadesExternas);
             setUrlDocumento(proyecto.nombreDocumento ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + proyecto.nombreDocumento : null);
         }
 
@@ -113,27 +113,28 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     }, [estadoSeleccionado]);
 
     useEffect(() => {
-        console.log("fraccionesExternas change", fraccionesExternas);
-        if(fraccionesExternas.length === 0){
-            setFraccionesExternasError(true);
+        console.log("unidadesExternas change", unidadesExternas);
+        if(unidadesExternas.length === 0){
+            setUnidadesExternasError(true);
         }else{
-            setFraccionesExternasError(false);
+            setUnidadesExternasError(false);
         }
 
-    }, [fraccionesExternas]);
+    }, [unidadesExternas]);
 
 
     const handleFormSubmit = (values) => {
         console.log("crear proyecto: ", values);
-        if(fraccionesExternas.length === 0) return
 
-        const fraccionesExt = fraccionesExternas.map(f =>{
-            f.fraccionId = regexpNums.test(f.fraccionId) ? f.fraccionId : null;
+        /*if(unidadesExternas.length === 0) return
+
+        const unidadesExt = unidadesExternas.map(f =>{
+            f.unidadId = regexpNums.test(f.unidadId) ? f.unidadId : null;
             return f;
-        }).filter(f => !(f.fraccionId == null && f.estatus === Estatus.DESACTIVADO));
+        }).filter(f => !(f.unidadId == null && f.estatus === Estatus.DESACTIVADO));*/
 
-        const valuesRequest = {...values, fraccionesExternas: fraccionesExt}
-        console.log("esEditar: " + esEditar + ", fraccionRequest: ", valuesRequest);
+        const valuesRequest = {...values, unidadesExternas: []}
+        console.log("esEditar: " + esEditar + ", UnidadRequest: ", valuesRequest);
 
         let actionSubmit = esEditar ? updateProyecto : createProyecto;
 
@@ -156,29 +157,29 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
 
     const handleSubmitModal = (fracExt) => {
         console.log("handleSubmitModal", fracExt);
-        let existeFext = fraccionesExternas.find(f => f.fraccionId === fracExt.fraccionId);
-        let listaFraccionesExt = [];
+        let existeFext = unidadesExternas.find(f => f.unidadId === fracExt.unidadId);
+        let listaUnidadesExt = [];
         if(existeFext !== undefined){
-            listaFraccionesExt = fraccionesExternas.map( f => {
-                if(f.fraccionId === fracExt.fraccionId){
+            listaUnidadesExt = unidadesExternas.map( f => {
+                if(f.unidadId === fracExt.unidadId){
                     f = fracExt;
                 }
                 return f;
             });
-            setFraccionesExternas(listaFraccionesExt)
+            setUnidadesExternas(listaUnidadesExt)
         }else{
-            setFraccionesExternas(prevState => [...prevState, fracExt]);
+            setUnidadesExternas(prevState => [...prevState, fracExt]);
         }
     }
 
-    const handlerEditFracExt = (fraccExtEdit, eliminar = false) => {
+    const handlerEditFracExt = (unidExtEdit, eliminar = false) => {
 
         if(eliminar){
-            console.log("handlerEditFracExt DELETE: ", fraccExtEdit);
-            handleDelete(fraccExtEdit);
+            console.log("handlerEditFracExt DELETE: ", unidExtEdit);
+            handleDelete(unidExtEdit);
         }else{
-            console.log("handlerEditFracExt: ", fraccExtEdit);
-            setFraccionExtUpdate(fraccExtEdit);
+            console.log("handlerEditFracExt: ", unidExtEdit);
+            setUnidadExtUpdate(unidExtEdit);
             setOpenModal(true);
 
         }
@@ -186,37 +187,37 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     }
 
 
-    const handleDelete = (fraccionDelete) => {
-        let fraccExtDel = {...fraccionDelete, estatus: Estatus.DESACTIVADO}
-        console.log("handleDelete: ", fraccExtDel);
+    const handleDelete = (unidadDelete) => {
+        let unidExtDel = {...unidadDelete, estatus: Estatus.DESACTIVADO}
+        console.log("handleDelete: ", unidExtDel);
 
-        let existeFext = fraccionesExternas.find(f => f.fraccionId === fraccExtDel.fraccionId);
-        let listaFraccionesExt = [];
+        let existeFext = unidadesExternas.find(f => f.unidadId === unidExtDel.unidadId);
+        let listaUnidadesExt = [];
         if(existeFext !== undefined){
-            listaFraccionesExt = fraccionesExternas.map( f => {
-                if(f.fraccionId === fraccExtDel.fraccionId){
-                    f = fraccExtDel;
+            listaUnidadesExt = unidadesExternas.map( f => {
+                if(f.unidadId === unidExtDel.unidadId){
+                    f = unidExtDel;
                 }
                 return f;
             });
-            setFraccionesExternas(listaFraccionesExt);
-            setFraccionExtUpdate(false);
+            setUnidadesExternas(listaUnidadesExt);
+            setUnidadExtUpdate(false);
 
             withReactContent(Swal).fire({
                 title: "Se eliminó correctamente",
                 icon: "success"
             });
 
-            console.log("BEFORE FRACEXT DELETE: ", listaFraccionesExt);
+            console.log("BEFORE FRACEXT DELETE: ", listaUnidadesExt);
 
         }
 
 
 
         /*dispatch(setLoader(true));
-        dispatch(deleteFraccion(fraccionDelete)).then((resp) => {
+        dispatch(deleteUnidad(unidadDelete)).then((resp) => {
             dispatch(setLoader(false));
-            setFraccionUpdate(null);
+            setUnidadUpdate(null);
             withReactContent(Swal).fire({
                 title: "Se eliminó correctamente",
                 icon: "success"
@@ -225,15 +226,15 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         })*/
     };
 
-    const textoErrorCotas = fraccionesExternasError ? 'Agregue al menos una colindancia' : 'Colindancias externas del proyecto';
+    const textoErrorCotas = unidadesExternasError ? 'Agregue al menos una colindancia' : 'Colindancias externas del proyecto';
 
     return (
 
         <Grid container spacing={3}>
-            <Grid item md={6}>
+            <Grid item md={4}>
                 <Box display="flex" justifyContent="space-between">
                     <Header subtitle={ esEditar ? "Editando Proyecto" : "Nuevo Proyecto"}/>
-                    {
+                    {/*{
                         urlDocumento && (<Box>
                             <a href={urlDocumento} target="_blank">
                                 <Button
@@ -246,14 +247,15 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                 </Button>
                             </a>
                         </Box>)
-                    }
+                    }*/}
                 </Box>
             </Grid>
-            <Grid item md={6}>
+            <Grid item md={8}>
                 <Box display="flex" justifyContent="space-between">
-                    <Header subtitle={textoErrorCotas} error={fraccionesExternasError}/>
+                    {/*<Header subtitle={textoErrorCotas} error={unidadesExternasError}/>*/}
+                    <Header subtitle="Documento de autorización"/>
                     <Box>
-                        <Button
+                        {/*<Button
                             size="small"
                             color="warning"
                             variant="contained"
@@ -263,31 +265,31 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                         >
                             <AddCircle sx={{ mr: "10px" }}/>
                             Agregar colindancia
-                        </Button>
+                        </Button>*/}
                     </Box>
                 </Box>
             </Grid>
             <Grid item md={12}>
+                <Grid container spacing={3}>
+                    <Grid item md={4} style={{ paddingTop: "0" }}>
+                        <Formik
+                            onSubmit={handleFormSubmit}
+                            initialValues={formState}
+                            validationSchema={checkoutSchema}
+                        >
+                            {({
+                                  values,
+                                  errors,
+                                  touched,
+                                  handleBlur,
+                                  handleChange,
+                                  handleSubmit,
+                                  setFieldValue,
+                                  //handleReset
+                              }) => (
 
-                <Formik
-                    onSubmit={handleFormSubmit}
-                    initialValues={formState}
-                    validationSchema={checkoutSchema}
-                >
-                    {({
-                          values,
-                          errors,
-                          touched,
-                          handleBlur,
-                          handleChange,
-                          handleSubmit,
-                          setFieldValue,
-                          //handleReset
-                      }) => (
+                                <form onSubmit={handleSubmit}>
 
-                        <form onSubmit={handleSubmit}>
-                            <Grid container spacing={3}>
-                                <Grid item md={6} style={{ paddingTop: "0" }}>
                                     <Grid container spacing={3}>
                                         <Grid item md={12}>
                                             <TextField
@@ -408,11 +410,11 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 label="Total unidades"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
-                                                value={values.totalFracciones}
-                                                name="totalFracciones"
+                                                value={values.totalUnidades}
+                                                name="totalUnidades"
                                                 color="secondary"
-                                                error={!!touched.totalFracciones && !!errors.totalFracciones}
-                                                helperText={touched.totalFracciones && errors.totalFracciones}
+                                                error={!!touched.totalUnidades && !!errors.totalUnidades}
+                                                helperText={touched.totalUnidades && errors.totalUnidades}
                                                 sx={{ gridColumn: "span 2" }}
                                             />
                                         </Grid>
@@ -460,7 +462,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 color="secondary"
                                                 error={!!touched.clase && !!errors.clase}
                                                 helperText={touched.clase && errors.clase}
-                                                sx={{ gridColumn: "span 1" }}
                                             />
                                         </Grid>
                                         <Grid item md={6}>
@@ -470,7 +471,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 options={orientaciones}
                                                 getOptionLabel={option => option}
                                                 value={puntoPartidaSelect}
-                                                sx={{ gridColumn: "span 2" }}
                                                 onChange={(e, value) => {
                                                     setFieldValue(
                                                         "puntoPartida", value !== null ? value : initialValues.puntoPartida
@@ -495,14 +495,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                             />
                                         </Grid>
                                         <Grid item md={12}>
-                                            {/*<FormControl variant="filled">
-                                                <InputLabel htmlFor="component-filled">Name</InputLabel>
-                                                <FilledInput id="component-filled" defaultValue="Composed TextField" />
-                                            </FormControl>*/}
-                                            {/*<input id="file" name="file" type="file" onChange={(event) => {
-                                                //setfieldvalue("file", event.currenttarget.files[0]);
-                                            }}/>*/}
-
                                             <TextField
                                                 fullWidth
                                                 variant="filled"
@@ -516,7 +508,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 color="secondary"
                                                 error={!!touched.documento && !!errors.documento}
                                                 helperText={touched.documento && errors.documento}
-                                                sx={{ gridColumn: "span 2" }}
                                                 onChange={(e) => {
                                                     setFieldValue("documento", e.currentTarget.files[0]);
                                                     console.log("documento: ", e.currentTarget.files[0]);
@@ -525,36 +516,44 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                             />
                                         </Grid>
                                     </Grid>
-                                </Grid>
-
-                                <Grid item md={6} style={{ paddingTop: "0" }}>
-                                    <Grid container>
-                                        <Grid item md={12}>
-                                            <FraccionExternaTable
-                                                handleEditRow={handlerEditFracExt}
-                                                fraccionesExternas={fraccionesExternas}
-                                            />
-                                        </Grid>
+                                    <Grid item md={12} display="flex" justifyContent="end" mt="20px">
+                                        <Button type="submit" color="secondary" variant="contained">
+                                            Guardar
+                                        </Button>
                                     </Grid>
-                                </Grid>
 
-                                <Grid item md={12} display="flex" justifyContent="end">
-                                    <Button type="submit" color="secondary" variant="contained">
-                                        Guardar
-                                    </Button>
-                                </Grid>
+                                </form>
+                            )}
+                        </Formik>
+                    </Grid>
+                    <Grid item md={8} style={{ paddingTop: "0" }}>
+                        <Grid container>
 
-                            </Grid>
-                        </form>
-                    )}
-                </Formik>
+                            {
+                                urlDocumento && (
+                                    <Grid item md={12}>
+                                        <iframe className="pdf"
+                                                src={urlDocumento}
+                                                width="100%" height="520">
+                                        </iframe>
+                                    </Grid>
+                                )
+                            }
+
+                            {/*<UnidadExternaTable
+                                                handleEditRow={handlerEditFracExt}
+                                                unidadesExternas={unidadesExternas}
+                                            />*/}
+                        </Grid>
+                    </Grid>
+                </Grid>
             </Grid>
 
-            <FraccionExternaModal openModal={openModal}
-                                  fraccionExt={fraccionExtUpdate}
-                                  handleEditRow={setFraccionExtUpdate}
-                                  handleSubmitModal={handleSubmitModal}
-                                  onCloseModal={setOpenModal}
+            <UnidadExternaModal openModal={openModal}
+                                unidadExt={unidadExtUpdate}
+                                handleEditRow={setUnidadExtUpdate}
+                                handleSubmitModal={handleSubmitModal}
+                                onCloseModal={setOpenModal}
             />
 
         </Grid>
@@ -570,7 +569,7 @@ const checkoutSchema = yup.object().shape({
     municipio: yup.string().required("required"),
     localidad: yup.string().required("required"),
     subtotal: yup.number().required("required"),
-    totalFracciones: yup.number().required("required"),
+    totalUnidades: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
     puntoPartida: yup.string().required("required"),
