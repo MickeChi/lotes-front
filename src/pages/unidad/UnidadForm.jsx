@@ -52,6 +52,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
 
     const usos = ["HABITACIONAL", "COMERCIAL", "COMUN"];
     const [usoSeleccionado, setUsoSeleccionado] = useState(null);
+    const [showHeader, setShowHeader] = useState(false);
 
     useEffect(() => {
         const generaFormState = () =>{
@@ -105,7 +106,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
 
     return (
         <Box>
-            <Header subtitle={ esEditar ? "Editando Unidad" : "Nueva Unidad"}/>
+            {showHeader && <Header subtitle={esEditar ? "Editando Unidad" : "Nueva Unidad"}/>}
             <Formik
                 onSubmit={handleFormSubmit}
                 initialValues={ formState || initialValues}
@@ -159,20 +160,6 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 helperText={touched.numeroCatastral && errors.numeroCatastral}
                                 sx={{ gridColumn: "span 2" }}
                             />
-                            {/*<TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                label="Finca"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.finca}
-                                name="finca"
-                                color="secondary"
-                                error={!!touched.finca && !!errors.finca}
-                                helperText={touched.finca && errors.finca}
-                                sx={{ gridColumn: "span 2" }}
-                            />*/}
 
                             <TextField
                                 fullWidth
@@ -339,17 +326,6 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 )}
                             />
 
-
-                            {/*<FormControlLabel control={
-                                <Checkbox color="secondary" checked={values.colindanciaProyecto} />
-                            }
-                                              name="colindanciaProyecto"
-                                              onChange={handleChange}
-                                              label="Colindancia proyecto"
-                                              sx={{ gridColumn: "span 2" }}/>
-*/}
-
-
                             <TextField
                                 fullWidth
                                 variant="filled"
@@ -372,8 +348,6 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 label="Seleccione autorización del proyecto"
                                 InputLabelProps={{ shrink: true }}
                                 onBlur={handleBlur}
-                                //onChange={handleChange}
-                                //value={values.documento}
                                 name="documento"
                                 color="secondary"
                                 error={!!touched.documento && !!errors.documento}
@@ -382,11 +356,8 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 onChange={(e) => {
                                     setFieldValue("documento", e.currentTarget.files[0]);
                                     console.log("documento: ", e.currentTarget.files[0]);
-                                    /*setPuntoPartidaSelect(value);*/
                                 }}
                             />
-
-
 
                         </Box>
                         <Box display="flex" justifyContent="end" mt="20px" cellSpacing={2}>

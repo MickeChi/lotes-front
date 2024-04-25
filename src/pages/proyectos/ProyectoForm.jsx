@@ -76,7 +76,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         if(proyecto){
             setPuntoPartidaSelect(proyecto.puntoPartida);
             setUsoSeleccionado(proyecto.uso);
-            setUnidadesExternas(proyecto.unidadesExternas);
+            //setUnidadesExternas(proyecto.unidadesExternas);
             setUrlDocumento(proyecto.nombreDocumento ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + proyecto.nombreDocumento : null);
         }
 
@@ -112,7 +112,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
 
     }, [estadoSeleccionado]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         console.log("unidadesExternas change", unidadesExternas);
         if(unidadesExternas.length === 0){
             setUnidadesExternasError(true);
@@ -120,7 +120,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
             setUnidadesExternasError(false);
         }
 
-    }, [unidadesExternas]);
+    }, [unidadesExternas]);*/
 
 
     const handleFormSubmit = (values) => {

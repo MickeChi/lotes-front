@@ -52,7 +52,7 @@ const CotaForm = ({cota, handleUnidadSelect, handleEditRow}) => {
     const [colindanciasSelect, setColindanciasSelect] = useState([]);
     const [unidadesForm, setunidadesForm] = useState([]);
     const [colindanciasForm, setColindanciasForm] = useState([]);
-
+    const [showHeader, setShowHeader] = useState(false);
 
     useEffect(() => {
         if(unidades.length > 0){
@@ -127,7 +127,7 @@ const CotaForm = ({cota, handleUnidadSelect, handleEditRow}) => {
 
     return (
         <Box>
-            <Header subtitle="Nueva Cota"/>
+            {showHeader && <Header subtitle="Nueva Cota"/>}
             <Formik
 
                 onSubmit={handleFormSubmit}
@@ -153,7 +153,7 @@ const CotaForm = ({cota, handleUnidadSelect, handleEditRow}) => {
                                 "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
                             }}
                         >
-                            <Autocomplete
+                            {/*<Autocomplete
                                 id="unidadId"
                                 name="unidadId"
                                 options={unidadesForm}
@@ -181,9 +181,9 @@ const CotaForm = ({cota, handleUnidadSelect, handleEditRow}) => {
                                         {...params}
                                     />
                                 )}
-                            />
+                            />*/}
 
-                            <TextField
+                            {/*<TextField
                                 fullWidth
                                 variant="filled"
                                 type="text"
@@ -196,7 +196,7 @@ const CotaForm = ({cota, handleUnidadSelect, handleEditRow}) => {
                                 helperText={touched.orden && errors.orden}
                                 color="secondary"
                                 sx={{ gridColumn: "span 2" }}
-                            />
+                            />*/}
 
 
                             <Autocomplete

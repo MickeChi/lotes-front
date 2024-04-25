@@ -19,6 +19,7 @@ const CotaTable = ({unidadId, handleEditRow}) => {
     const cotas = useSelector(state => state.cotas.cotas);
 
     useEffect(() => {
+        console.log("CotaTable unidadID: ", unidadId);
         const cargarCotas = ()=>{
             dispatch(setLoader(true));
             dispatch(getAllCotas({unidadId: unidadId})).then(resp => {
@@ -34,16 +35,16 @@ const CotaTable = ({unidadId, handleEditRow}) => {
     }, [unidadId]);
 
     const columns = [
-        {
+        /*{
             field: "orden",
             headerName: "Orden",
             type: "number",
             headerAlign: "left",
             align: "left",
-        },
+        },*/
         {
             field: "unidadId",
-            headerName: "unidadId",
+            headerName: "Unidad",
             flex: 1,
             cellClassName: "name-column--cell",
         },
@@ -105,10 +106,10 @@ const CotaTable = ({unidadId, handleEditRow}) => {
 
     return (
         <Box>
-            <Header subtitle="Cotas" />
+            {/*<Header subtitle="Cotas" />*/}
             <Box
                 //m="40px 0 0 0"
-                height="75vh"
+                height="300px"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none",

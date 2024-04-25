@@ -14,7 +14,7 @@ import {createCota, deleteCota, updateCota} from "../../store/slices/cotaSlice.j
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 
-const CotaTab = ({proyectoId}) => {
+const CotaTab = ({unidadId, showVertical}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -22,10 +22,10 @@ const CotaTab = ({proyectoId}) => {
     const dispatch = useDispatch();
     const [unidadIdSelect, setunidadIdSelect] = useState(null);
     const [cotaUpdate, setCotaUpdate] = useState(null);
-    const unidades = useSelector(state => state.unidades.unidades);
+    //const unidades = useSelector(state => state.unidades.unidades);
 
 
-    useEffect(() => {
+    /*useEffect(() => {
         if(unidades.length === 0){
             console.log("proyectoId: ", proyectoId);
             dispatch(setLoader(true));
@@ -34,7 +34,7 @@ const CotaTab = ({proyectoId}) => {
                     dispatch(setLoader(false));
                 });
         }
-    }, [unidades]);
+    }, [unidades]);*/
 
     const handleUnidadSelect = (unidadSelect) => {
         console.log("handleUnidadSelect: ", unidadSelect);
@@ -71,11 +71,11 @@ const CotaTab = ({proyectoId}) => {
 
     return (
         <Grid container spacing={3}>
-            <Grid item md={5}>
+            <Grid item md={showVertical ? 12 : 5}>
                 <CotaForm handleUnidadSelect={handleUnidadSelect} cota={cotaUpdate} handleEditRow={handlerEditCota}/>
             </Grid>
-            <Grid item md={7}>
-                <CotaTable unidadId={unidadIdSelect} handleEditRow={handlerEditCota}/>
+            <Grid item md={showVertical ? 12: 7}>
+                <CotaTable unidadId={unidadId} handleEditRow={handlerEditCota}/>
             </Grid>
 
             {/*<Dialog
