@@ -102,7 +102,7 @@ const ProyectoShowPage = () => {
                     )}
 
                     {currentTab === 2 && (
-                        <UnidadTab proyectoId={proyectoId}></UnidadTab>
+                        <UnidadTab proyecto={proyecto}></UnidadTab>
                     )}
 
                     {/*{currentTab === 3 && (
@@ -111,7 +111,7 @@ const ProyectoShowPage = () => {
 
                     {currentTab === 4 && (
                         <Grid container>
-                            <ProyectoDocumentos proyectoTitulo={proyecto.titulo} proyectoId={proyectoId}/>
+                            <ProyectoDocumentos proyectoTitulo={proyecto.titulo} proyecto={proyecto}/>
                         </Grid>
                     )}
 

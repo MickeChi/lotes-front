@@ -55,7 +55,40 @@ const unidadSlice = createSlice({
                 ...state,
                 unidadActivo: action.payload
             }
+        },
+        addCotaUnidad: (state, action) => {
+            const unidadesUp = state.unidades.map(p=>{
+                if(p.id === action.payload.unidadId){
+                    p = {...p, cotas: [...p.cotas, action.payload]}
+                }
+                return p;
+            })
+
+            return {
+                ...state,
+                unidades: unidadesUp
+            }
+        },
+
+        removeCotaUnidad: (state, action) => {
+            const unidadesUp = state.unidades.map(p=>{
+                console.log("removeCotaUnidad action: ", action.payload);
+                if(p.id === action.payload.unidadId){
+                    console.log("removeCotaUnidad action del: ", action.payload);
+                    let cotasFil = p.cotas.filter(c => c.id !== action.payload.id);
+                    console.log("removeCotaUnidad cotasFil: ", cotasFil);
+
+                    p = {...p, cotas: cotasFil}
+                }
+                return p;
+            })
+
+            return {
+                ...state,
+                unidades: unidadesUp
+            }
         }
+
 
     },
     extraReducers: (builder) => {
@@ -88,3 +121,5 @@ const unidadSlice = createSlice({
 
 const { reducer } = unidadSlice;
 export default reducer;
+
+export const {setUnidadActivo,  addCotaUnidad, removeCotaUnidad} = unidadSlice.actions;

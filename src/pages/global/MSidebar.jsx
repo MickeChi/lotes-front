@@ -53,7 +53,7 @@ const MSidebar = () => {
             height: "100vh",
             top: 0,
             bottom: 0,
-            zIndex: 1300,
+            zIndex: 100,
             "& .ps-sidebar-root": {
               border: "none",
             },

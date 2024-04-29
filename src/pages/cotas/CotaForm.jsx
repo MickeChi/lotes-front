@@ -1,7 +1,7 @@
 import {
     Autocomplete,
     Box,
-    Button, FormControl, FormHelperText,
+    Button, FormControl, FormHelperText, Grid,
     TextField, Typography,
     useTheme
 } from "@mui/material";
@@ -17,92 +17,133 @@ import {createCota, getAllCotas, setCotas, updateCota} from "../../store/slices/
 import ColindanciaTransList from "./ColindanciaTransList.jsx";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
-import {createUnidad, updateUnidad} from "../../store/slices/unidadSlice.js";
+import {addCotaUnidad, createUnidad, updateUnidad} from "../../store/slices/unidadSlice.js";
 import Checkbox from "@mui/material/Checkbox";
 import {CheckBox, CheckBoxOutlineBlank} from "@mui/icons-material";
 import {Estatus} from "../../utils/constantes.js";
+import {addColindanciaCota, getAllColindancias, setColindancias} from "../../store/slices/colindanciaSlice.js";
 
 const initialValues = {
-    "orden": "",
+    //"orden": "",
     "tipoLinea": "",
     "orientacion": "",
     "medida": "",
     "unidadId": "",
-    "colindanciasIds": [],
+    "colindanciaId": "",
+    "colindanciaNueva": "",
     "estatus": Estatus.ACTIVO
 }
 
 const icon = <CheckBoxOutlineBlank fontSize="small" />;
 const checkedIcon = <CheckBox fontSize="small" />;
 
-const CotaForm = ({cota, handleUnidadSelect, handleEditRow}) => {
+const CotaForm = ({cota, unidadId, handleUnidadSelect, handleEditRow}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [formState, setFormState] = useState(cota || initialValues);
     const dispatch = useDispatch();
     const unidades = useSelector(state => state.unidades.unidades);
-    const [unidadSelect, setunidadSelect] = useState(null);
+    const colindancias = useSelector(state => state.colindancias.colindancias);
+    const [unidadSelect, setUnidadSelect] = useState(null);
+    const [colindanciaSelect, setColindanciaSelect] = useState(null);
     const [esEditar, setEsEditar] = useState(false);
 
     const tiposLineas = ["RECTA", "CURVA"];
     const [tipoLineaSelect, setTipoLineaSelect] = useState(null);
     const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
     const [orientacionSelect, setOrientacionSelect] = useState(null);
-    const [colindanciasSelect, setColindanciasSelect] = useState([]);
-    const [unidadesForm, setunidadesForm] = useState([]);
     const [colindanciasForm, setColindanciasForm] = useState([]);
     const [showHeader, setShowHeader] = useState(false);
+    const [showNuevaColindancia, setShowNuevaColindancia] = useState(false);
+
 
     useEffect(() => {
-        if(unidades.length > 0){
-            console.log("unidades : ", unidades);
-            let fraccsForm = unidades.filter(f => !f.colindanciaProyecto);
-            console.log("unidadesForm: ", fraccsForm);
-            setunidadesForm(fraccsForm);
+        const cargarColindancias = (unidadId)=>{
+            let unidadCurrent = unidades.find(u => u.id === unidadId);
+            if(unidadCurrent != null) {
+                setUnidadSelect(unidadCurrent);
+                dispatch(setLoader(true));
+                dispatch(getAllColindancias({proyectoId: unidadCurrent.proyectoId})).then(resp => {
+                    dispatch(setLoader(false));
+                });
+            }
+        }
 
-            let colidsForm = [];
-            unidades.forEach(f => {
-                let label = f.colindanciaProyecto ? f.descripcion : `Lote: ${f.lote} - Número catastral: ${f.numeroCatastral}`;
-                colidsForm.push({...f, label})
-            });
+        if(unidadId) {
+            cargarColindancias(unidadId);
+        }else{
+            dispatch(setColindancias([]));
+        }
+    }, [unidadId]);
+
+    useEffect(() => {
+        if(colindancias.length > 0){
+            let colNuevaOp = {
+                "id": 0,
+                "proyecto": null,
+                "proyectoId": 0,
+                "descripcion": "Nueva colindancia",
+                "estatus": "ACTIVO"
+            };
+            let colidsForm = [colNuevaOp, ...colindancias];
             console.log("colindanciasForm: ", colidsForm);
             setColindanciasForm(colidsForm);
         }
-
-    }, [unidades]);
+    }, [colindancias]);
 
     useEffect(() => {
         if(cota){
             setEsEditar(true);
-            setFormState(cota);
+            setFormState({...cota, colindanciaNueva: ""});
             let unidadSel = unidades.find(f => f.id === cota.unidadId);
-            setunidadSelect(unidadSel === undefined ? null : unidadSel);
+            let colindanciaSel = colindancias.find(c => c.id === cota.colindanciaId);
+
+            setUnidadSelect(unidadSel === undefined ? null : unidadSel);
+            setColindanciaSelect(colindanciaSel === undefined ? null : colindanciaSel);
             setOrientacionSelect(cota.orientacion);
             setTipoLineaSelect(cota.tipoLinea);
-
-            let colsSelect = colindanciasForm.filter(f => {
-                let existId = cota.colindanciasIds.find(cs => cs === f.id);
-                return existId !== undefined;
-            });
-            setColindanciasSelect(colsSelect);
         }else{
             handleReset();
         }
     }, [cota]);
 
+
     useEffect(() => {
+        console.log("colindanciaSelect");
+        if(colindanciaSelect && colindanciaSelect.id === 0){
+            console.log("colindanciaSelect: ", colindanciaSelect);
+            setShowNuevaColindancia(true);
+        }else{
+            setShowNuevaColindancia(false);
+        }
+    }, [colindanciaSelect]);
+
+    /*useEffect(() => {
         handleReset();
         handleUnidadSelect(unidadSelect);
-    }, [unidadSelect]);
+    }, [unidadSelect]);*/
 
     const handleFormSubmit = (values, actions) => {
         const actionSubmit = esEditar ? updateCota : createCota;
-        const valuesRequest = {...values}
-        console.log("esEditar: " + esEditar + ", cotaRequest: ", valuesRequest);
+        let colindanciaDescript = values.colindanciaId === 0 ? values.colindanciaNueva : colindanciaSelect.descripcion;
+        const colindanciaReq = {...colindanciaSelect, descripcion: colindanciaDescript};
+        let request = {...values, unidadId: unidadSelect.id, colindancia: colindanciaReq}
+        delete request.colindanciaNueva;
+
+        console.log("esEditar: " + esEditar + ", cotaRequest: ", request);
 
         dispatch(setLoader(true));
-        dispatch(actionSubmit(valuesRequest)).then(() => {
+        dispatch(actionSubmit(request)).then((resp) => {
+            console.log("respCota: ", resp.payload.colindancia);
+            if(request.colindanciaId === 0){
+                dispatch(addColindanciaCota(resp.payload.colindancia));
+            }
+            //Si se agrego una cota nueva esta se agrega a la unidad para que se muestre en el contador de cotas de la tabla de unidades
+            if(!esEditar){
+                dispatch(addCotaUnidad(resp.payload));
+            }
+
             dispatch(setLoader(false));
             actions.resetForm();
             handleReset();
@@ -116,11 +157,12 @@ const CotaForm = ({cota, handleUnidadSelect, handleEditRow}) => {
 
     const handleReset = () => {
         console.log("Reset form initialValues: ", initialValues);
-        setFormState({...initialValues, unidadId: (unidadSelect ? unidadSelect.id : "")});
+        //setFormState({...initialValues, unidadId: (unidadSelect ? unidadSelect.id : "")});
+        setFormState(initialValues);
         setEsEditar(false);
         setTipoLineaSelect(null);
         setOrientacionSelect(null);
-        setColindanciasSelect([]);
+        setColindanciaSelect(null);
         handleEditRow(null);
     }
 
@@ -145,186 +187,147 @@ const CotaForm = ({cota, handleUnidadSelect, handleEditRow}) => {
                       setFieldValue
                   }) => (
                     <form onSubmit={handleSubmit}>
-                        <Box
-                            display="grid"
-                            gap="30px"
-                            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-                            sx={{
-                                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-                            }}
-                        >
-                            {/*<Autocomplete
-                                id="unidadId"
-                                name="unidadId"
-                                options={unidadesForm}
-                                getOptionLabel={option => `Lote: ${option.lote} - Número catastral: ${option.numeroCatastral}`}
-                                value={unidadSelect}
-                                sx={{ gridColumn: "span 4" }}
-                                onChange={(e, value) => {
-                                    setFieldValue(
-                                        "unidadId", value !== null ? value.id : initialValues.unidadId
-                                    );
-                                    setunidadSelect(value);
-                                }}
-                                renderInput={params => (
-                                    <TextField
-                                        label="Seleccion una unidad"
-                                        fullWidth
-                                        variant="filled"
-                                        type="text"
-                                        name="unidadId"
-                                        color="secondary"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        error={!!touched.unidadId && !!errors.unidadId}
-                                        helperText={touched.unidadId && errors.unidadId}
-                                        {...params}
-                                    />
-                                )}
-                            />*/}
-
-                            {/*<TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                label="Orden"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.orden}
-                                name="orden"
-                                error={!!touched.orden && !!errors.orden}
-                                helperText={touched.orden && errors.orden}
-                                color="secondary"
-                                sx={{ gridColumn: "span 2" }}
-                            />*/}
-
-
-                            <Autocomplete
-                                id="tipoLinea"
-                                name="tipoLinea"
-                                options={tiposLineas}
-                                getOptionLabel={option => option}
-                                value={tipoLineaSelect}
-                                sx={{ gridColumn: "span 2" }}
-                                onChange={(e, value) => {
-                                    setFieldValue(
-                                        "tipoLinea", value !== null ? value : initialValues.tipoLinea
-                                    );
-                                    setTipoLineaSelect(value);
-                                }}
-                                renderInput={params => (
-                                    <TextField
-                                        label="Seleccione tipo de linea"
-                                        fullWidth
-                                        variant="filled"
-                                        type="text"
+                        <Box>
+                            <Grid container spacing={3}>
+                                <Grid item md={6}>
+                                    <Autocomplete
+                                        id="tipoLinea"
                                         name="tipoLinea"
-                                        color="secondary"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        error={!!touched.tipoLinea && !!errors.tipoLinea}
-                                        helperText={touched.tipoLinea && errors.tipoLinea}
-                                        {...params}
+                                        options={tiposLineas}
+                                        getOptionLabel={option => option}
+                                        value={tipoLineaSelect}
+                                        size="small"
+                                        onChange={(e, value) => {
+                                            setFieldValue(
+                                                "tipoLinea", value !== null ? value : initialValues.tipoLinea
+                                            );
+                                            setTipoLineaSelect(value);
+                                        }}
+                                        renderInput={params => (
+                                            <TextField
+                                                label="Seleccione tipo de linea"
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                name="tipoLinea"
+                                                color="secondary"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                error={!!touched.tipoLinea && !!errors.tipoLinea}
+                                                helperText={touched.tipoLinea && errors.tipoLinea}
+                                                {...params}
+                                            />
+                                        )}
                                     />
-                                )}
-                            />
+                                </Grid>
 
-
-                            <Autocomplete
-                                id="orientacion"
-                                name="orientacion"
-                                options={orientaciones}
-                                getOptionLabel={option => option}
-                                value={orientacionSelect}
-                                sx={{ gridColumn: "span 2" }}
-                                onChange={(e, value) => {
-                                    setFieldValue(
-                                        "orientacion", value !== null ? value : initialValues.orientacion
-                                    );
-                                    setOrientacionSelect(value);
-                                    //setOrientacionSelect(value !== null ? value : initialValues.orientacion);
-
-                                }}
-                                renderInput={params => (
-                                    <TextField
-                                        label="Seleccione el rumbo"
-                                        fullWidth
-                                        variant="filled"
-                                        type="text"
+                                <Grid item md={6}>
+                                    <Autocomplete
+                                        id="orientacion"
                                         name="orientacion"
-                                        color="secondary"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        error={!!touched.orientacion && !!errors.orientacion}
-                                        helperText={touched.orientacion && errors.orientacion}
-                                        {...params}
+                                        options={orientaciones}
+                                        getOptionLabel={option => option}
+                                        value={orientacionSelect}
+                                        size="small"
+                                        onChange={(e, value) => {
+                                            setFieldValue(
+                                                "orientacion", value !== null ? value : initialValues.orientacion
+                                            );
+                                            setOrientacionSelect(value);
+                                            //setOrientacionSelect(value !== null ? value : initialValues.orientacion);
+
+                                        }}
+                                        renderInput={params => (
+                                            <TextField
+                                                label="Seleccione el rumbo"
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                name="orientacion"
+                                                color="secondary"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                error={!!touched.orientacion && !!errors.orientacion}
+                                                helperText={touched.orientacion && errors.orientacion}
+                                                {...params}
+                                            />
+                                        )}
                                     />
-                                )}
-                            />
+                                </Grid>
 
-
-                            <TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                label="Distancia"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.medida}
-                                name="medida"
-                                color="secondary"
-                                error={!!touched.medida && !!errors.medida}
-                                helperText={touched.medida && errors.medida}
-                                sx={{ gridColumn: "span 2" }}
-                            />
-
-
-                            <Autocomplete
-                                multiple
-                                disableCloseOnSelect
-                                id="colindanciasIds"
-                                name="colindanciasIds"
-                                options={colindanciasForm}
-                                getOptionLabel={option => option.label}
-                                value={colindanciasSelect}
-                                sx={{ gridColumn: "span 4" }}
-                                onChange={(e, value) => {
-                                    let colIds = value !== null ? (value.map(v=> v.id)) : initialValues.colindanciasIds
-                                    console.log("colIds: ", colIds);
-                                    setFieldValue(
-                                        "colindanciasIds", colIds
-                                    );
-                                    setColindanciasSelect(value);
-                                }}
-                                renderOption={(props, option, { selected }) => (
-                                    <li {...props}>
-                                        <Checkbox
-                                            color="secondary"
-                                            icon={icon}
-                                            checkedIcon={checkedIcon}
-                                            style={{ marginRight: 8 }}
-                                            checked={selected}
-                                        />
-                                        {option.label}
-                                    </li>
-                                )}
-                                renderInput={params => (
+                                <Grid item md={6}>
                                     <TextField
-                                        label="Seleccione las colindancias"
                                         fullWidth
                                         variant="filled"
                                         type="text"
-                                        name="colindanciasIds"
-                                        color="secondary"
-                                        placeholder="Colindancias"
+                                        label="Distancia"
                                         onBlur={handleBlur}
                                         onChange={handleChange}
-                                        error={!!touched.colindanciasIds && !!errors.colindanciasIds}
-                                        helperText={touched.colindanciasIds && errors.colindanciasIds}
-                                        {...params}
+                                        value={values.medida}
+                                        size="small"
+                                        name="medida"
+                                        color="secondary"
+                                        error={!!touched.medida && !!errors.medida}
+                                        helperText={touched.medida && errors.medida}
                                     />
-                                )}
-                            />
+                                </Grid>
+
+                                <Grid item md={6}>
+                                    <Autocomplete
+                                        id="colindanciaId"
+                                        name="colindanciaId"
+                                        options={colindanciasForm}
+                                        getOptionLabel={option => {
+                                            let labeltxt = option.id === 0 ? option.descripcion : `Id: ${option.id} - ${option.descripcion}`;
+                                            return labeltxt;
+                                        }}
+                                        value={colindanciaSelect}
+                                        size="small"
+                                        onChange={(e, value) => {
+                                            setFieldValue(
+                                                "colindanciaId", value !== null ? value.id : initialValues.colindanciaId
+                                            );
+                                            setColindanciaSelect(value);
+                                        }}
+                                        renderInput={params => (
+                                            <TextField
+                                                label="Seleccion una colindancia"
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                name="colindanciaId"
+                                                color="secondary"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                error={!!touched.colindanciaId && !!errors.colindanciaId}
+                                                helperText={touched.colindanciaId && errors.colindanciaId}
+                                                {...params}
+                                            />
+                                        )}
+                                    />
+                                </Grid>
+
+                                {showNuevaColindancia &&
+                                    <Grid item md={12}>
+                                        <TextField
+                                            fullWidth
+                                            variant="filled"
+                                            //disabled="true"
+                                            type="text"
+                                            label="Nueva colindancia"
+                                            onBlur={handleBlur}
+                                            onChange={handleChange}
+                                            value={values.colindanciaNueva}
+                                            name="colindanciaNueva"
+                                            color="secondary"
+                                            size="small"
+                                            error={!!touched.colindanciaNueva && !!errors.colindanciaNueva}
+                                            helperText={touched.colindanciaNueva && errors.colindanciaNueva}
+                                        />
+                                    </Grid>
+                                }
+
+                            </Grid>
 
                         </Box>
                         <Box display="flex" justifyContent="end" mt="20px" cellSpacing={2}>
@@ -346,13 +349,20 @@ const CotaForm = ({cota, handleUnidadSelect, handleEditRow}) => {
 
 
 const checkoutSchema = yup.object().shape({
-   // "id": yup.string().required("required"),
-    "orden": yup.number().required("required"),
+    // "id": yup.string().required("required"),
+    //"orden": yup.number().required("required"),
     "tipoLinea": yup.string().required("required"),
     "orientacion": yup.string().required("required"),
     "medida": yup.number().required("required"),
-    "unidadId": yup.number().required("required"),
-    "colindanciasIds": yup.array().min(1, "al menos 1").max(1, "máximo 1").required("required"),
+    //"unidadId": yup.number().required("required"),
+    "colindanciaId": yup.number().required("required"),
+    //"colindanciaNueva": yup.string().required("required")
+    "colindanciaNueva": yup.string().when("colindanciaId", {
+        is: (val) => val === 0,
+        then: yup.string().required('required'),
+        otherwise: yup.string().notRequired()
+    })
+    // "colindanciasIds": yup.array().min(1, "al menos 1").max(1, "máximo 1").required("required"),
 });
 
 

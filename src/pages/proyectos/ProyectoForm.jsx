@@ -33,6 +33,7 @@ import {AddCircle} from "@mui/icons-material";
 import UnidadExternaModal from "./UnidadExternaModal.jsx";
 import {deleteUnidad} from "../../store/slices/UnidadSlice.js";
 import {Estatus} from "../../utils/constantes.js";
+import {getTiposDesarrollos} from "../../store/slices/catalogoSlice.js";
 
 const initialValues = {
     titulo: "",
@@ -40,12 +41,21 @@ const initialValues = {
     municipio: "",
     localidad: "",
     subtotal: "",
-    totalUnidades: "",
+    tipoDesarrollo: "",
     uso: "",
     clase: "",
     puntoPartida: "",
     documento: "",
-    estatus: Estatus.ACTIVO
+    estatus: Estatus.ACTIVO,
+
+    totalUnidades: "",
+    terrenoTotal: "",
+    terrenoExclusivoTotal: "",
+    terrenoComunTotal: "",
+    construccionTotal: "",
+    construccionExclusivoTotal: "",
+    construccionComunTotal: ""
+
 };
 const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -54,10 +64,14 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const navigate = useNavigate();
     const [estadoSeleccionado, setEstadoSeleccionado] = useState(null);
     const [municipioSeleccionado, setMunicipioSeleccionado] = useState(null);
-    const [formState, setFormState] = useState( proyecto || initialValues);
+    const [formState, setFormState] = useState(initialValues);
     const dispatch = useDispatch();
     const estados = useSelector(state => state.general.estados);
     const municipios = useSelector(state => state.general.municipios);
+    const tiposDesarrollos = useSelector(state => state.catalogos.tiposDesarrollos);
+    const [tipoDesarrolloSeleccionado, setTipoDesarrolloSeleccionado] = useState(null);
+
+
     const [contCargaMunicipio, setContCargaMunicipio] = useState(1);
     const [unidadesExternas, setUnidadesExternas] = useState([]);
     const [unidadesExternasError, setUnidadesExternasError] = useState(false);
@@ -74,13 +88,38 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
 
     useEffect(() => {
         if(proyecto){
+
+            const proyectoState = {...proyecto};
+            for(const key in proyectoState){
+                if(initialValues.hasOwnProperty(key) && (proyectoState[key] === null || proyectoState[key] === undefined)){
+                    proyectoState[key] = "";
+                }
+            }
             setPuntoPartidaSelect(proyecto.puntoPartida);
             setUsoSeleccionado(proyecto.uso);
-            //setUnidadesExternas(proyecto.unidadesExternas);
             setUrlDocumento(proyecto.nombreDocumento ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + proyecto.nombreDocumento : null);
+            setFormState(proyectoState);
+
         }
 
     }, [proyecto]);
+
+    useEffect(() => {
+        if(tiposDesarrollos.length === 0){
+            dispatch(getTiposDesarrollos()).then((resp) => {
+                if(esEditar){
+                    let tipoDesSel = resp.payload.find(t => t.id === proyecto.tipoDesarrollo.id);
+                    setTipoDesarrolloSeleccionado(tipoDesSel);
+                }
+            });
+        }else{
+            if(esEditar){
+                let tipoDesSel = tiposDesarrollos.find(t => t.id === proyecto.tipoDesarrollo.id);
+                setTipoDesarrolloSeleccionado(tipoDesSel);
+            }
+        }
+    }, []);
+
 
     useEffect(() => {
         if(estados.length === 0){
@@ -133,7 +172,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
             return f;
         }).filter(f => !(f.unidadId == null && f.estatus === Estatus.DESACTIVADO));*/
 
-        const valuesRequest = {...values, unidadesExternas: []}
+        const valuesRequest = {...values}
         console.log("esEditar: " + esEditar + ", UnidadRequest: ", valuesRequest);
 
         let actionSubmit = esEditar ? updateProyecto : createProyecto;
@@ -227,6 +266,12 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     };
 
     const textoErrorCotas = unidadesExternasError ? 'Agregue al menos una colindancia' : 'Colindancias externas del proyecto';
+    const createFilePreview = (file) => {
+        setUrlDocumento(null);
+        if(file && ["application/pdf", "image/jpeg"].includes(file.type)){
+            setUrlDocumento(URL.createObjectURL(file));
+        }
+    }
 
     return (
 
@@ -234,39 +279,11 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
             <Grid item md={4}>
                 <Box display="flex" justifyContent="space-between">
                     <Header subtitle={ esEditar ? "Editando Proyecto" : "Nuevo Proyecto"}/>
-                    {/*{
-                        urlDocumento && (<Box>
-                            <a href={urlDocumento} target="_blank">
-                                <Button
-                                    size="small"
-                                    color="warning"
-                                    variant="contained"
-                                >
-                                    <OpenInNewIcon sx={{ mr: "10px" }}/>
-                                    Ver documento
-                                </Button>
-                            </a>
-                        </Box>)
-                    }*/}
                 </Box>
             </Grid>
             <Grid item md={8}>
                 <Box display="flex" justifyContent="space-between">
-                    {/*<Header subtitle={textoErrorCotas} error={unidadesExternasError}/>*/}
                     <Header subtitle="Documento de autorización"/>
-                    <Box>
-                        {/*<Button
-                            size="small"
-                            color="warning"
-                            variant="contained"
-                            onClick={() => {
-                                setOpenModal(true);
-                            }}
-                        >
-                            <AddCircle sx={{ mr: "10px" }}/>
-                            Agregar colindancia
-                        </Button>*/}
-                    </Box>
                 </Box>
             </Grid>
             <Grid item md={12}>
@@ -274,8 +291,9 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                     <Grid item md={4} style={{ paddingTop: "0" }}>
                         <Formik
                             onSubmit={handleFormSubmit}
-                            initialValues={formState}
+                            initialValues={formState || initialValues}
                             validationSchema={checkoutSchema}
+                            enableReinitialize
                         >
                             {({
                                   values,
@@ -304,7 +322,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 error={!!touched.titulo && !!errors.titulo}
                                                 helperText={touched.titulo && errors.titulo}
                                                 color="secondary"
-                                                //sx={{ gridColumn: "span 4" }}
                                             />
                                         </Grid>
                                         <Grid item md={6}>
@@ -314,7 +331,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 options={estados}
                                                 getOptionLabel={option => option}
                                                 value={estadoSeleccionado}
-                                                //sx={{ gridColumn: "span 2" }}
                                                 onChange={(e, value) => {
                                                     setFieldValue("municipio", "");
                                                     setMunicipioSeleccionado(null);
@@ -345,7 +361,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 options={municipios}
                                                 getOptionLabel={option => option}
                                                 value={municipioSeleccionado}
-                                                //sx={{ gridColumn: "span 2" }}
                                                 onChange={(e, value) => {
                                                     setFieldValue(
                                                         "municipio",
@@ -383,41 +398,41 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 color="secondary"
                                                 error={!!touched.localidad && !!errors.localidad}
                                                 helperText={touched.localidad && errors.localidad}
-                                                sx={{ gridColumn: "span 2" }}
                                             />
                                         </Grid>
+
                                         <Grid item md={6}>
-                                            <TextField
-                                                fullWidth
-                                                variant="filled"
-                                                type="text"
-                                                label="Terreno exclusivo total"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                                value={values.subtotal}
-                                                name="subtotal"
-                                                color="secondary"
-                                                error={!!touched.subtotal && !!errors.subtotal}
-                                                helperText={touched.subtotal && errors.subtotal}
-                                                sx={{ gridColumn: "span 2" }}
+                                            <Autocomplete
+                                                id="tipoDesarrollo"
+                                                name="tipoDesarrollo"
+                                                options={tiposDesarrollos}
+                                                getOptionLabel={option => option.descripcion}
+                                                value={tipoDesarrolloSeleccionado}
+                                                onChange={(e, value) => {
+                                                    setFieldValue(
+                                                        "tipoDesarrollo",
+                                                        value !== null ? value : initialValues.tipoDesarrollo
+                                                    );
+                                                    setTipoDesarrolloSeleccionado(value);
+                                                }}
+                                                renderInput={params => (
+                                                    <TextField
+                                                        label="Seleccion el tipo de desarrollo"
+                                                        fullWidth
+                                                        variant="filled"
+                                                        type="text"
+                                                        name="tipoDesarrollo"
+                                                        color="secondary"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                        error={!!touched.tipoDesarrollo && !!errors.tipoDesarrollo}
+                                                        helperText={touched.tipoDesarrollo && errors.tipoDesarrollo}
+                                                        {...params}
+                                                    />
+                                                )}
                                             />
                                         </Grid>
-                                        <Grid item md={6}>
-                                            <TextField
-                                                fullWidth
-                                                variant="filled"
-                                                type="text"
-                                                label="Total unidades"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                                value={values.totalUnidades}
-                                                name="totalUnidades"
-                                                color="secondary"
-                                                error={!!touched.totalUnidades && !!errors.totalUnidades}
-                                                helperText={touched.totalUnidades && errors.totalUnidades}
-                                                sx={{ gridColumn: "span 2" }}
-                                            />
-                                        </Grid>
+
                                         <Grid item md={6}>
                                             <Autocomplete
                                                 id="uso"
@@ -464,6 +479,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 helperText={touched.clase && errors.clase}
                                             />
                                         </Grid>
+
                                         <Grid item md={6}>
                                             <Autocomplete
                                                 id="puntoPartida"
@@ -494,6 +510,119 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 )}
                                             />
                                         </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Total unidades"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.totalUnidades}
+                                                name="totalUnidades"
+                                                color="secondary"
+                                                error={!!touched.totalUnidades && !!errors.totalUnidades}
+                                                helperText={touched.totalUnidades && errors.totalUnidades}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Terreno total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.terrenoTotal}
+                                                name="terrenoTotal"
+                                                color="secondary"
+                                                error={!!touched.terrenoTotal && !!errors.terrenoTotal}
+                                                helperText={touched.terrenoTotal && errors.terrenoTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Contrucción total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.construccionTotal}
+                                                name="construccionTotal"
+                                                color="secondary"
+                                                error={!!touched.construccionTotal && !!errors.construccionTotal}
+                                                helperText={touched.construccionTotal && errors.construccionTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Terreno exclusivo total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.terrenoExclusivoTotal}
+                                                name="terrenoExclusivoTotal"
+                                                color="secondary"
+                                                error={!!touched.terrenoExclusivoTotal && !!errors.terrenoExclusivoTotal}
+                                                helperText={touched.terrenoExclusivoTotal && errors.terrenoExclusivoTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Contrucción exclusiva total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.construccionExclusivoTotal}
+                                                name="construccionExclusivoTotal"
+                                                color="secondary"
+                                                error={!!touched.construccionExclusivoTotal && !!errors.construccionExclusivoTotal}
+                                                helperText={touched.construccionExclusivoTotal && errors.construccionExclusivoTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Terreno común total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.terrenoComunTotal}
+                                                name="terrenoComunTotal"
+                                                color="secondary"
+                                                error={!!touched.terrenoComunTotal && !!errors.terrenoComunTotal}
+                                                helperText={touched.terrenoComunTotal && errors.terrenoComunTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Contrucción común total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.construccionComunTotal}
+                                                name="construccionComunTotal"
+                                                color="secondary"
+                                                error={!!touched.construccionComunTotal && !!errors.construccionComunTotal}
+                                                helperText={touched.construccionComunTotal && errors.construccionComunTotal}
+                                            />
+                                        </Grid>
+
                                         <Grid item md={12}>
                                             <TextField
                                                 fullWidth
@@ -502,8 +631,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 label="Seleccione autorización del proyecto"
                                                 InputLabelProps={{ shrink: true }}
                                                 onBlur={handleBlur}
-                                                //onChange={handleChange}
-                                                //value={values.documento}
                                                 name="documento"
                                                 color="secondary"
                                                 error={!!touched.documento && !!errors.documento}
@@ -511,10 +638,11 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 onChange={(e) => {
                                                     setFieldValue("documento", e.currentTarget.files[0]);
                                                     console.log("documento: ", e.currentTarget.files[0]);
-                                                    /*setPuntoPartidaSelect(value);*/
+                                                    createFilePreview(e.currentTarget.files[0]);
                                                 }}
                                             />
                                         </Grid>
+
                                     </Grid>
                                     <Grid item md={12} display="flex" justifyContent="end" mt="20px">
                                         <Button type="submit" color="secondary" variant="contained">
@@ -534,16 +662,11 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                     <Grid item md={12}>
                                         <iframe className="pdf"
                                                 src={urlDocumento}
-                                                width="100%" height="520">
+                                                width="100%" height="720">
                                         </iframe>
                                     </Grid>
                                 )
                             }
-
-                            {/*<UnidadExternaTable
-                                                handleEditRow={handlerEditFracExt}
-                                                unidadesExternas={unidadesExternas}
-                                            />*/}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -569,10 +692,19 @@ const checkoutSchema = yup.object().shape({
     municipio: yup.string().required("required"),
     localidad: yup.string().required("required"),
     subtotal: yup.number().required("required"),
-    totalUnidades: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
     puntoPartida: yup.string().required("required"),
+
+    tipoDesarrollo: yup.mixed().required("required"),
+    totalUnidades: yup.number().required("required"),
+    terrenoTotal: yup.number().required("required"),
+    terrenoExclusivoTotal: yup.number().required("required"),
+    terrenoComunTotal: yup.number().required("required"),
+    construccionTotal: yup.number().required("required"),
+    construccionExclusivoTotal: yup.number().required("required"),
+    construccionComunTotal: yup.number().required("required"),
+
     documento: yup.mixed()
         //.required("required")
         .nullable()

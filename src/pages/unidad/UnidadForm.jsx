@@ -27,8 +27,16 @@ const initialValues = {
     tablaje:"",
     colonia:"",
     folioElectronico:"",
+
     superficieTerreno:"",
+    terrenoExclusivo:"",
+    terrenoComun: "",
+
     superficieConstruccion:"",
+    construccionExclusiva:"",
+    construccionComun: "",
+    cuotaPaIn: "",
+
     valorCatastral:"",
     uso:"",
     clase:"",
@@ -39,11 +47,11 @@ const initialValues = {
     estatus: Estatus.ACTIVO
 };
 
-const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
+const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [formState, setFormState] = useState(unidad || initialValues);
+    const [formState, setFormState] = useState(initialValues);
     const dispatch = useDispatch();
     const [esEditar, setEsEditar] = useState(false);
 
@@ -56,14 +64,14 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
 
     useEffect(() => {
         const generaFormState = () =>{
-            console.log("unidadForm: ", unidad);
+            console.log("generaFormState: ", unidad);
             const unidadState = {...unidad};
             for(const key in unidadState){
                 if(initialValues.hasOwnProperty(key) && (unidadState[key] === null || unidadState[key] === undefined)){
                     unidadState[key] = "";
                 }
             }
-            console.log("unidadState: ", unidadState);
+            console.log("generaFormState: ", unidadState);
             setEsEditar(true);
             setFormState(unidadState);
             setUsoSeleccionado(unidadState.uso);
@@ -84,10 +92,12 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
         console.log("esEditar: " + esEditar + ", unidadRequest: ", valuesRequest);
 
         dispatch(setLoader(true));
-        dispatch(actionSubmit(valuesRequest)).then(() => {
+        dispatch(actionSubmit(valuesRequest)).then((resp) => {
+            console.log("Unidad request: ", resp.payload);
             dispatch(setLoader(false));
-            actions.resetForm();
-            handleReset();
+            handleEditRow(resp.payload);
+            //actions.resetForm();
+            //handleReset();
             withReactContent(Swal).fire({
                 title: "Se guardó correctamente",
                 icon: "success"
@@ -143,6 +153,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 error={!!touched.lote && !!errors.lote}
                                 helperText={touched.lote && errors.lote}
                                 color="secondary"
+                                size="small"
                                 sx={{ gridColumn: "span 2" }}
                             />
 
@@ -156,6 +167,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 value={values.numeroCatastral}
                                 name="numeroCatastral"
                                 color="secondary"
+                                size="small"
                                 error={!!touched.numeroCatastral && !!errors.numeroCatastral}
                                 helperText={touched.numeroCatastral && errors.numeroCatastral}
                                 sx={{ gridColumn: "span 2" }}
@@ -171,6 +183,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 value={values.tablaje}
                                 name="tablaje"
                                 color="secondary"
+                                size="small"
                                 error={!!touched.tablaje && !!errors.tablaje}
                                 helperText={touched.tablaje && errors.tablaje}
                                 sx={{ gridColumn: "span 2" }}
@@ -186,6 +199,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 value={values.colonia}
                                 name="colonia"
                                 color="secondary"
+                                size="small"
                                 error={!!touched.colonia && !!errors.colonia}
                                 helperText={touched.colonia && errors.colonia}
                                 sx={{ gridColumn: "span 2" }}
@@ -201,6 +215,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 value={values.folioElectronico}
                                 name="folioElectronico"
                                 color="secondary"
+                                size="small"
                                 error={!!touched.folioElectronico && !!errors.folioElectronico}
                                 helperText={touched.folioElectronico && errors.folioElectronico}
                                 sx={{ gridColumn: "span 2" }}
@@ -210,12 +225,29 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 fullWidth
                                 variant="filled"
                                 type="text"
+                                label="Numero parcela"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.numeroParcela}
+                                name="numeroParcela"
+                                color="secondary"
+                                size="small"
+                                error={!!touched.numeroParcela && !!errors.numeroParcela}
+                                helperText={touched.numeroParcela && errors.numeroParcela}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
+                            {/*<TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
                                 label="Superficie de Terreno"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 value={values.superficieTerreno}
                                 name="superficieTerreno"
                                 color="secondary"
+                                size="small"
                                 error={!!touched.superficieTerreno && !!errors.superficieTerreno}
                                 helperText={touched.superficieTerreno && errors.superficieTerreno}
                                 sx={{ gridColumn: "span 2" }}
@@ -231,8 +263,89 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 value={values.superficieConstruccion}
                                 name="superficieConstruccion"
                                 color="secondary"
+                                size="small"
                                 error={!!touched.superficieConstruccion && !!errors.superficieConstruccion}
                                 helperText={touched.superficieConstruccion && errors.superficieConstruccion}
+                                sx={{ gridColumn: "span 2" }}
+                            />*/}
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Terreno exclusivo"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.terrenoExclusivo}
+                                name="terrenoExclusivo"
+                                color="secondary"
+                                size="small"
+                                error={!!touched.terrenoExclusivo && !!errors.terrenoExclusivo}
+                                helperText={touched.terrenoExclusivo && errors.terrenoExclusivo}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Contrucción exclusiva"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.construccionExclusiva}
+                                name="construccionExclusiva"
+                                color="secondary"
+                                size="small"
+                                error={!!touched.construccionExclusiva && !!errors.construccionExclusiva}
+                                helperText={touched.construccionExclusiva && errors.construccionExclusiva}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Terreno común"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.terrenoComun}
+                                name="terrenoComun"
+                                color="secondary"
+                                size="small"
+                                error={!!touched.terrenoComun && !!errors.terrenoComun}
+                                helperText={touched.terrenoComun && errors.terrenoComun}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Contrucción común"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.construccionComun}
+                                name="construccionComun"
+                                color="secondary"
+                                size="small"
+                                error={!!touched.construccionComun && !!errors.construccionComun}
+                                helperText={touched.construccionComun && errors.construccionComun}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Cuota participación indiviso"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.cuotaPaIn}
+                                name="cuotaPaIn"
+                                color="secondary"
+                                size="small"
+                                error={!!touched.cuotaPaIn && !!errors.cuotaPaIn}
+                                helperText={touched.cuotaPaIn && errors.cuotaPaIn}
                                 sx={{ gridColumn: "span 2" }}
                             />
 
@@ -246,6 +359,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 value={values.valorCatastral}
                                 name="valorCatastral"
                                 color="secondary"
+                                size="small"
                                 error={!!touched.valorCatastral && !!errors.valorCatastral}
                                 helperText={touched.valorCatastral && errors.valorCatastral}
                                 sx={{ gridColumn: "span 2" }}
@@ -257,6 +371,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 options={usos}
                                 getOptionLabel={option => option}
                                 value={usoSeleccionado}
+                                size="small"
                                 sx={{ gridColumn: "span 2" }}
                                 onChange={(e, value) => {
                                     setFieldValue(
@@ -291,6 +406,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 value={values.clase}
                                 name="clase"
                                 color="secondary"
+                                size="small"
                                 error={!!touched.clase && !!errors.clase}
                                 helperText={touched.clase && errors.clase}
                                 sx={{ gridColumn: "span 2" }}
@@ -303,6 +419,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 getOptionLabel={option => option}
                                 value={tipoUnidadSeleccionado}
                                 sx={{ gridColumn: "span 2" }}
+                                size="small"
                                 onChange={(e, value) => {
                                     setFieldValue(
                                         "tipoUnidad", value !== null ? value : initialValues.tipoUnidad
@@ -326,20 +443,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 )}
                             />
 
-                            <TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                label="Numero parcela"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.numeroParcela}
-                                name="numeroParcela"
-                                color="secondary"
-                                error={!!touched.numeroParcela && !!errors.numeroParcela}
-                                helperText={touched.numeroParcela && errors.numeroParcela}
-                                sx={{ gridColumn: "span 2" }}
-                            />
+
 
                             <TextField
                                 fullWidth
@@ -353,19 +457,21 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad}) => {
                                 error={!!touched.documento && !!errors.documento}
                                 helperText={touched.documento && errors.documento}
                                 sx={{ gridColumn: "span 4" }}
+                                size="small"
                                 onChange={(e) => {
                                     setFieldValue("documento", e.currentTarget.files[0]);
+                                    handleFilePreview(e.currentTarget.files[0]);
                                     console.log("documento: ", e.currentTarget.files[0]);
                                 }}
                             />
 
                         </Box>
                         <Box display="flex" justifyContent="end" mt="20px" cellSpacing={2}>
-                            {esEditar && <Button color="warning" variant="contained" onClick={() => {
+                            {/*{esEditar && <Button color="warning" variant="contained" onClick={() => {
                                 handleReset()
                             }}>
                                 Cancelar
-                            </Button>}&nbsp;&nbsp;
+                            </Button>}&nbsp;&nbsp;*/}
                             <Button type="submit" color="secondary" variant="contained">
                                 Guardar
                             </Button>
@@ -384,15 +490,23 @@ const checkoutSchema = yup.object().shape({
     //finca: yup.string().required("required"),
     tablaje: yup.number().required("required"),
     //colonia: yup.string().required("required"),
-    //folioElectronico: yup.number().required("required"),
-    superficieTerreno: yup.number().required("required"),
-    superficieConstruccion: yup.number().required("required"),
-    //valorCatastral: yup.number().required("required"),
+    folioElectronico: yup.number(),
+    valorCatastral: yup.number(),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
     tipoUnidad: yup.string().required("required"),
     //colindanciaProyecto: yup.bool().required("required"),
-    //numeroParcela: yup.number().required("required"),
+    numeroParcela: yup.number(),
+
+    //superficieTerreno: yup.number().required("required"),
+    terrenoExclusivo: yup.number().required("required"),
+    terrenoComun: yup.number().required("required"),
+
+    //superficieConstruccion: yup.number().required("required"),
+    construccionExclusiva: yup.number().required("required"),
+    construccionComun: yup.number().required("required"),
+    cuotaPaIn: yup.number().required("required"),
+
     documento: yup.mixed()
         //.required("required")
         .nullable()

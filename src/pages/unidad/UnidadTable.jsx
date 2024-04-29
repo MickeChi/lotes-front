@@ -1,4 +1,4 @@
-import {Box, Button, ButtonGroup, useTheme} from "@mui/material";
+import {Badge, Box, Button, ButtonGroup, Chip, useTheme} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme.jsx";
 import Header from "../../components/Header";
@@ -6,10 +6,12 @@ import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {getAllUnidades} from "../../store/slices/unidadSlice.js";
-import {Edit} from "@mui/icons-material";
+import {Dashboard, Edit, Polyline, Warning} from "@mui/icons-material";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import Avatar from "@mui/material/Avatar";
+import {Estatus} from "../../utils/constantes.js";
 
 const UnidadTable = ({proyectoId, handleEditRow}) => {
     const theme = useTheme();
@@ -37,8 +39,8 @@ const UnidadTable = ({proyectoId, handleEditRow}) => {
 
     const columns = [
         {
-            field: "lote",
-            headerName: "Lote",
+            field: "id",
+            headerName: "Id",
             flex: 1,
         },
         {
@@ -71,10 +73,29 @@ const UnidadTable = ({proyectoId, handleEditRow}) => {
             headerName: "Clase",
             flex: 1,
         },
-        {
+        /*{
             field: "tipoColindancia",
             headerName: "Tipo colindancia",
             flex: 1,
+        },*/
+        {
+            field: "cotas",
+            headerName: "Num Cotas",
+            flex: 1,
+            renderCell: ({ row }) => {
+                let cantidadCotas = (row.cotas.filter(c => c.estatus === Estatus.ACTIVO)).length;
+                let labelCota = cantidadCotas >= 3 ? "Válido" : "Inválido";
+                let colorCota = cantidadCotas >= 3 ? "success" : "error";
+
+                return (
+                    <Chip color={colorCota} label={labelCota}
+                          avatar={<Avatar sx={{
+                              backgroundColor: "#fff",
+                              color: `#000 !important`,
+                              fontWeight: `bold`
+                          }}>{cantidadCotas}</Avatar>} />
+                );
+            },
         },
         {
             field: "opciones",

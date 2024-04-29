@@ -8,33 +8,46 @@ import {
 import { tokens } from "../../theme.jsx";
 import Header from "../../components/Header.jsx";
 import {useEffect, useState} from "react";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import ProyectoService from "../../services/ProyectoService.js";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import {getAllUnidades} from "../../store/slices/unidadSlice.js";
 
 
-const ProyectoDocumentos = ({proyectoId, proyectoTitulo}) => {
+const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const dispatch = useDispatch();
     const [tituloDoc, setTituloDoc] = useState("");
     const [docGenerado, setDocGenerado] = useState(null);
+    const unidades = useSelector(state => state.unidades.unidades);
+
 
     useEffect(() => {
-        if(proyectoId){
-
-            setTituloDoc("documentoProyecto_" + proyectoId);
+        if(proyecto){
+            setTituloDoc("documentoProyecto_" + proyecto.id);
         }
 
     }, []);
 
+    useEffect(() => {
+        console.log("proyectoId: ", proyecto.id);
+        if(proyecto) {
+            dispatch(setLoader(true));
+            dispatch(getAllUnidades({proyectoId: proyecto.id}))
+                .then(resp => {
+                    dispatch(setLoader(false));
+                });
+        }
+    }, []);
+
 
     const generaDocumento = () => {
-        console.log("Generando proyecto: ", proyectoId);
+        console.log("Generando proyecto: ", proyecto.id);
         dispatch(setLoader(true));
-        ProyectoService.getUnidadesDoc(proyectoId).then(resp => {
+        ProyectoService.getUnidadesDoc(proyecto.id).then(resp => {
             dispatch(setLoader(false));
 
             console.log("docGenerado: ", resp.data);

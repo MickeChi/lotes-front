@@ -7,7 +7,7 @@ import CotaForm from "./CotaForm.jsx";
 import CotaTable from "./CotaTable.jsx";
 import {useEffect, useState} from "react";
 import {setLoader} from "../../store/slices/generalSlice.js";
-import {getAllUnidades} from "../../store/slices/unidadSlice.js";
+import {getAllUnidades, removeCotaUnidad} from "../../store/slices/unidadSlice.js";
 import {useDispatch, useSelector} from "react-redux";
 import {Estatus} from "../../utils/constantes.js";
 import {createCota, deleteCota, updateCota} from "../../store/slices/cotaSlice.js";
@@ -60,6 +60,7 @@ const CotaTab = ({unidadId, showVertical}) => {
         dispatch(setLoader(true));
         dispatch(deleteCota(cotaDelete)).then((resp) => {
             dispatch(setLoader(false));
+            dispatch(removeCotaUnidad(cotaDelete));
             setCotaUpdate(null);
             withReactContent(Swal).fire({
                 title: "Se eliminó correctamente",
@@ -72,7 +73,7 @@ const CotaTab = ({unidadId, showVertical}) => {
     return (
         <Grid container spacing={3}>
             <Grid item md={showVertical ? 12 : 5}>
-                <CotaForm handleUnidadSelect={handleUnidadSelect} cota={cotaUpdate} handleEditRow={handlerEditCota}/>
+                <CotaForm handleUnidadSelect={handleUnidadSelect} cota={cotaUpdate} unidadId={unidadId} handleEditRow={handlerEditCota}/>
             </Grid>
             <Grid item md={showVertical ? 12: 7}>
                 <CotaTable unidadId={unidadId} handleEditRow={handlerEditCota}/>

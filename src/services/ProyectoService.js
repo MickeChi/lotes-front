@@ -43,11 +43,11 @@ const generateRequest = (request) => {
     let documento  = (typeof request["documento"] === "object") ? request["documento"] : null;
     let proyecto = {...request, createdAt: null, updatedAt: null}
     delete proyecto.documento;
-    proyecto.unidadesExternas.map(f => {
+    /*proyecto.unidadesExternas.map(f => {
         f.createdAt = null;
         f.updatedAt = null;
         return f;
-    });
+    });*/
 
     console.log("generateReques proyecto", proyecto);
     console.log("generateReques documento", documento);

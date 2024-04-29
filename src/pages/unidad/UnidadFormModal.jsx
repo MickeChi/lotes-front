@@ -82,6 +82,14 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
         handleEditRow(null);
         onCloseModal(false);
         setUrlDocumento(null);
+        setCurrentTab(1);
+    }
+
+    const createFilePreview = (file) => {
+        setUrlDocumento(null);
+        if(file && ["application/pdf", "image/jpeg"].includes(file.type)){
+            setUrlDocumento(URL.createObjectURL(file));
+        }
     }
 
     return (
@@ -91,7 +99,7 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
                 onClose={()=> onCloseModal(false)}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
-                sx={{zIndex: 1300}}
+                sx={{zIndex: 100}}
             >
                 <Box sx={style}>
                     <Card sx={{
@@ -121,14 +129,16 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
                                         }}
                                     >
                                         <Tab value={1} label="Unidad" />
-                                        <Tab value={2} label="Cotas" />
+                                        {(unidadId) && (
+                                            <Tab value={2} label="Cotas" />
+                                        )}
                                     </Tabs>
                                     <Divider />
                                     <Box mt="20px">
                                         {currentTab === 1 && (
-                                            <UnidadForm proyectoId={proyectoId} unidad={unidad} handleEditRow={handleEditRow}/>
+                                            <UnidadForm proyectoId={proyectoId} unidad={unidad} handleEditRow={handleEditRow} handleFilePreview={createFilePreview}/>
                                         )}
-                                        {currentTab === 2 && (
+                                        {(currentTab === 2 && unidadId) && (
                                             <CotaTab unidadId={unidadId} showVertical={true} />
                                         )}
                                     </Box>
@@ -141,7 +151,7 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
                                                 <Grid item md={12}>
                                                     <iframe className="pdf"
                                                             src={urlDocumento}
-                                                            width="100%" height="520">
+                                                            width="100%" height="720">
                                                     </iframe>
                                                 </Grid>
                                             )

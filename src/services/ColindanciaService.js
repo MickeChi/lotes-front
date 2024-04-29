@@ -1,28 +1,28 @@
 import axiosClient from "../utils/axiosClient.js";
 
 const getAll = (request) => {
-    return axiosClient.get(`cota`, {
+    return axiosClient.get(`colindancia`, {
         params: request
     });
 }
 
 const getById = (id) => {
-    return axiosClient.get(`cota/${id}`);
+    return axiosClient.get(`colindancia/${id}`);
 }
 
 const update = (request) => {
-    return axiosClient.put(`cota/${request.id}`, request);
+    return axiosClient.put(`colindancia/${request.id}`, request);
 }
 
 const create = (request) => {
-    return axiosClient.post(`cota`, request);
+    return axiosClient.post(`colindancia`, request);
 }
 
 const remove = (id) => {
-    return axiosClient.delete(`cota/${id}`);
+    return axiosClient.delete(`colindancia/${id}`);
 }
 
-const CotaService =  {
+const ColindanciaService =  {
     getAll,
     getById,
     update,
@@ -30,4 +30,4 @@ const CotaService =  {
     remove
 }
 
-export default CotaService;
+export default ColindanciaService;

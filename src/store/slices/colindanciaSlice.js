@@ -1,98 +1,104 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import CotaService from "../../services/CotaService.js";
+import ColindanciaService from "../../services/ColindanciaService.js";
 
 const initialState = {
-    cotas: [],
-    cotaActivo: null,
+    colindancias: [],
+    colindanciaActivo: null,
 }
 
-export const createCota = createAsyncThunk(
-    "cotas/create",
+export const createColindancia = createAsyncThunk(
+    "colindancias/create",
     async (request) => {
-        const res = await CotaService.create(request);
+        const res = await ColindanciaService.create(request);
         return res.data;
     }
 );
 
-export const getAllCotas = createAsyncThunk(
-    "cotas/getAll",
+export const getAllColindancias = createAsyncThunk(
+    "colindancias/getAll",
     async (request) => {
-        const res = await CotaService.getAll(request);
+        const res = await ColindanciaService.getAll(request);
         return res.data;
     }
 );
 
-export const updateCota = createAsyncThunk(
-    "cotas/update",
+export const updateColindancia = createAsyncThunk(
+    "colindancias/update",
     async (request) => {
-        const res = await CotaService.update(request);
+        const res = await ColindanciaService.update(request);
         return res.data;
     }
 );
 
-export const deleteCota = createAsyncThunk(
-    "cotas/delete",
+export const deleteColindancia = createAsyncThunk(
+    "colindancias/delete",
     async ({ id }) => {
-        const res = await CotaService.remove(id);
+        const res = await ColindanciaService.remove(id);
         return res.data;
     }
 );
 
-export const setCotaActivoById = createAsyncThunk(
-    "cotas/findById",
+export const setColindanciaActivoById = createAsyncThunk(
+    "colindancias/findById",
     async ({ id }) => {
-        const res = await CotaService.getById(id);
+        const res = await ColindanciaService.getById(id);
         return res.data;
     }
 );
 
-const cotaSlice = createSlice({
-    name: "cotas",
+const colindanciaSlice = createSlice({
+    name: "colindancias",
     initialState,
     reducers:{
-        setCotaActivo: (state, action) => {
+        setColindanciaActivo: (state, action) => {
             return {
                 ...state,
-                cotaActivo: action.payload
+                colindanciaActivo: action.payload
             }
         },
-        setCotas: (state, action) => {
+        setColindancias: (state, action) => {
             return {
                 ...state,
-                cotas: action.payload
+                colindancias: action.payload
+            }
+        },
+        addColindanciaCota: (state, action) => {
+            return {
+                ...state,
+                colindancias: [...state.colindancias, action.payload]
             }
         }
 
     },
     extraReducers: (builder) => {
         builder
-            .addCase(createCota.fulfilled,  (state, action) => {
-                state.cotas.push(action.payload);
+            .addCase(createColindancia.fulfilled,  (state, action) => {
+                state.colindancias.push(action.payload);
             })
-            .addCase(getAllCotas.fulfilled, (state, action) => {
-                state.cotas = action.payload;
+            .addCase(getAllColindancias.fulfilled, (state, action) => {
+                state.colindancias = action.payload;
 
             })
-            .addCase(updateCota.fulfilled, (state, action) => {
-                const cotasUp = state.cotas.map(p=>{
+            .addCase(updateColindancia.fulfilled, (state, action) => {
+                const colindanciasUp = state.colindancias.map(p=>{
                     if(p.id === action.payload.id)
                         p = {...p, ...action.payload}
                     return p;
                 })
-                state.cotas = cotasUp
+                state.colindancias = colindanciasUp
             })
-            .addCase(deleteCota.fulfilled, (state, action) => {
-                const cotasUp = state.cotas.filter(p=> p.id !== action.payload.id)
-                state.cotas = cotasUp;
+            .addCase(deleteColindancia.fulfilled, (state, action) => {
+                const colindanciasUp = state.colindancias.filter(p=> p.id !== action.payload.id)
+                state.colindancias = colindanciasUp;
             })
-            .addCase(setCotaActivoById.fulfilled, (state, action) => {
-                state.cotaActivo = action.payload
+            .addCase(setColindanciaActivoById.fulfilled, (state, action) => {
+                state.colindanciaActivo = action.payload
             })
     }
 
 })
 
-const { reducer } = cotaSlice;
+const { reducer } = colindanciaSlice;
 export default reducer;
 
-export const {setCotaActivo, setCotas} = cotaSlice.actions;
+export const {setColindanciaActivo, setColindancias, addColindanciaCota} = colindanciaSlice.actions;
