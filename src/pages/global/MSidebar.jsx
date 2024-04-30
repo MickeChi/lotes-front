@@ -105,7 +105,7 @@ const MSidebar = () => {
                       ml="15px"
                   >
                     <Typography variant="h3" color={colors.grey[100]}>
-                      LOTIFICADOR
+                      DESCRIPTIVOS
                     </Typography>
                     <IconButton
                         onClick={

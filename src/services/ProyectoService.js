@@ -34,7 +34,7 @@ const remove = (id) => {
     return axiosClient.get(`proyecto/${id}`);
 }
 
-const getunidadesDoc = (id) => {
+const getUnidadesDoc = (id) => {
     return axiosClient.get(`proyecto/generate-proyecto-doc/${id}`);
 }
 
@@ -88,7 +88,7 @@ const ProyectoService = {
     update,
     create,
     remove,
-    getunidadesDoc
+    getUnidadesDoc
 }
 
 export default ProyectoService;

@@ -78,17 +78,19 @@ const CotaForm = ({cota, unidadId, handleUnidadSelect, handleEditRow}) => {
     }, [unidadId]);
 
     useEffect(() => {
+        let colNuevaOp = {
+            "id": 0,
+            "proyecto": null,
+            "proyectoId": 0,
+            "descripcion": "Nueva colindancia",
+            "estatus": "ACTIVO"
+        };
         if(colindancias.length > 0){
-            let colNuevaOp = {
-                "id": 0,
-                "proyecto": null,
-                "proyectoId": 0,
-                "descripcion": "Nueva colindancia",
-                "estatus": "ACTIVO"
-            };
             let colidsForm = [colNuevaOp, ...colindancias];
             console.log("colindanciasForm: ", colidsForm);
             setColindanciasForm(colidsForm);
+        }else{
+            setColindanciasForm([colNuevaOp]);
         }
     }, [colindancias]);
 

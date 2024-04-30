@@ -42,11 +42,12 @@ const generateRequest = (request) => {
     let unidad = {...request, createdAt: null, updatedAt: null}
     delete unidad.documento;
 
-    /*unidad.cotas.map(f => {
-        f.createdAt = null;
-        f.updatedAt = null;
+    let cotasUp = unidad.cotas.map(f => {
+        f = {...f, createdAt: null, updatedAt: null}
         return f;
-    });*/
+    });
+
+    unidad.cotas = [...cotasUp];
 
     console.log("generateReques unidad", unidad);
     console.log("generateReques documento", documento);

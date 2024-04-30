@@ -144,6 +144,25 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                             <TextField
                                 fullWidth
                                 variant="filled"
+                                type="file"
+                                label="Cargar plano"
+                                InputLabelProps={{ shrink: true }}
+                                onBlur={handleBlur}
+                                name="documento"
+                                color="secondary"
+                                error={!!touched.documento && !!errors.documento}
+                                helperText={touched.documento && errors.documento}
+                                sx={{ gridColumn: "span 4" }}
+                                size="small"
+                                onChange={(e) => {
+                                    setFieldValue("documento", e.currentTarget.files[0]);
+                                    handleFilePreview(e.currentTarget.files[0]);
+                                    console.log("documento: ", e.currentTarget.files[0]);
+                                }}
+                            />
+                            <TextField
+                                fullWidth
+                                variant="filled"
                                 type="text"
                                 label="Lote"
                                 onBlur={handleBlur}
@@ -428,7 +447,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 }}
                                 renderInput={params => (
                                     <TextField
-                                        label="Seleccione tipo de colindancia"
+                                        label="Seleccione tipo"
                                         fullWidth
                                         variant="filled"
                                         type="text"
@@ -445,25 +464,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
 
 
 
-                            <TextField
-                                fullWidth
-                                variant="filled"
-                                type="file"
-                                label="Seleccione autorización del proyecto"
-                                InputLabelProps={{ shrink: true }}
-                                onBlur={handleBlur}
-                                name="documento"
-                                color="secondary"
-                                error={!!touched.documento && !!errors.documento}
-                                helperText={touched.documento && errors.documento}
-                                sx={{ gridColumn: "span 4" }}
-                                size="small"
-                                onChange={(e) => {
-                                    setFieldValue("documento", e.currentTarget.files[0]);
-                                    handleFilePreview(e.currentTarget.files[0]);
-                                    console.log("documento: ", e.currentTarget.files[0]);
-                                }}
-                            />
+
 
                         </Box>
                         <Box display="flex" justifyContent="end" mt="20px" cellSpacing={2}>

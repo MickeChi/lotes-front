@@ -691,7 +691,7 @@ const checkoutSchema = yup.object().shape({
     estado: yup.string().required("required"),
     municipio: yup.string().required("required"),
     localidad: yup.string().required("required"),
-    subtotal: yup.number().required("required"),
+    //subtotal: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
     puntoPartida: yup.string().required("required"),
