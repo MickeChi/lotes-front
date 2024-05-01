@@ -56,6 +56,12 @@ const unidadSlice = createSlice({
                 unidadActivo: action.payload
             }
         },
+        setUnidades: (state, action) => {
+            return {
+                ...state,
+                unidades: action.payload
+            }
+        },
         addCotaUnidad: (state, action) => {
             const unidadesUp = state.unidades.map(p=>{
                 if(p.id === action.payload.unidadId){
@@ -122,4 +128,4 @@ const unidadSlice = createSlice({
 const { reducer } = unidadSlice;
 export default reducer;
 
-export const {setUnidadActivo,  addCotaUnidad, removeCotaUnidad} = unidadSlice.actions;
+export const {setUnidadActivo,  addCotaUnidad, removeCotaUnidad, setUnidades} = unidadSlice.actions;

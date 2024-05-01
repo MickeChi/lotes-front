@@ -11,6 +11,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import {Estatus} from "../../utils/constantes.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import {setUnidades} from "../../store/slices/unidadSlice.js";
 
 const CotaTable = ({unidadId, handleEditRow}) => {
     const theme = useTheme();
@@ -31,6 +32,11 @@ const CotaTable = ({unidadId, handleEditRow}) => {
         }else{
             dispatch(setCotas([]));
         }
+
+        return () => {
+            console.log("callback setCotas: ", cotas);
+            dispatch(setCotas([]));
+        };
 
     }, [unidadId]);
 

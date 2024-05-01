@@ -13,9 +13,10 @@ import ProyectoService from "../../services/ProyectoService.js";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
-import {getAllUnidades} from "../../store/slices/unidadSlice.js";
+import {getAllUnidades, setUnidades} from "../../store/slices/unidadSlice.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import {setCotas} from "../../store/slices/cotaSlice.js";
 
 
 const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
@@ -52,6 +53,11 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
                     dispatch(setLoader(false));
                 });
         }
+
+        return () => {
+            console.log("callback setCotas: ", unidades);
+            dispatch(setUnidades([]));
+        };
     }, []);
 
     const validarUnidades = () => {

@@ -5,7 +5,7 @@ import Header from "../../components/Header";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
-import {getAllUnidades} from "../../store/slices/unidadSlice.js";
+import {getAllUnidades, setUnidades} from "../../store/slices/unidadSlice.js";
 import {Dashboard, Edit, Polyline, Warning} from "@mui/icons-material";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever.js";
 import withReactContent from "sweetalert2-react-content";
@@ -26,7 +26,13 @@ const UnidadTable = ({proyectoId, handleEditRow}) => {
         dispatch(getAllUnidades({proyectoId: proyectoId}))
             .then(resp => {
                 dispatch(setLoader(false));
-            })
+            });
+
+        return () => {
+            console.log("callback setUnidadesTabla: ", unidadesTabla);
+            dispatch(setUnidades([]));
+        };
+
     }, []);
 
     useEffect(() => {

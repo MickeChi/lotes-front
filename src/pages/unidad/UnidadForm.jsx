@@ -256,23 +256,9 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 sx={{ gridColumn: "span 2" }}
                             />
 
-                            {/*<TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                label="Superficie de Terreno"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.superficieTerreno}
-                                name="superficieTerreno"
-                                color="secondary"
-                                size="small"
-                                error={!!touched.superficieTerreno && !!errors.superficieTerreno}
-                                helperText={touched.superficieTerreno && errors.superficieTerreno}
-                                sx={{ gridColumn: "span 2" }}
-                            />
 
-                            <TextField
+
+                            {/*<TextField
                                 fullWidth
                                 variant="filled"
                                 type="text"
@@ -365,6 +351,23 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 size="small"
                                 error={!!touched.cuotaPaIn && !!errors.cuotaPaIn}
                                 helperText={touched.cuotaPaIn && errors.cuotaPaIn}
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
+
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Superficie de Terreno"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.superficieTerreno}
+                                name="superficieTerreno"
+                                color="secondary"
+                                size="small"
+                                error={!!touched.superficieTerreno && !!errors.superficieTerreno}
+                                helperText={touched.superficieTerreno && errors.superficieTerreno}
                                 sx={{ gridColumn: "span 2" }}
                             />
 
