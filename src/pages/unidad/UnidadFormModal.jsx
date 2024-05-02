@@ -30,8 +30,6 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
     const [esEditar, setEsEditar] = useState(false);
     const [urlDocumento, setUrlDocumento] = useState(null);
     const [unidadId, setUnidadId] = useState(null);
-
-
     const [currentTab, setCurrentTab] = useState(1);
 
     const handleChangeTab = (event, newValue) => {
@@ -45,6 +43,7 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
         transform: 'translate(-50%, -50%)',
         width: '90%',
         border: '1px solid #555',
+        //maxHeight: 800, overflowY: 'auto',
         backgroundColor: `${colors.primary[400]}`,
         boxShadow: 24,
     };
@@ -96,7 +95,11 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
         <div>
             <Modal
                 open={openModal}
-                onClose={()=> onCloseModal(false)}
+                onClose={(e, r)=> {
+                    console.log("unidadModal onClose: ", e, r);
+                    return false;
+                    //onCloseModal(false);
+                }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
                 sx={{zIndex: 100}}
@@ -112,7 +115,7 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
                                     title={ esEditar ? "Editando Unidad" : "Nueva Unidad"}
                         />
                         <CardContent>
-                            <Grid container spacing={3} >
+                            <Grid container spacing={3} sx={{maxHeight: 750, overflowY: 'auto',}}>
                                 <Grid item md={4}>
 
                                     <Tabs

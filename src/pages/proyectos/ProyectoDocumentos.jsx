@@ -17,6 +17,7 @@ import {getAllUnidades, setUnidades} from "../../store/slices/unidadSlice.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import {setCotas} from "../../store/slices/cotaSlice.js";
+import {Estatus} from "../../utils/constantes.js";
 
 
 const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
@@ -29,28 +30,28 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
 
 
     useEffect(() => {
-        if(unidades){
+        console.log("1.- validarUnidades - cant unidades: ", unidades.length);
+        if(unidades.length > 0){
+            console.log("1.1- validarUnidades - cant unidades: ", unidades.length);
             validarUnidades();
         }
 
     }, [unidades]);
 
 
-
-    useEffect(() => {
-        if(proyecto){
-            setTituloDoc("documentoProyecto_" + proyecto.id);
-        }
-
-    }, []);
-
     useEffect(() => {
         console.log("proyectoId: ", proyecto.id);
+        console.log("2.- carga unidades - cant unidades: ", unidades.length);
+
         if(proyecto) {
+            setTituloDoc("documentoProyecto_" + proyecto.id);
             dispatch(setLoader(true));
             dispatch(getAllUnidades({proyectoId: proyecto.id}))
                 .then(resp => {
                     dispatch(setLoader(false));
+                    console.log("2.1- after carga unidades - cant unidades: ", unidades.length);
+
+                    //validarUnidades();
                 });
         }
 
@@ -61,6 +62,10 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
     }, []);
 
     const validarUnidades = () => {
+
+        console.log("validarUnidades -unidades: ", unidades);
+        console.log("validarUnidades - proyecto: ", proyecto);
+
         let unidadSuma = {
             terrenoTotal: 0,
             terrenoExclusivoTotal: 0,
@@ -72,6 +77,7 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
             totalUnidades: 0,
             unidadesIncompletas: 0
         }
+
         unidadSuma.terrenoExclusivoTotal = unidades.reduce((sum, u) => {
             return sum + Number(u.terrenoExclusivo)
         }, 0);
@@ -98,7 +104,9 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
 
         unidadSuma.totalUnidades = unidades.length;
 
-        unidadSuma.unidadesIncompletas = unidades.filter(u => u.cotas.length < 3).length;
+        unidadSuma.unidadesIncompletas = unidades.filter(u => {
+            return (u.cotas.filter(c => c.estatus === Estatus.ACTIVO).length < 3)
+        }).length;
 
         //console.log("unidadSuma: ", unidadSuma);
         //console.log("proyecto: ", proyecto);
@@ -120,9 +128,10 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
                 message = mensajeTerrenoContruccion(key, value);
                 error = (value !== proyecto[key]);
             }
-
             console.log(error, message);
+
             if(error){
+                //console.log(error, message);
                 withReactContent(Swal).fire({
                     title: "Advertencia",
                     text: message,
