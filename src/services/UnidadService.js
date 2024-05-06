@@ -41,13 +41,13 @@ const generateRequest = (request) => {
     let documento  = (typeof request["documento"] === "object") ? request["documento"] : null;
     let unidad = {...request, createdAt: null, updatedAt: null}
     delete unidad.documento;
-
-    let cotasUp = unidad.cotas.map(f => {
-        f = {...f, createdAt: null, updatedAt: null}
-        return f;
-    });
-
-    unidad.cotas = [...cotasUp];
+    if(request.id){
+        let cotasUp = unidad.cotas.map(f => {
+            f = {...f, createdAt: null, updatedAt: null}
+            return f;
+        });
+        unidad.cotas = [...cotasUp];
+    }
 
     console.log("generateReques unidad", unidad);
     console.log("generateReques documento", documento);
