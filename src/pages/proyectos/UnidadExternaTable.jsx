@@ -8,25 +8,25 @@ import {useEffect, useState} from "react";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {getAllCotas, setCotas} from "../../store/slices/cotaSlice.js";
 import {Link} from "react-router-dom";
-import FraccionExternaModal from "./FraccionExternaModal.jsx";
+import UnidadExternaModal from "./UnidadExternaModal.jsx";
 import ModalDemo from "./ModalDemo.jsx";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import {Estatus} from "../../utils/constantes.js";
 
-const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
+const UnidadExternaTable = ({handleEditRow, unidadesExternas}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     //const dispatch = useDispatch();
     //onChange={colindanciasHandler} colindanciasSelected={colindsIdsSelect}/>
-    const [fraccionesExtTable, setFraccionesExtTable] = useState([]);
+    const [unidadesExtTable, setUnidadesExtTable] = useState([]);
     useEffect(() => {
-        console.log("fraccionesExternas Change: ", fraccionesExternas);
-        let fraccionesActivas = fraccionesExternas.filter(f => f.estatus === Estatus.ACTIVO);
-        setFraccionesExtTable(fraccionesActivas);
+        console.log("unidadesExternas Change: ", unidadesExternas);
+        let unidadesExtTable = unidadesExternas.filter(f => f.estatus === Estatus.ACTIVO);
+        setUnidadesExtTable(unidadesExtTable);
 
-    }, [fraccionesExternas]);
+    }, [unidadesExternas]);
 
     const columns = [
         {
@@ -76,9 +76,9 @@ const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
         },
     ];
 
-    const alertaEliminar = (fraccionEdit) => {
+    const alertaEliminar = (unidadEdit) => {
 
-        console.log("alertaEliminar", fraccionEdit);
+        console.log("alertaEliminar", unidadEdit);
         withReactContent(Swal).fire({
             title: "¿Está seguro de eliminar?",
             icon: "error",
@@ -88,7 +88,7 @@ const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 console.log("SE CONFIRMA ELIMINACIÓN")
-                handleEditRow(fraccionEdit, true);
+                handleEditRow(unidadEdit, true);
             }
         });
     }
@@ -131,12 +131,12 @@ const FraccionExternaTable = ({handleEditRow, fraccionesExternas}) => {
                     }
                 }}
             >
-                <DataGrid rows={fraccionesExtTable}
+                <DataGrid rows={unidadesExtTable}
                           columns={columns}
-                          getRowId={(row) => row.fraccionId}
+                          getRowId={(row) => row.unidadId}
                 />
             </Box>
     );
 };
 
-export default FraccionExternaTable;
+export default UnidadExternaTable;

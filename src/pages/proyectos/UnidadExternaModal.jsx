@@ -18,7 +18,7 @@ import CardHeader from "@mui/material/CardHeader";
 import {Estatus} from "../../utils/constantes.js";
 
 const initialValues = {
-    "fraccionId": null,
+    "unidadId": null,
     "proyectoId": null,
     "cotaId": null,
     "orden": "",
@@ -30,11 +30,11 @@ const initialValues = {
     "estatus": Estatus.ACTIVO
 }
 
-const FraccionExternaModal = ({fraccionExt, handleEditRow, openModal, onCloseModal, handleSubmitModal}) => {
+const UnidadExternaModal = ({unidadExt, handleEditRow, openModal, onCloseModal, handleSubmitModal}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [formState, setFormState] = useState(fraccionExt || initialValues);
+    const [formState, setFormState] = useState(unidadExt || initialValues);
     const [esEditar, setEsEditar] = useState(false);
 
     const style = {
@@ -48,36 +48,35 @@ const FraccionExternaModal = ({fraccionExt, handleEditRow, openModal, onCloseMod
         boxShadow: 24,
     };
 
-
     const tiposLineas = ["RECTA", "CURVA"];
     const [tipoLineaSelect, setTipoLineaSelect] = useState(null);
     const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
     const [orientacionSelect, setOrientacionSelect] = useState(null);
 
     useEffect(() => {
-        console.log("useEffect fraccionModal: ", openModal)
+        console.log("useEffect UnidadModal: ", openModal)
         return () => {
-            console.log("callback fraccionModal: ", openModal);
+            console.log("callback UnidadModal: ", openModal);
             if(openModal){
-                console.log("RESET fraccionModal: ", openModal);
+                console.log("RESET UnidadModal: ", openModal);
                 handleReset();
             }
         };
     }, [openModal]);
 
     useEffect(() => {
-        if(fraccionExt){
+        if(unidadExt){
             setEsEditar(true);
-            setFormState(fraccionExt);
-            setOrientacionSelect(fraccionExt.orientacion);
-            setTipoLineaSelect(fraccionExt.tipoLinea);
+            setFormState(unidadExt);
+            setOrientacionSelect(unidadExt.orientacion);
+            setTipoLineaSelect(unidadExt.tipoLinea);
         }
-    }, [fraccionExt]);
+    }, [unidadExt]);
 
     const handleFormSubmit = (values, actions) => {
-        const id = values.fraccionId !== null ? values.fraccionId : randomUUID();
-        const valuesRequest = {...values, fraccionId: id};
-        console.log("esEditar: " + esEditar + ", fraccionExtRequest: ", valuesRequest);
+        const id = values.unidadId !== null ? values.unidadId : randomUUID();
+        const valuesRequest = {...values, unidadId: id};
+        console.log("esEditar: " + esEditar + ", UnidadExtRequest: ", valuesRequest);
         handleSubmitModal(valuesRequest);
         actions.resetForm();
         onCloseModal(false);
@@ -286,9 +285,9 @@ const checkoutSchema = yup.object().shape({
     "tipoLinea": yup.string().required("required"),
     "orientacion": yup.string().required("required"),
     "medida": yup.number().required("required"),
-    //"fraccionId": yup.number().required("required"),
+    //"unidadId": yup.number().required("required"),
     "descripcion": yup.string().required("required"),
 });
 
 
-export default FraccionExternaModal;
+export default UnidadExternaModal;

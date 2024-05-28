@@ -11,39 +11,46 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import {Estatus} from "../../utils/constantes.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import {setUnidades} from "../../store/slices/unidadSlice.js";
 
-const CotaTable = ({fraccionId, handleEditRow}) => {
+const CotaTable = ({unidadId, handleEditRow}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const dispatch = useDispatch();
     const cotas = useSelector(state => state.cotas.cotas);
 
     useEffect(() => {
+        console.log("CotaTable unidadID: ", unidadId);
         const cargarCotas = ()=>{
             dispatch(setLoader(true));
-            dispatch(getAllCotas({fraccionId: fraccionId})).then(resp => {
+            dispatch(getAllCotas({unidadId: unidadId})).then(resp => {
                 dispatch(setLoader(false));
             })
         }
-        if(fraccionId) {
+        if(unidadId) {
             cargarCotas();
         }else{
             dispatch(setCotas([]));
         }
 
-    }, [fraccionId]);
+        return () => {
+            console.log("callback setCotas: ", cotas);
+            dispatch(setCotas([]));
+        };
+
+    }, [unidadId]);
 
     const columns = [
-        {
+        /*{
             field: "orden",
             headerName: "Orden",
             type: "number",
             headerAlign: "left",
             align: "left",
-        },
+        },*/
         {
-            field: "fraccionId",
-            headerName: "UnidadId",
+            field: "unidadId",
+            headerName: "Unidad",
             flex: 1,
             cellClassName: "name-column--cell",
         },
@@ -105,10 +112,10 @@ const CotaTable = ({fraccionId, handleEditRow}) => {
 
     return (
         <Box>
-            <Header subtitle="Cotas" />
+            {/*<Header subtitle="Cotas" />*/}
             <Box
                 //m="40px 0 0 0"
-                height="75vh"
+                height="300px"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none",

@@ -34,7 +34,7 @@ const remove = (id) => {
     return axiosClient.get(`proyecto/${id}`);
 }
 
-const getFraccionesDoc = (id) => {
+const getUnidadesDoc = (id) => {
     return axiosClient.get(`proyecto/generate-proyecto-doc/${id}`);
 }
 
@@ -43,11 +43,11 @@ const generateRequest = (request) => {
     let documento  = (typeof request["documento"] === "object") ? request["documento"] : null;
     let proyecto = {...request, createdAt: null, updatedAt: null}
     delete proyecto.documento;
-    proyecto.fraccionesExternas.map(f => {
+    /*proyecto.unidadesExternas.map(f => {
         f.createdAt = null;
         f.updatedAt = null;
         return f;
-    });
+    });*/
 
     console.log("generateReques proyecto", proyecto);
     console.log("generateReques documento", documento);
@@ -61,7 +61,7 @@ const generateRequest = (request) => {
         let value = null
 
         switch (key) {
-            case "fraccionesExternas":
+            case "unidadesExternas":
               value = JSON.stringify(request[key]);
               break;
             case "documento":
@@ -88,7 +88,7 @@ const ProyectoService = {
     update,
     create,
     remove,
-    getFraccionesDoc
+    getUnidadesDoc
 }
 
 export default ProyectoService;

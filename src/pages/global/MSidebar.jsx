@@ -53,7 +53,7 @@ const MSidebar = () => {
             height: "100vh",
             top: 0,
             bottom: 0,
-            zIndex: 10000,
+            zIndex: 100,
             "& .ps-sidebar-root": {
               border: "none",
             },
@@ -105,7 +105,7 @@ const MSidebar = () => {
                       ml="15px"
                   >
                     <Typography variant="h3" color={colors.grey[100]}>
-                      LOTIFICADOR
+                      DESCRIPTIVOS
                     </Typography>
                     <IconButton
                         onClick={

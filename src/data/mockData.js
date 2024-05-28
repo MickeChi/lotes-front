@@ -1,9 +1,9 @@
 import { tokens } from "../theme.jsx";
 
-export const mockDataFraccion = [
+export const mockDataunidad = [
   {
     id: 1,
-    fraccion: 1,
+    unidad: 1,
     numeroCatastral: 1243544,
     folioElectronico: 35,
     tipoColindancia: "LOTE",
@@ -11,7 +11,7 @@ export const mockDataFraccion = [
   },
   {
     id: 2,
-    fraccion: 2,
+    unidad: 2,
     numeroCatastral: 344545,
     folioElectronico: 45433,
     tipoColindancia: "LOTE",
@@ -19,7 +19,7 @@ export const mockDataFraccion = [
   },
   {
     id: 3,
-    fraccion: 3,
+    unidad: 3,
     numeroCatastral: 1166,
     folioElectronico: 5851,
     tipoColindancia: "LOTE",
@@ -27,7 +27,7 @@ export const mockDataFraccion = [
   },
   {
     id: 4,
-    fraccion: 4,
+    unidad: 4,
     numeroCatastral: 8812,
     folioElectronico: 9915,
     tipoColindancia: "LOTE",
@@ -355,28 +355,28 @@ export const mockBarDataCostos = [
   {
     operacion: "CREATE",
     PROYECTOS: 137,
-    FRACCIONES: 96,
+    UNIDADES: 96,
     COTAS: 72,
     DOCUMENTOS: 140,
   },
   {
     operacion: "UPDATE",
     PROYECTOS: 55,
-    FRACCIONES: 28,
+    UNIDADES: 28,
     COTAS: 58,
     DOCUMENTOS: 29,
   },
   {
     operacion: "DELETE",
     PROYECTOS: 109,
-    FRACCIONES: 23,
+    UNIDADES: 23,
     COTAS: 34,
     DOCUMENTOS: 152,
   },
   {
     operacion: "GENERATE",
     PROYECTOS: 133,
-    FRACCIONES: 52,
+    UNIDADES: 52,
     COTAS: 43,
     DOCUMENTOS: 83,
   }
@@ -519,7 +519,7 @@ export const mockLineData = [
     ],
   },
   {
-    id: "FRACCIONES",
+    id: "UNIDADES",
     color: tokens("dark").blueAccent[300],
     data: [
       {
@@ -610,7 +610,7 @@ export const mockLineData2 = [
     ],
   },
   {
-    id: "FRACCIONES",
+    id: "UNIDADES",
     color: tokens("dark").blueAccent[300],
     data: [
       {
