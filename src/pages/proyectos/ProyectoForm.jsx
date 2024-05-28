@@ -27,12 +27,13 @@ import {
 } from "../../store/slices/generalSlice.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
-import ProyectoColindanciaForm from "./FraccionExternaTable.jsx";
-import FraccionExternaTable from "./FraccionExternaTable.jsx";
+import ProyectoColindanciaForm from "./UnidadExternaTable.jsx";
+import UnidadExternaTable from "./UnidadExternaTable.jsx";
 import {AddCircle} from "@mui/icons-material";
-import FraccionExternaModal from "./FraccionExternaModal.jsx";
-import {deleteFraccion} from "../../store/slices/fraccionSlice.js";
+import UnidadExternaModal from "./UnidadExternaModal.jsx";
+import {deleteUnidad} from "../../store/slices/UnidadSlice.js";
 import {Estatus} from "../../utils/constantes.js";
+import {getTiposDesarrollos} from "../../store/slices/catalogoSlice.js";
 
 const initialValues = {
     titulo: "",
@@ -40,12 +41,21 @@ const initialValues = {
     municipio: "",
     localidad: "",
     subtotal: "",
-    totalFracciones: "",
+    tipoDesarrollo: "",
     uso: "",
     clase: "",
     puntoPartida: "",
     documento: "",
-    estatus: Estatus.ACTIVO
+    estatus: Estatus.ACTIVO,
+
+    totalUnidades: "",
+    terrenoTotal: "",
+    terrenoExclusivoTotal: "",
+    terrenoComunTotal: "",
+    construccionTotal: "",
+    construccionExclusivoTotal: "",
+    construccionComunTotal: ""
+
 };
 const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -54,15 +64,19 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const navigate = useNavigate();
     const [estadoSeleccionado, setEstadoSeleccionado] = useState(null);
     const [municipioSeleccionado, setMunicipioSeleccionado] = useState(null);
-    const [formState, setFormState] = useState( proyecto || initialValues);
+    const [formState, setFormState] = useState(initialValues);
     const dispatch = useDispatch();
     const estados = useSelector(state => state.general.estados);
     const municipios = useSelector(state => state.general.municipios);
+    const tiposDesarrollos = useSelector(state => state.catalogos.tiposDesarrollos);
+    const [tipoDesarrolloSeleccionado, setTipoDesarrolloSeleccionado] = useState(null);
+
+
     const [contCargaMunicipio, setContCargaMunicipio] = useState(1);
-    const [fraccionesExternas, setFraccionesExternas] = useState([]);
-    const [fraccionesExternasError, setFraccionesExternasError] = useState(false);
+    const [unidadesExternas, setUnidadesExternas] = useState([]);
+    const [unidadesExternasError, setUnidadesExternasError] = useState(false);
     const [openModal, setOpenModal] = useState(false);
-    const [fraccionExtUpdate, setFraccionExtUpdate] = useState(null);
+    const [unidadExtUpdate, setUnidadExtUpdate] = useState(null);
     const [urlDocumento, setUrlDocumento] = useState(null);
 
     const regexpNums = /^\d*$/;
@@ -74,13 +88,38 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
 
     useEffect(() => {
         if(proyecto){
+
+            const proyectoState = {...proyecto};
+            for(const key in proyectoState){
+                if(initialValues.hasOwnProperty(key) && (proyectoState[key] === null || proyectoState[key] === undefined)){
+                    proyectoState[key] = "";
+                }
+            }
             setPuntoPartidaSelect(proyecto.puntoPartida);
             setUsoSeleccionado(proyecto.uso);
-            setFraccionesExternas(proyecto.fraccionesExternas);
             setUrlDocumento(proyecto.nombreDocumento ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + proyecto.nombreDocumento : null);
+            setFormState(proyectoState);
+
         }
 
     }, [proyecto]);
+
+    useEffect(() => {
+        if(tiposDesarrollos.length === 0){
+            dispatch(getTiposDesarrollos()).then((resp) => {
+                if(esEditar){
+                    let tipoDesSel = resp.payload.find(t => t.id === proyecto.tipoDesarrollo.id);
+                    setTipoDesarrolloSeleccionado(tipoDesSel);
+                }
+            });
+        }else{
+            if(esEditar){
+                let tipoDesSel = tiposDesarrollos.find(t => t.id === proyecto.tipoDesarrollo.id);
+                setTipoDesarrolloSeleccionado(tipoDesSel);
+            }
+        }
+    }, []);
+
 
     useEffect(() => {
         if(estados.length === 0){
@@ -112,28 +151,29 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
 
     }, [estadoSeleccionado]);
 
-    useEffect(() => {
-        console.log("fraccionesExternas change", fraccionesExternas);
-        if(fraccionesExternas.length === 0){
-            setFraccionesExternasError(true);
+    /*useEffect(() => {
+        console.log("unidadesExternas change", unidadesExternas);
+        if(unidadesExternas.length === 0){
+            setUnidadesExternasError(true);
         }else{
-            setFraccionesExternasError(false);
+            setUnidadesExternasError(false);
         }
 
-    }, [fraccionesExternas]);
+    }, [unidadesExternas]);*/
 
 
     const handleFormSubmit = (values) => {
         console.log("crear proyecto: ", values);
-        if(fraccionesExternas.length === 0) return
 
-        const fraccionesExt = fraccionesExternas.map(f =>{
-            f.fraccionId = regexpNums.test(f.fraccionId) ? f.fraccionId : null;
+        /*if(unidadesExternas.length === 0) return
+
+        const unidadesExt = unidadesExternas.map(f =>{
+            f.unidadId = regexpNums.test(f.unidadId) ? f.unidadId : null;
             return f;
-        }).filter(f => !(f.fraccionId == null && f.estatus === Estatus.DESACTIVADO));
+        }).filter(f => !(f.unidadId == null && f.estatus === Estatus.DESACTIVADO));*/
 
-        const valuesRequest = {...values, fraccionesExternas: fraccionesExt}
-        console.log("esEditar: " + esEditar + ", fraccionRequest: ", valuesRequest);
+        const valuesRequest = {...values}
+        console.log("esEditar: " + esEditar + ", UnidadRequest: ", valuesRequest);
 
         let actionSubmit = esEditar ? updateProyecto : createProyecto;
 
@@ -156,29 +196,29 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
 
     const handleSubmitModal = (fracExt) => {
         console.log("handleSubmitModal", fracExt);
-        let existeFext = fraccionesExternas.find(f => f.fraccionId === fracExt.fraccionId);
-        let listaFraccionesExt = [];
+        let existeFext = unidadesExternas.find(f => f.unidadId === fracExt.unidadId);
+        let listaUnidadesExt = [];
         if(existeFext !== undefined){
-            listaFraccionesExt = fraccionesExternas.map( f => {
-                if(f.fraccionId === fracExt.fraccionId){
+            listaUnidadesExt = unidadesExternas.map( f => {
+                if(f.unidadId === fracExt.unidadId){
                     f = fracExt;
                 }
                 return f;
             });
-            setFraccionesExternas(listaFraccionesExt)
+            setUnidadesExternas(listaUnidadesExt)
         }else{
-            setFraccionesExternas(prevState => [...prevState, fracExt]);
+            setUnidadesExternas(prevState => [...prevState, fracExt]);
         }
     }
 
-    const handlerEditFracExt = (fraccExtEdit, eliminar = false) => {
+    const handlerEditFracExt = (unidExtEdit, eliminar = false) => {
 
         if(eliminar){
-            console.log("handlerEditFracExt DELETE: ", fraccExtEdit);
-            handleDelete(fraccExtEdit);
+            console.log("handlerEditFracExt DELETE: ", unidExtEdit);
+            handleDelete(unidExtEdit);
         }else{
-            console.log("handlerEditFracExt: ", fraccExtEdit);
-            setFraccionExtUpdate(fraccExtEdit);
+            console.log("handlerEditFracExt: ", unidExtEdit);
+            setUnidadExtUpdate(unidExtEdit);
             setOpenModal(true);
 
         }
@@ -186,37 +226,37 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     }
 
 
-    const handleDelete = (fraccionDelete) => {
-        let fraccExtDel = {...fraccionDelete, estatus: Estatus.DESACTIVADO}
-        console.log("handleDelete: ", fraccExtDel);
+    const handleDelete = (unidadDelete) => {
+        let unidExtDel = {...unidadDelete, estatus: Estatus.DESACTIVADO}
+        console.log("handleDelete: ", unidExtDel);
 
-        let existeFext = fraccionesExternas.find(f => f.fraccionId === fraccExtDel.fraccionId);
-        let listaFraccionesExt = [];
+        let existeFext = unidadesExternas.find(f => f.unidadId === unidExtDel.unidadId);
+        let listaUnidadesExt = [];
         if(existeFext !== undefined){
-            listaFraccionesExt = fraccionesExternas.map( f => {
-                if(f.fraccionId === fraccExtDel.fraccionId){
-                    f = fraccExtDel;
+            listaUnidadesExt = unidadesExternas.map( f => {
+                if(f.unidadId === unidExtDel.unidadId){
+                    f = unidExtDel;
                 }
                 return f;
             });
-            setFraccionesExternas(listaFraccionesExt);
-            setFraccionExtUpdate(false);
+            setUnidadesExternas(listaUnidadesExt);
+            setUnidadExtUpdate(false);
 
             withReactContent(Swal).fire({
                 title: "Se eliminó correctamente",
                 icon: "success"
             });
 
-            console.log("BEFORE FRACEXT DELETE: ", listaFraccionesExt);
+            console.log("BEFORE FRACEXT DELETE: ", listaUnidadesExt);
 
         }
 
 
 
         /*dispatch(setLoader(true));
-        dispatch(deleteFraccion(fraccionDelete)).then((resp) => {
+        dispatch(deleteUnidad(unidadDelete)).then((resp) => {
             dispatch(setLoader(false));
-            setFraccionUpdate(null);
+            setUnidadUpdate(null);
             withReactContent(Swal).fire({
                 title: "Se eliminó correctamente",
                 icon: "success"
@@ -225,69 +265,49 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         })*/
     };
 
-    const textoErrorCotas = fraccionesExternasError ? 'Agregue al menos una colindancia' : 'Colindancias externas del proyecto';
+    const textoErrorCotas = unidadesExternasError ? 'Agregue al menos una colindancia' : 'Colindancias externas del proyecto';
+    const createFilePreview = (file) => {
+        setUrlDocumento(null);
+        if(file && ["application/pdf", "image/jpeg"].includes(file.type)){
+            setUrlDocumento(URL.createObjectURL(file));
+        }
+    }
 
     return (
 
         <Grid container spacing={3}>
-            <Grid item md={6}>
+            <Grid item md={4}>
                 <Box display="flex" justifyContent="space-between">
                     <Header subtitle={ esEditar ? "Editando Proyecto" : "Nuevo Proyecto"}/>
-                    {
-                        urlDocumento && (<Box>
-                            <a href={urlDocumento} target="_blank">
-                                <Button
-                                    size="small"
-                                    color="warning"
-                                    variant="contained"
-                                >
-                                    <OpenInNewIcon sx={{ mr: "10px" }}/>
-                                    Ver documento
-                                </Button>
-                            </a>
-                        </Box>)
-                    }
                 </Box>
             </Grid>
-            <Grid item md={6}>
+            <Grid item md={8}>
                 <Box display="flex" justifyContent="space-between">
-                    <Header subtitle={textoErrorCotas} error={fraccionesExternasError}/>
-                    <Box>
-                        <Button
-                            size="small"
-                            color="warning"
-                            variant="contained"
-                            onClick={() => {
-                                setOpenModal(true);
-                            }}
-                        >
-                            <AddCircle sx={{ mr: "10px" }}/>
-                            Agregar colindancia
-                        </Button>
-                    </Box>
+                    <Header subtitle="Documento de autorización"/>
                 </Box>
             </Grid>
             <Grid item md={12}>
+                <Grid container spacing={3}>
+                    <Grid item md={4} style={{ paddingTop: "0" }}>
+                        <Formik
+                            onSubmit={handleFormSubmit}
+                            initialValues={formState || initialValues}
+                            validationSchema={checkoutSchema}
+                            enableReinitialize
+                        >
+                            {({
+                                  values,
+                                  errors,
+                                  touched,
+                                  handleBlur,
+                                  handleChange,
+                                  handleSubmit,
+                                  setFieldValue,
+                                  //handleReset
+                              }) => (
 
-                <Formik
-                    onSubmit={handleFormSubmit}
-                    initialValues={formState}
-                    validationSchema={checkoutSchema}
-                >
-                    {({
-                          values,
-                          errors,
-                          touched,
-                          handleBlur,
-                          handleChange,
-                          handleSubmit,
-                          setFieldValue,
-                          //handleReset
-                      }) => (
+                                <form onSubmit={handleSubmit}>
 
-                        <form onSubmit={handleSubmit}>
-                            <Grid container spacing={3}>
-                                <Grid item md={6} style={{ paddingTop: "0" }}>
                                     <Grid container spacing={3}>
                                         <Grid item md={12}>
                                             <TextField
@@ -302,7 +322,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 error={!!touched.titulo && !!errors.titulo}
                                                 helperText={touched.titulo && errors.titulo}
                                                 color="secondary"
-                                                //sx={{ gridColumn: "span 4" }}
                                             />
                                         </Grid>
                                         <Grid item md={6}>
@@ -312,7 +331,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 options={estados}
                                                 getOptionLabel={option => option}
                                                 value={estadoSeleccionado}
-                                                //sx={{ gridColumn: "span 2" }}
                                                 onChange={(e, value) => {
                                                     setFieldValue("municipio", "");
                                                     setMunicipioSeleccionado(null);
@@ -343,7 +361,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 options={municipios}
                                                 getOptionLabel={option => option}
                                                 value={municipioSeleccionado}
-                                                //sx={{ gridColumn: "span 2" }}
                                                 onChange={(e, value) => {
                                                     setFieldValue(
                                                         "municipio",
@@ -381,41 +398,41 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 color="secondary"
                                                 error={!!touched.localidad && !!errors.localidad}
                                                 helperText={touched.localidad && errors.localidad}
-                                                sx={{ gridColumn: "span 2" }}
                                             />
                                         </Grid>
+
                                         <Grid item md={6}>
-                                            <TextField
-                                                fullWidth
-                                                variant="filled"
-                                                type="text"
-                                                label="Terreno exclusivo total"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                                value={values.subtotal}
-                                                name="subtotal"
-                                                color="secondary"
-                                                error={!!touched.subtotal && !!errors.subtotal}
-                                                helperText={touched.subtotal && errors.subtotal}
-                                                sx={{ gridColumn: "span 2" }}
+                                            <Autocomplete
+                                                id="tipoDesarrollo"
+                                                name="tipoDesarrollo"
+                                                options={tiposDesarrollos}
+                                                getOptionLabel={option => option.descripcion}
+                                                value={tipoDesarrolloSeleccionado}
+                                                onChange={(e, value) => {
+                                                    setFieldValue(
+                                                        "tipoDesarrollo",
+                                                        value !== null ? value : initialValues.tipoDesarrollo
+                                                    );
+                                                    setTipoDesarrolloSeleccionado(value);
+                                                }}
+                                                renderInput={params => (
+                                                    <TextField
+                                                        label="Seleccion el tipo de desarrollo"
+                                                        fullWidth
+                                                        variant="filled"
+                                                        type="text"
+                                                        name="tipoDesarrollo"
+                                                        color="secondary"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                        error={!!touched.tipoDesarrollo && !!errors.tipoDesarrollo}
+                                                        helperText={touched.tipoDesarrollo && errors.tipoDesarrollo}
+                                                        {...params}
+                                                    />
+                                                )}
                                             />
                                         </Grid>
-                                        <Grid item md={6}>
-                                            <TextField
-                                                fullWidth
-                                                variant="filled"
-                                                type="text"
-                                                label="Total unidades"
-                                                onBlur={handleBlur}
-                                                onChange={handleChange}
-                                                value={values.totalFracciones}
-                                                name="totalFracciones"
-                                                color="secondary"
-                                                error={!!touched.totalFracciones && !!errors.totalFracciones}
-                                                helperText={touched.totalFracciones && errors.totalFracciones}
-                                                sx={{ gridColumn: "span 2" }}
-                                            />
-                                        </Grid>
+
                                         <Grid item md={6}>
                                             <Autocomplete
                                                 id="uso"
@@ -460,9 +477,9 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 color="secondary"
                                                 error={!!touched.clase && !!errors.clase}
                                                 helperText={touched.clase && errors.clase}
-                                                sx={{ gridColumn: "span 1" }}
                                             />
                                         </Grid>
+
                                         <Grid item md={6}>
                                             <Autocomplete
                                                 id="puntoPartida"
@@ -470,7 +487,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 options={orientaciones}
                                                 getOptionLabel={option => option}
                                                 value={puntoPartidaSelect}
-                                                sx={{ gridColumn: "span 2" }}
                                                 onChange={(e, value) => {
                                                     setFieldValue(
                                                         "puntoPartida", value !== null ? value : initialValues.puntoPartida
@@ -494,15 +510,120 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 )}
                                             />
                                         </Grid>
-                                        <Grid item md={12}>
-                                            {/*<FormControl variant="filled">
-                                                <InputLabel htmlFor="component-filled">Name</InputLabel>
-                                                <FilledInput id="component-filled" defaultValue="Composed TextField" />
-                                            </FormControl>*/}
-                                            {/*<input id="file" name="file" type="file" onChange={(event) => {
-                                                //setfieldvalue("file", event.currenttarget.files[0]);
-                                            }}/>*/}
 
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Total unidades"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.totalUnidades}
+                                                name="totalUnidades"
+                                                color="secondary"
+                                                error={!!touched.totalUnidades && !!errors.totalUnidades}
+                                                helperText={touched.totalUnidades && errors.totalUnidades}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Terreno total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.terrenoTotal}
+                                                name="terrenoTotal"
+                                                color="secondary"
+                                                error={!!touched.terrenoTotal && !!errors.terrenoTotal}
+                                                helperText={touched.terrenoTotal && errors.terrenoTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Contrucción total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.construccionTotal}
+                                                name="construccionTotal"
+                                                color="secondary"
+                                                error={!!touched.construccionTotal && !!errors.construccionTotal}
+                                                helperText={touched.construccionTotal && errors.construccionTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Terreno exclusivo total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.terrenoExclusivoTotal}
+                                                name="terrenoExclusivoTotal"
+                                                color="secondary"
+                                                error={!!touched.terrenoExclusivoTotal && !!errors.terrenoExclusivoTotal}
+                                                helperText={touched.terrenoExclusivoTotal && errors.terrenoExclusivoTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Contrucción exclusiva total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.construccionExclusivoTotal}
+                                                name="construccionExclusivoTotal"
+                                                color="secondary"
+                                                error={!!touched.construccionExclusivoTotal && !!errors.construccionExclusivoTotal}
+                                                helperText={touched.construccionExclusivoTotal && errors.construccionExclusivoTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Terreno común total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.terrenoComunTotal}
+                                                name="terrenoComunTotal"
+                                                color="secondary"
+                                                error={!!touched.terrenoComunTotal && !!errors.terrenoComunTotal}
+                                                helperText={touched.terrenoComunTotal && errors.terrenoComunTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="text"
+                                                label="Contrucción común total"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                value={values.construccionComunTotal}
+                                                name="construccionComunTotal"
+                                                color="secondary"
+                                                error={!!touched.construccionComunTotal && !!errors.construccionComunTotal}
+                                                helperText={touched.construccionComunTotal && errors.construccionComunTotal}
+                                            />
+                                        </Grid>
+
+                                        <Grid item md={12}>
                                             <TextField
                                                 fullWidth
                                                 variant="filled"
@@ -510,51 +631,52 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 label="Seleccione autorización del proyecto"
                                                 InputLabelProps={{ shrink: true }}
                                                 onBlur={handleBlur}
-                                                //onChange={handleChange}
-                                                //value={values.documento}
                                                 name="documento"
                                                 color="secondary"
                                                 error={!!touched.documento && !!errors.documento}
                                                 helperText={touched.documento && errors.documento}
-                                                sx={{ gridColumn: "span 2" }}
                                                 onChange={(e) => {
                                                     setFieldValue("documento", e.currentTarget.files[0]);
                                                     console.log("documento: ", e.currentTarget.files[0]);
-                                                    /*setPuntoPartidaSelect(value);*/
+                                                    createFilePreview(e.currentTarget.files[0]);
                                                 }}
                                             />
                                         </Grid>
+
                                     </Grid>
-                                </Grid>
-
-                                <Grid item md={6} style={{ paddingTop: "0" }}>
-                                    <Grid container>
-                                        <Grid item md={12}>
-                                            <FraccionExternaTable
-                                                handleEditRow={handlerEditFracExt}
-                                                fraccionesExternas={fraccionesExternas}
-                                            />
-                                        </Grid>
+                                    <Grid item md={12} display="flex" justifyContent="end" mt="20px">
+                                        <Button type="submit" color="secondary" variant="contained">
+                                            Guardar
+                                        </Button>
                                     </Grid>
-                                </Grid>
 
-                                <Grid item md={12} display="flex" justifyContent="end">
-                                    <Button type="submit" color="secondary" variant="contained">
-                                        Guardar
-                                    </Button>
-                                </Grid>
+                                </form>
+                            )}
+                        </Formik>
+                    </Grid>
+                    <Grid item md={8} style={{ paddingTop: "0" }}>
+                        <Grid container>
 
-                            </Grid>
-                        </form>
-                    )}
-                </Formik>
+                            {
+                                urlDocumento && (
+                                    <Grid item md={12}>
+                                        <iframe className="pdf"
+                                                src={urlDocumento}
+                                                width="100%" height="720">
+                                        </iframe>
+                                    </Grid>
+                                )
+                            }
+                        </Grid>
+                    </Grid>
+                </Grid>
             </Grid>
 
-            <FraccionExternaModal openModal={openModal}
-                                  fraccionExt={fraccionExtUpdate}
-                                  handleEditRow={setFraccionExtUpdate}
-                                  handleSubmitModal={handleSubmitModal}
-                                  onCloseModal={setOpenModal}
+            <UnidadExternaModal openModal={openModal}
+                                unidadExt={unidadExtUpdate}
+                                handleEditRow={setUnidadExtUpdate}
+                                handleSubmitModal={handleSubmitModal}
+                                onCloseModal={setOpenModal}
             />
 
         </Grid>
@@ -569,11 +691,20 @@ const checkoutSchema = yup.object().shape({
     estado: yup.string().required("required"),
     municipio: yup.string().required("required"),
     localidad: yup.string().required("required"),
-    subtotal: yup.number().required("required"),
-    totalFracciones: yup.number().required("required"),
+    //subtotal: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
     puntoPartida: yup.string().required("required"),
+
+    tipoDesarrollo: yup.mixed().required("required"),
+    totalUnidades: yup.number().required("required"),
+    terrenoTotal: yup.number().required("required"),
+    terrenoExclusivoTotal: yup.number().required("required"),
+    terrenoComunTotal: yup.number().required("required"),
+    construccionTotal: yup.number().required("required"),
+    construccionExclusivoTotal: yup.number().required("required"),
+    construccionComunTotal: yup.number().required("required"),
+
     documento: yup.mixed()
         //.required("required")
         .nullable()

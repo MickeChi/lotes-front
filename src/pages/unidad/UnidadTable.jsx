@@ -1,44 +1,52 @@
-import {Box, Button, ButtonGroup, useTheme} from "@mui/material";
+import {Badge, Box, Button, ButtonGroup, Chip, useTheme} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme.jsx";
 import Header from "../../components/Header";
 import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
-import {getAllFracciones} from "../../store/slices/fraccionSlice.js";
-import {Edit} from "@mui/icons-material";
+import {getAllUnidades, setUnidades} from "../../store/slices/unidadSlice.js";
+import {Dashboard, Edit, Polyline, Warning} from "@mui/icons-material";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
+import Avatar from "@mui/material/Avatar";
+import {Estatus} from "../../utils/constantes.js";
 
-const FraccionTable = ({proyectoId, handleEditRow}) => {
+const UnidadTable = ({proyectoId, handleEditRow}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const dispatch = useDispatch();
-    const fracciones = useSelector(state => state.fracciones.fracciones);
-    const [fraccionesTabla, setFraccionesTabla] = useState([]);
+    const unidades = useSelector(state => state.unidades.unidades);
+    const [unidadesTabla, setUnidadesTabla] = useState([]);
 
     useEffect(() => {
         console.log("proyectoId: ", proyectoId);
         dispatch(setLoader(true));
-        dispatch(getAllFracciones({proyectoId: proyectoId}))
+        dispatch(getAllUnidades({proyectoId: proyectoId}))
             .then(resp => {
                 dispatch(setLoader(false));
-            })
+            });
+
+        return () => {
+            console.log("callback setUnidadesTabla: ", unidadesTabla);
+            dispatch(setUnidades([]));
+        };
+
     }, []);
 
     useEffect(() => {
-        if(fracciones.length > 0){
-            let fraccTabla = fracciones.filter(f => !f.colindanciaProyecto);
-            setFraccionesTabla(fraccTabla);
+        if(unidades.length > 0){
+            let fraccTabla = unidades.filter(f => !f.colindanciaProyecto);
+            setUnidadesTabla(fraccTabla);
         }
 
-    }, [fracciones]);
+    }, [unidades]);
 
     const columns = [
         {
-            field: "lote",
-            headerName: "Lote",
+            field: "id",
+            headerName: "Id",
             flex: 1,
         },
         {
@@ -71,10 +79,29 @@ const FraccionTable = ({proyectoId, handleEditRow}) => {
             headerName: "Clase",
             flex: 1,
         },
-        {
+        /*{
             field: "tipoColindancia",
             headerName: "Tipo colindancia",
             flex: 1,
+        },*/
+        {
+            field: "cotas",
+            headerName: "Num Cotas",
+            flex: 1,
+            renderCell: ({ row }) => {
+                let cantidadCotas = (row.cotas.filter(c => c.estatus === Estatus.ACTIVO)).length;
+                let labelCota = cantidadCotas >= 3 ? "Válido" : "Inválido";
+                let colorCota = cantidadCotas >= 3 ? "success" : "error";
+
+                return (
+                    <Chip color={colorCota} label={labelCota}
+                          avatar={<Avatar sx={{
+                              backgroundColor: "#fff",
+                              color: `#000 !important`,
+                              fontWeight: `bold`
+                          }}>{cantidadCotas}</Avatar>} />
+                );
+            },
         },
         {
             field: "opciones",
@@ -95,9 +122,9 @@ const FraccionTable = ({proyectoId, handleEditRow}) => {
         },
     ];
 
-    const alertaEliminar = (fraccionEdit) => {
+    const alertaEliminar = (unidadEdit) => {
 
-        console.log("alertaEliminar", fraccionEdit);
+        console.log("alertaEliminar", unidadEdit);
         withReactContent(Swal).fire({
             title: "¿Está seguro de eliminar?",
             icon: "error",
@@ -107,21 +134,20 @@ const FraccionTable = ({proyectoId, handleEditRow}) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 console.log("SE CONFIRMA ELIMINACIÓN")
-                handleEditRow(fraccionEdit, true);
+                handleEditRow(unidadEdit, true);
             }
         });
     }
 
-    const onClikEdit = (fraccionEdit) => {
-        handleEditRow(fraccionEdit);
+    const onClikEdit = (unidadEdit) => {
+        handleEditRow(unidadEdit);
     }
 
     return (
-        <Box>
-            <Header subtitle="Unidades" />
+        <Box >
             <Box
                 //m="40px 0 0 0"
-                height="75vh"
+                height="50vh"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none",
@@ -151,10 +177,10 @@ const FraccionTable = ({proyectoId, handleEditRow}) => {
                     }
                 }}
             >
-                <DataGrid rows={fraccionesTabla} columns={columns} />
+                <DataGrid rows={unidadesTabla} columns={columns} />
             </Box>
         </Box>
     );
 };
 
-export default FraccionTable;
+export default UnidadTable;

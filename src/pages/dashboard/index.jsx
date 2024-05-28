@@ -148,10 +148,10 @@ const Dashboard = () => {
           >
             {
                 indicadores.length > 0 &&<StatBox
-                    title={indicador("FRACCION", "CREATE").cantOperaciones}
-                    subtitle="Fracciones creadas"
-                    progress={porcentajeOperacion("FRACCION", "CREATE") / 100}
-                    increase={`${porcentajeOperacion("FRACCION", "CREATE")}%`}
+                    title={indicador("UNIDAD", "CREATE").cantOperaciones}
+                    subtitle="unidades creadas"
+                    progress={porcentajeOperacion("unidad", "CREATE") / 100}
+                    increase={`${porcentajeOperacion("unidad", "CREATE")}%`}
                     icon={
                       <Microsoft
                           sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -188,10 +188,10 @@ const Dashboard = () => {
           >
             {
                 indicadores.length > 0 && <StatBox
-                    title={indicador("DOCUMENTO_FRACCIONES", "GENERATE").cantOperaciones}
+                    title={indicador("DOCUMENTO_UNIDADES", "GENERATE").cantOperaciones}
                     subtitle="Documento"
-                    progress={porcentajeOperacion("DOCUMENTO_FRACCIONES", "GENERATE") / 100}
-                    increase={`${porcentajeOperacion("DOCUMENTO_FRACCIONES", "GENERATE")}%`}
+                    progress={porcentajeOperacion("DOCUMENTO_UNIDADES", "GENERATE") / 100}
+                    increase={`${porcentajeOperacion("DOCUMENTO_UNIDADES", "GENERATE")}%`}
                     icon={
                       <DescriptionIcon
                           sx={{ color: colors.greenAccent[600], fontSize: "26px" }}

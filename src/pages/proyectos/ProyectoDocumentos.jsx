@@ -8,38 +8,179 @@ import {
 import { tokens } from "../../theme.jsx";
 import Header from "../../components/Header.jsx";
 import {useEffect, useState} from "react";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import ProyectoService from "../../services/ProyectoService.js";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import {getAllUnidades, setUnidades} from "../../store/slices/unidadSlice.js";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
+import {setCotas} from "../../store/slices/cotaSlice.js";
+import {Estatus} from "../../utils/constantes.js";
 
 
-const ProyectoDocumentos = ({proyectoId, proyectoTitulo}) => {
+const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const dispatch = useDispatch();
     const [tituloDoc, setTituloDoc] = useState("");
     const [docGenerado, setDocGenerado] = useState(null);
+    const unidades = useSelector(state => state.unidades.unidades);
+
 
     useEffect(() => {
-        if(proyectoId){
-
-            setTituloDoc("documentoProyecto_" + proyectoId);
+        console.log("1.- validarUnidades - cant unidades: ", unidades.length);
+        if(unidades.length > 0){
+            console.log("1.1- validarUnidades - cant unidades: ", unidades.length);
+            validarUnidades();
         }
 
+    }, [unidades]);
+
+
+    useEffect(() => {
+        console.log("proyectoId: ", proyecto.id);
+        console.log("2.- carga unidades - cant unidades: ", unidades.length);
+
+        if(proyecto) {
+            setTituloDoc("documentoProyecto_" + proyecto.id);
+            dispatch(setLoader(true));
+            dispatch(getAllUnidades({proyectoId: proyecto.id}))
+                .then(resp => {
+                    dispatch(setLoader(false));
+                    console.log("2.1- after carga unidades - cant unidades: ", unidades.length);
+
+                    //validarUnidades();
+                });
+        }
+
+        return () => {
+            console.log("callback setCotas: ", unidades);
+            dispatch(setUnidades([]));
+        };
     }, []);
+
+    const validarUnidades = () => {
+
+        console.log("validarUnidades -unidades: ", unidades);
+        console.log("validarUnidades - proyecto: ", proyecto);
+
+        let unidadSuma = {
+            terrenoTotal: 0,
+            terrenoExclusivoTotal: 0,
+            terrenoComunTotal: 0,
+            construccionTotal: 0,
+            construccionExclusivoTotal: 0,
+            construccionComunTotal: 0,
+            cuotaPaInTotal: 0,
+            totalUnidades: 0,
+            unidadesIncompletas: 0
+        }
+
+        unidadSuma.terrenoExclusivoTotal = unidades.reduce((sum, u) => {
+            return sum + Number(u.terrenoExclusivo)
+        }, 0);
+
+        unidadSuma.terrenoComunTotal = unidades.reduce((sum, u) => {
+            return sum + Number(u.terrenoComun)
+        }, 0);
+
+        unidadSuma.terrenoTotal = unidadSuma.terrenoExclusivoTotal + unidadSuma.terrenoComunTotal;
+
+        unidadSuma.construccionExclusivoTotal = unidades.reduce((sum, u) => {
+            return sum + Number(u.construccionExclusiva)
+        }, 0);
+
+        unidadSuma.construccionComunTotal = unidades.reduce((sum, u) => {
+            return sum + Number(u.construccionComun)
+        }, 0);
+
+        unidadSuma.construccionTotal = unidadSuma.construccionExclusivoTotal + unidadSuma.construccionComunTotal;
+
+        unidadSuma.cuotaPaInTotal = unidades.reduce((sum, u) => {
+            return sum + Number(u.cuotaPaIn)
+        }, 0);
+
+        unidadSuma.totalUnidades = unidades.length;
+
+        unidadSuma.unidadesIncompletas = unidades.filter(u => {
+            return (u.cotas.filter(c => c.estatus === Estatus.ACTIVO).length < 3)
+        }).length;
+
+        //console.log("unidadSuma: ", unidadSuma);
+        //console.log("proyecto: ", proyecto);
+
+
+        return Object.entries(unidadSuma).some(([key, value]) => {
+            let error = false;
+            let message = null;
+            if(['unidadesIncompletas'].includes(key)){
+                message = mensajeUnidadesCotas(key, value);
+                error = (value > 0);
+            }else if(['cuotaPaInTotal'].includes(key)){
+                message = mensajeCuotaPain(key, value);
+                error = (value !== 100);
+            }else if(['totalUnidades'].includes(key)){
+                message = mensajeTotalUnidades(key, value);
+                error = (value !== proyecto[key]);
+            }else{
+                message = mensajeTerrenoContruccion(key, value);
+                error = (value !== proyecto[key]);
+            }
+            console.log(error, message);
+
+            if(error){
+                //console.log(error, message);
+                withReactContent(Swal).fire({
+                    title: "Advertencia",
+                    text: message,
+                    icon: "warning"
+                });
+            }
+
+            return error;
+
+        });
+
+    }
+
+    const validacionesNombres = {
+        terrenoTotal: 'Terreno Total',
+        terrenoExclusivoTotal: 'Terreno Exclusivo Total',
+        terrenoComunTotal: 'Terreno Común Total',
+        construccionTotal: 'Construcción Total',
+        construccionExclusivoTotal: 'construccion Exclusivo Total',
+        construccionComunTotal: 'Construcción Común Total',
+        cuotaPaInTotal: 'Cuota Participacion Indiviso',
+        totalUnidades: 'Total Unidades',
+        unidadesIncompletas: 'Unidades Incompletas'
+    }
+
+    const mensajeTerrenoContruccion = (key, value) => `Se le informa que el proyecto ${proyecto.titulo}  tiene un ${validacionesNombres[key]} de ${proyecto[key]} m2,
+         sin embargo observamos que se han ingresado ${value} m2 entre todas las unidades. 
+         Si necesita ayuda copie este mensaje y envielo por correo a contacto@aliadonotarial.com`;
+
+    const mensajeTotalUnidades = (key, value) => `El proyecto ${proyecto.titulo} tiene un total de ${proyecto[key]} unidades sin embargo se han cargado ${value} `;
+
+    const mensajeUnidadesCotas = (key, value) => `El proyecto ${proyecto.titulo} tiene un total de ${value} unidades con menos de 3 cotas`;
+
+
+    const mensajeCuotaPain = (key, value) => `Se le informa que el proyecto ${proyecto.titulo} no alcanza el 100% de cuota de 
+    participación (${value}). 
+    Si necesita ayuda copie este mensaje y envielo por correo a contacto@aliadonotarial.com`;
 
 
     const generaDocumento = () => {
-        console.log("Generando proyecto: ", proyectoId);
-        dispatch(setLoader(true));
-        ProyectoService.getFraccionesDoc(proyectoId).then(resp => {
-            dispatch(setLoader(false));
+        if(!validarUnidades()){
+            dispatch(setLoader(true));
+            ProyectoService.getUnidadesDoc(proyecto.id).then(resp => {
+                dispatch(setLoader(false));
 
-            console.log("docGenerado: ", resp.data);
-            setDocGenerado(resp.data);
-        });
+                console.log("docGenerado: ", resp.data);
+                setDocGenerado(resp.data);
+            });
+        }
     }
 
     const descargaWord = (element, filename = '') => {
@@ -94,9 +235,9 @@ const ProyectoDocumentos = ({proyectoId, proyectoTitulo}) => {
                         <Typography variant="h4" fontWeight="600" sx={{mt: "15px"}}>{proyectoTitulo}</Typography>
 
                         {
-                            docGenerado.fraccionesTxt.map( f => {
+                            docGenerado.unidadesTxt.map( f => {
                                 return (
-                                    <Typography key={f.fraccionId} variant="h6" fontWeight="600" sx={{mt: "15px"}}>{f.fraccionTexto}</Typography>
+                                    <Typography key={f.unidadId} variant="h6" fontWeight="600" sx={{mt: "15px"}}>{f.unidadTexto}</Typography>
                                 );
                             })
                         }

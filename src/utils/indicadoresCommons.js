@@ -41,13 +41,13 @@ const getTipoEntidad = (tipoEntidad) => {
         case "PROYECTO":
             tipo = "PROYECTOS";
             break;
-        case "FRACCION":
-            tipo = "FRACCIONES";
+        case "unidad":
+            tipo = "unidadES";
             break;
         case "COTA":
             tipo = "COTAS";
             break;
-        case "DOCUMENTO_FRACCIONES":
+        case "DOCUMENTO_UNIDADES":
             tipo = "DOCUMENTOS";
             break;
         default:

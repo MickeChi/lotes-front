@@ -24,7 +24,7 @@ function union(a, b) {
 }
 
 export default function ColindanciaTransList({onChange, colindanciasSelected}) {
-    const fracciones = useSelector(state => state.fracciones.fracciones);
+    const unidades = useSelector(state => state.unidades.unidades);
 
     const [checked, setChecked] = useState([]);
     const [left, setLeft] = useState([]);
@@ -34,21 +34,21 @@ export default function ColindanciaTransList({onChange, colindanciasSelected}) {
     const rightChecked = intersection(checked, right);
 
     useEffect(() => {
-        if(fracciones){
-            setLeft(fracciones);
+        if(unidades){
+            setLeft(unidades);
         }
     }, []);
 
     useEffect(() => {
         console.log("colindanciasSelected: ", colindanciasSelected);
         const inicialiceTransList = () =>{
-            let checkedCols = fracciones.filter(f => {
+            let checkedCols = unidades.filter(f => {
                 let existId = colindanciasSelected.find(cs => cs === f.id);
                 return existId !== undefined;
             });
             console.log("colindancias Checked right: ", colindanciasSelected);
             if(checkedCols.length > 0){
-                let initLeft = fracciones;
+                let initLeft = unidades;
                 let leftCheck = intersection(checkedCols, initLeft);
                 setRight(leftCheck);
                 setLeft(not(initLeft, leftCheck));
@@ -59,7 +59,7 @@ export default function ColindanciaTransList({onChange, colindanciasSelected}) {
         if(colindanciasSelected.length > 0){
             inicialiceTransList();
         }else{
-            setLeft(fracciones);
+            setLeft(unidades);
             setRight([]);
             setChecked([]);
         }
