@@ -6,6 +6,7 @@ import cotaSlice from "./slices/cotaSlice.js";
 import operacionSlice from "./slices/operacionSlice.js";
 import colindanciaSlice from "./slices/colindanciaSlice.js";
 import catalogoSlice from "./slices/catalogoSlice.js";
+import archivoSlice from "./slices/archivoSlice.js";
 
 const store = configureStore({
     reducer: {
@@ -15,7 +16,8 @@ const store = configureStore({
         cotas: cotaSlice,
         colindancias: colindanciaSlice,
         operaciones: operacionSlice,
-        catalogos: catalogoSlice
+        catalogos: catalogoSlice,
+        archivos: archivoSlice
     },
     devTools: true
 })

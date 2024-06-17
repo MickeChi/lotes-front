@@ -5,7 +5,10 @@ import MunicipiosService from "../../services/MunicipiosService.js";
 const initialState = {
     loader: false,
     estados: [],
-    municipios: []
+    municipios: [],
+    idbx: null,
+    runWebWorkerFiles: false,
+    infoWebWorkerFiles: null,
 }
 
 export const getAllNamesEstados = createAsyncThunk(
@@ -40,7 +43,27 @@ const generalSlice = createSlice({
                 ...state,
                 municipios: action.payload
             }
-        }
+        },
+        setIdbx: (state, action) => {
+            return {
+                ...state,
+                idbx: action.payload
+            }
+        },
+
+        setRunWebWorkerFiles: (state, action) => {
+            return {
+                ...state,
+                runWebWorkerFiles: action.payload
+            }
+        },
+
+        setInfoWebWorkerFiles: (state, action) => {
+            return {
+                ...state,
+                infoWebWorkerFiles: action.payload
+            }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -57,4 +80,4 @@ const generalSlice = createSlice({
 
 const { reducer } = generalSlice;
 export default reducer;
-export const {setLoader, setMunicipios} = generalSlice.actions;
+export const {setLoader, setMunicipios, setIdbx, setRunWebWorkerFiles, setInfoWebWorkerFiles} = generalSlice.actions;

@@ -32,8 +32,11 @@ import UnidadExternaTable from "./UnidadExternaTable.jsx";
 import {AddCircle} from "@mui/icons-material";
 import UnidadExternaModal from "./UnidadExternaModal.jsx";
 import {deleteUnidad} from "../../store/slices/UnidadSlice.js";
-import {Estatus} from "../../utils/constantes.js";
+import {ArchivosProps, Estatus} from "../../utils/constantes.js";
 import {getTiposDesarrollos} from "../../store/slices/catalogoSlice.js";
+import ArchivosProyectoModal from "./ArchivosProyectoModal.jsx";
+import {addArchivo, getAllArchivos, setArchivos} from "../../store/slices/archivoSlice.js";
+import PreviewFile from "./PreviewFile.jsx";
 
 const initialValues = {
     titulo: "",
@@ -42,6 +45,7 @@ const initialValues = {
     localidad: "",
     subtotal: "",
     tipoDesarrollo: "",
+    archivo: "",
     uso: "",
     clase: "",
     puntoPartida: "",
@@ -70,6 +74,8 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const municipios = useSelector(state => state.general.municipios);
     const tiposDesarrollos = useSelector(state => state.catalogos.tiposDesarrollos);
     const [tipoDesarrolloSeleccionado, setTipoDesarrolloSeleccionado] = useState(null);
+    const archivos = useSelector(state => state.archivos.archivos);
+    const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
 
 
     const [contCargaMunicipio, setContCargaMunicipio] = useState(1);
@@ -97,14 +103,29 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
             }
             setPuntoPartidaSelect(proyecto.puntoPartida);
             setUsoSeleccionado(proyecto.uso);
-            setUrlDocumento(proyecto.nombreDocumento ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + proyecto.nombreDocumento : null);
+            let nombreDocumento = proyecto.archivo ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + proyecto.archivo.nombre : null ;
+            setUrlDocumento(nombreDocumento);
+            if(proyecto && proyecto.archivo){
+                setArchivoSeleccionado(proyecto.archivo);
+            }
             setFormState(proyectoState);
 
         }
 
     }, [proyecto]);
 
-    useEffect(() => {
+    const cargaArchivosProyecto = () => {
+        if(esEditar){
+            dispatch(getAllArchivos({proyectoId: proyecto.id})).then((resp) => {
+                if(proyecto && proyecto.archivo){
+                    let archivoSel = resp.payload.find(t => t.id === proyecto.archivo.id);
+                    setArchivoSeleccionado(archivoSel);
+                }
+            });
+        }
+    }
+
+    const cargaTiposDedesarrollo = () => {
         if(tiposDesarrollos.length === 0){
             dispatch(getTiposDesarrollos()).then((resp) => {
                 if(esEditar){
@@ -118,8 +139,21 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                 setTipoDesarrolloSeleccionado(tipoDesSel);
             }
         }
+    }
+
+    useEffect(() => {
+        cargaArchivosProyecto();
+        cargaTiposDedesarrollo();
+
+        return () => {
+            dispatch(setArchivos([]));
+        };
     }, []);
 
+    /*useEffect(() => {
+        cargaArchivosProyecto();
+    }, [archivos]);
+*/
 
     useEffect(() => {
         if(estados.length === 0){
@@ -181,6 +215,9 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         dispatch(actionSubmit(valuesRequest)).then((resp) => {
 
             dispatch(setLoader(false));
+            if(resp.payload && resp.payload.archivo){
+                dispatch(addArchivo(resp.payload.archivo));
+            }
             withReactContent(Swal).fire({
                 title: "Se guardó correctamente",
                 icon: "success"
@@ -265,11 +302,17 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         })*/
     };
 
+    const isValidTypePreview = (type) => ArchivosProps.FILE_TYPES_PREVIEW.includes(type);
+
     const textoErrorCotas = unidadesExternasError ? 'Agregue al menos una colindancia' : 'Colindancias externas del proyecto';
-    const createFilePreview = (file) => {
+    const createFilePreview = (file, isFileInput) => {
         setUrlDocumento(null);
-        if(file && ["application/pdf", "image/jpeg"].includes(file.type)){
+        if(file && isFileInput && isValidTypePreview(file.type)){
             setUrlDocumento(URL.createObjectURL(file));
+        }else {
+            console.log("createFilePreview SHOW: ", file);
+            setUrlDocumento(file && isValidTypePreview(file.tipo) ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + file.nombre : null);
+
         }
     }
 
@@ -284,6 +327,19 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
             <Grid item md={8}>
                 <Box display="flex" justifyContent="space-between">
                     <Header subtitle="Documento de autorización"/>
+                    <Box>
+                        {proyecto.id && <Button
+                            size="small"
+                            color="warning"
+                            variant="contained"
+                            onClick={() => {
+                                setOpenModal(true);
+                            }}
+                        >
+                            <AddCircle sx={{mr: "10px"}}/>
+                            Agregar archivos
+                        </Button>}
+                    </Box>
                 </Box>
             </Grid>
             <Grid item md={12}>
@@ -322,6 +378,42 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 error={!!touched.titulo && !!errors.titulo}
                                                 helperText={touched.titulo && errors.titulo}
                                                 color="secondary"
+                                            />
+                                        </Grid>
+                                        <Grid item md={12}>
+                                            <Autocomplete
+                                                id="archivo"
+                                                name="archivo"
+                                                options={archivos}
+                                                getOptionLabel={option => option.nombre}
+                                                isOptionEqualToValue={(option, selectedValue) => {
+                                                    return option.id === selectedValue.id;
+                                                }}
+                                                value={archivoSeleccionado}
+                                                onChange={(e, value) => {
+                                                    setFieldValue(
+                                                        "archivo",
+                                                        value !== null ? value : initialValues.archivo
+                                                    );
+                                                    setArchivoSeleccionado(value);
+                                                    createFilePreview(value, true);
+
+                                                }}
+                                                renderInput={params => (
+                                                    <TextField
+                                                        label="Seleccione un documento"
+                                                        fullWidth
+                                                        variant="filled"
+                                                        type="text"
+                                                        name="archivo"
+                                                        color="secondary"
+                                                        onBlur={handleBlur}
+                                                        onChange={handleChange}
+                                                        error={!!touched.archivo && !!errors.archivo}
+                                                        helperText={touched.archivo && errors.archivo}
+                                                        {...params}
+                                                    />
+                                                )}
                                             />
                                         </Grid>
                                         <Grid item md={6}>
@@ -638,7 +730,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 onChange={(e) => {
                                                     setFieldValue("documento", e.currentTarget.files[0]);
                                                     console.log("documento: ", e.currentTarget.files[0]);
-                                                    createFilePreview(e.currentTarget.files[0]);
+                                                    createFilePreview(e.currentTarget.files[0], true);
                                                 }}
                                             />
                                         </Grid>
@@ -655,29 +747,23 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                         </Formik>
                     </Grid>
                     <Grid item md={8} style={{ paddingTop: "0" }}>
-                        <Grid container>
-
-                            {
-                                urlDocumento && (
-                                    <Grid item md={12}>
-                                        <iframe className="pdf"
-                                                src={urlDocumento}
-                                                width="100%" height="720">
-                                        </iframe>
-                                    </Grid>
-                                )
-                            }
-                        </Grid>
+                        <PreviewFile urlFile={urlDocumento} />
                     </Grid>
                 </Grid>
             </Grid>
 
-            <UnidadExternaModal openModal={openModal}
+            {/*<UnidadExternaModal openModal={openModal}
                                 unidadExt={unidadExtUpdate}
                                 handleEditRow={setUnidadExtUpdate}
                                 handleSubmitModal={handleSubmitModal}
                                 onCloseModal={setOpenModal}
-            />
+            />*/}
+
+            {proyecto && <ArchivosProyectoModal openModal={openModal}
+                                proyectoId={proyecto.id}
+                                handleSubmitModal={handleSubmitModal}
+                                onCloseModal={setOpenModal}
+            />}
 
         </Grid>
 

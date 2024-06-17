@@ -3,7 +3,7 @@ import ProyectoService from "../../services/ProyectoService.js";
 
 const initialState = {
     proyectos: [],
-    proyectoActivo: null,
+    proyectoActivo: null
 }
 
 export const createProyecto = createAsyncThunk(

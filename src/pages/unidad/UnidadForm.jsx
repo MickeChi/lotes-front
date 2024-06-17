@@ -15,10 +15,11 @@ import {useEffect, useState} from "react";
 import Checkbox from "@mui/material/Checkbox";
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {createUnidad, updateUnidad} from "../../store/slices/unidadSlice.js";
 import {Estatus} from "../../utils/constantes.js";
+import {addArchivo, getAllArchivos} from "../../store/slices/archivoSlice.js";
 
 const initialValues = {
     lote:"",
@@ -44,6 +45,7 @@ const initialValues = {
     colindanciaProyecto: false,
     numeroParcela:"",
     documento: "",
+    archivo: "",
     estatus: Estatus.ACTIVO
 };
 
@@ -62,6 +64,9 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
     const [usoSeleccionado, setUsoSeleccionado] = useState(null);
     const [showHeader, setShowHeader] = useState(false);
 
+    const archivos = useSelector(state => state.archivos.archivos);
+    const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
+
     useEffect(() => {
         const generaFormState = () =>{
             console.log("generaFormState: ", unidad);
@@ -76,6 +81,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
             setFormState(unidadState);
             setUsoSeleccionado(unidadState.uso);
             setTipoUnidadSeleccionado(unidadState.tipoUnidad);
+            cargaArchivosProyecto();
         }
 
         if(unidad){
@@ -84,6 +90,28 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
             handleReset();
         }
     }, [unidad]);
+
+
+    const cargaArchivosProyecto = () => {
+        if(archivos.length === 0){
+            dispatch(getAllArchivos({proyectoId: proyectoId})).then((resp) => {
+                if(unidad.archivo){
+                    let archivoSel = resp.payload.find(t => t.id === unidad.archivo.id);
+                    setArchivoSeleccionado(archivoSel);
+                }
+            });
+        }else{
+
+            if(unidad.archivo && esEditar){
+                let archivoSel = archivos.find(t => t.id === unidad.archivo.id);
+                setArchivoSeleccionado(archivoSel);
+            }
+
+        }
+    }
+
+
+
 
     const handleFormSubmit = (values, actions) => {
         const actionSubmit = esEditar ? updateUnidad : createUnidad;
@@ -95,6 +123,9 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
         dispatch(actionSubmit(valuesRequest)).then((resp) => {
             console.log("Unidad request: ", resp.payload);
             dispatch(setLoader(false));
+            if(resp.payload && resp.payload.archivo){
+                dispatch(addArchivo(resp.payload.archivo));
+            }
             handleEditRow(resp.payload);
             //actions.resetForm();
             //handleReset();
@@ -111,6 +142,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
         setEsEditar(false);
         setTipoUnidadSeleccionado(null);
         setUsoSeleccionado(null);
+        setArchivoSeleccionado(null);
         handleEditRow(null);
     }
 
@@ -156,9 +188,48 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 size="small"
                                 onChange={(e) => {
                                     setFieldValue("documento", e.currentTarget.files[0]);
-                                    handleFilePreview(e.currentTarget.files[0]);
+                                    handleFilePreview(e.currentTarget.files[0], true);
                                     console.log("documento: ", e.currentTarget.files[0]);
                                 }}
+                            />
+                            <Autocomplete
+                                id="archivo"
+                                name="archivo"
+                                options={archivos}
+                                getOptionLabel={option => option.nombre}
+                                isOptionEqualToValue={(option, selectedValue) => {
+                                    return option.id === selectedValue.id;
+                                }}
+                                value={archivoSeleccionado}
+                                onChange={(e, value) => {
+                                    setFieldValue(
+                                        "archivo",
+                                        value !== null ? value : initialValues.archivo
+                                    );
+                                    setArchivoSeleccionado(value);
+                                    handleFilePreview(value, true);
+
+                                }}
+
+                                size="small"
+                                sx={{ gridColumn: "span 4" }}
+                                renderInput={params => (
+                                    <TextField
+                                        label="Seleccione un documento"
+                                        fullWidth
+                                        variant="filled"
+                                        type="text"
+                                        name="archivo"
+                                        color="secondary"
+                                        size="small"
+                                        sx={{ gridColumn: "span 2" }}
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        error={!!touched.archivo && !!errors.archivo}
+                                        helperText={touched.archivo && errors.archivo}
+                                        {...params}
+                                    />
+                                )}
                             />
                             <TextField
                                 fullWidth

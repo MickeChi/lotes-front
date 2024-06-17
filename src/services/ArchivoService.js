@@ -1,19 +1,19 @@
 import axiosClient from "../utils/axiosClient.js";
 
 const getAll = (request) =>{
-    return axiosClient.get(`proyecto`, {
+    return axiosClient.get(`archivo`, {
         params: request
     });
 }
 
 const getById = (id) => {
-    return axiosClient.get(`proyecto/${id}`);
+    return axiosClient.get(`archivo/${id}`);
 }
 
 const update = (request) => {
     let formData = generateRequest(request);
     console.log("generateReques t update", formData);
-    return axiosClient.put(`proyecto/${request.id}`, formData, {
+    return axiosClient.put(`archivo/${request.id}`, formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         }
@@ -23,7 +23,7 @@ const update = (request) => {
 const create = (request) => {
     let formData = generateRequest(request);
     console.log("generateReques t create", formData);
-    return axiosClient.post(`proyecto`, formData, {
+    return axiosClient.post(`archivo`, formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         }
@@ -31,36 +31,28 @@ const create = (request) => {
 }
 
 const remove = (id) => {
-    return axiosClient.get(`proyecto/${id}`);
-}
-
-const getUnidadesDoc = (id) => {
-    return axiosClient.get(`proyecto/generate-proyecto-doc/${id}`);
+    return axiosClient.delete(`archivo/${id}`);
 }
 
 const generateRequest = (request) => {
 
     let documento  = (typeof request["documento"] === "object") ? request["documento"] : null;
-    let archivo = null;
-    if(request.archivo !== "" ){
-        archivo = {...request.archivo, createdAt: null, updatedAt: null}
-    }
-    let proyecto = {...request, createdAt: null, updatedAt: null, archivo}
-    delete proyecto.documento;
-    /*proyecto.unidadesExternas.map(f => {
+    let archivo = {...request, createdAt: null, updatedAt: null}
+    delete archivo.documento;
+    /*archivo.unidadesExternas.map(f => {
         f.createdAt = null;
         f.updatedAt = null;
         return f;
     });*/
 
-    console.log("generateReques proyecto", proyecto);
+    console.log("generateReques archivo", archivo);
     console.log("generateReques documento", documento);
 
 
 
     let formData = new FormData();
     formData.append("documento", documento);
-    formData.append("proyecto", JSON.stringify(proyecto));
+    formData.append("archivo", JSON.stringify(archivo));
     /*for (var key in request) {
         let value = null
 
@@ -86,18 +78,12 @@ const generateRequest = (request) => {
     return formData;
 }
 
-const getDocumentosByProyectoId = (id) => {
-    return axiosClient.get(`proyecto/${id}/files`);
-}
-
 const ProyectoService = {
     getAll,
     getById,
     update,
     create,
     remove,
-    getUnidadesDoc,
-    getDocumentosByProyectoId
 }
 
 export default ProyectoService;

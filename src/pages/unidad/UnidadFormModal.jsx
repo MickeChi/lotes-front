@@ -16,11 +16,12 @@ import withReactContent from 'sweetalert2-react-content'
 import {useDispatch} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {createUnidad, updateUnidad} from "../../store/slices/unidadSlice.js";
-import {Estatus} from "../../utils/constantes.js";
+import {ArchivosProps, Estatus} from "../../utils/constantes.js";
 import CardHeader from "@mui/material/CardHeader";
 import Modal from "@mui/material/Modal";
 import UnidadForm from "./UnidadForm.jsx";
 import CotaTab from "../cotas/CotaTab.jsx";
+import PreviewFile from "../proyectos/PreviewFile.jsx";
 
 const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseModal}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -64,7 +65,8 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
         console.log("proyectoId: ", proyectoId);
         if(unidad){
             setUnidadId(unidad.id);
-            setUrlDocumento(unidad.nombreDocumento ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + unidad.nombreDocumento : null);
+            let nombreDocumento = unidad.archivo ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + unidad.archivo.nombre : null ;
+            setUrlDocumento(nombreDocumento);
         }else{
             setUrlDocumento(null);
             setUnidadId(null);
@@ -84,10 +86,16 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
         setCurrentTab(1);
     }
 
-    const createFilePreview = (file) => {
+    const isValidTypePreview = (type) => ArchivosProps.FILE_TYPES_PREVIEW.includes(type);
+
+    const createFilePreview = (file, isFileInput) => {
         setUrlDocumento(null);
-        if(file && ["application/pdf", "image/jpeg"].includes(file.type)){
+        if(file && isFileInput && isValidTypePreview(file.type)){
             setUrlDocumento(URL.createObjectURL(file));
+        }else {
+            console.log("createFilePreview SHOW: ", file);
+            setUrlDocumento(file && isValidTypePreview(file.tipo) ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + file.nombre : null);
+
         }
     }
 
@@ -148,18 +156,7 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
 
                                 </Grid>
                                 <Grid item md={8}>
-                                    <Grid container>
-                                        {
-                                            urlDocumento && (
-                                                <Grid item md={12}>
-                                                    <iframe className="pdf"
-                                                            src={urlDocumento}
-                                                            width="100%" height="720">
-                                                    </iframe>
-                                                </Grid>
-                                            )
-                                        }
-                                    </Grid>
+                                    <PreviewFile urlFile={urlDocumento} />
                                 </Grid>
 
                             </Grid>

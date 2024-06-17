@@ -13,3 +13,25 @@ export const Estatus = Object.freeze({
     DESACTIVADO: "DESACTIVADO",
     ACTIVO: "ACTIVO"
 });
+
+
+export const IdbProps = Object.freeze({
+    DB_NAME: "lotesDB",
+    STORE_NAME: "projectFiles",
+    STORE_KEY: "idbxFile",
+    DB_VERSION: 1
+});
+
+
+export const EstatusArchivos = Object.freeze({
+    CARGA_ARCHIVOS_INIT: "CARGA_ARCHIVOS_INIT",
+    CARGA_ARCHIVOS_FIN: "CARGA_ARCHIVOS_FIN"
+});
+
+export const ArchivosProps = Object.freeze({
+    FILE_TYPES: ["application/pdf", "image/jpeg", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+    FILE_TYPES_PREVIEW: ["application/pdf", "image/jpeg"],
+    MAX_FILE_SIZE: 50,
+    BATCH_SIZE: 5,
+    MAX_FILES_SELECTED: 100
+});

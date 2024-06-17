@@ -39,7 +39,11 @@ const remove = (id) => {
 const generateRequest = (request) => {
 
     let documento  = (typeof request["documento"] === "object") ? request["documento"] : null;
-    let unidad = {...request, createdAt: null, updatedAt: null}
+    let archivo = null;
+    if(request.archivo !== "" ){
+        archivo = {...request.archivo, createdAt: null, updatedAt: null}
+    }
+    let unidad = {...request, createdAt: null, updatedAt: null, archivo}
     delete unidad.documento;
     if(request.id){
         let cotasUp = unidad.cotas.map(f => {
