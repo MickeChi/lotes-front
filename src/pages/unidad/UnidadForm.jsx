@@ -22,28 +22,28 @@ import {Estatus} from "../../utils/constantes.js";
 import {addArchivo, getAllArchivos} from "../../store/slices/archivoSlice.js";
 
 const initialValues = {
-    lote:"",
-    numeroCatastral:"",
+    lote: 0,
+    numeroCatastral: 0,
     finca:"",
-    tablaje:"",
+    tablaje: 0,
     colonia:"",
-    folioElectronico:"",
+    folioElectronico: 0,
 
-    superficieTerreno:"",
-    terrenoExclusivo:"",
-    terrenoComun: "",
+    superficieTerreno: 0,
+    terrenoExclusivo: 0,
+    terrenoComun:  0,
 
-    superficieConstruccion:"",
-    construccionExclusiva:"",
-    construccionComun: "",
-    cuotaPaIn: "",
+    superficieConstruccion: 0,
+    construccionExclusiva: 0,
+    construccionComun:  0,
+    cuotaPaIn:  0,
 
-    valorCatastral:"",
+    valorCatastral: 0,
     uso:"",
     clase:"",
     tipoUnidad:"PARCELA",
     colindanciaProyecto: false,
-    numeroParcela:"",
+    numeroParcela: 0,
     documento: "",
     archivo: "",
     estatus: Estatus.ACTIVO
@@ -73,7 +73,8 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
             const unidadState = {...unidad};
             for(const key in unidadState){
                 if(initialValues.hasOwnProperty(key) && (unidadState[key] === null || unidadState[key] === undefined)){
-                    unidadState[key] = "";
+                    let nums = [];
+                    unidadState[key] = initialValues[key];
                 }
             }
             console.log("generaFormState: ", unidadState);
@@ -231,11 +232,74 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                     />
                                 )}
                             />
+
+                            <Autocomplete
+                                id="tipoUnidad"
+                                name="tipoUnidad"
+                                options={tiposUnidad}
+                                getOptionLabel={option => option}
+                                value={tipoUnidadSeleccionado}
+                                sx={{ gridColumn: "span 2" }}
+                                size="small"
+                                onChange={(e, value) => {
+                                    setFieldValue(
+                                        "tipoUnidad", value !== null ? value : initialValues.tipoUnidad
+                                    );
+                                    setTipoUnidadSeleccionado(value);
+                                }}
+                                renderInput={params => (
+                                    <TextField
+                                        label="Seleccione tipo"
+                                        fullWidth
+                                        variant="filled"
+                                        type="text"
+                                        name="tipoUnidad"
+                                        color="secondary"
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        error={!!touched.tipoUnidad && !!errors.tipoUnidad}
+                                        helperText={touched.tipoUnidad && errors.tipoUnidad}
+                                        {...params}
+                                    />
+                                )}
+                            />
+
+                            <Autocomplete
+                                id="uso"
+                                name="uso"
+                                options={usos}
+                                getOptionLabel={option => option}
+                                value={usoSeleccionado}
+                                size="small"
+                                sx={{ gridColumn: "span 2" }}
+                                onChange={(e, value) => {
+                                    setFieldValue(
+                                        "uso", value !== null ? value : initialValues.uso
+                                    );
+                                    setUsoSeleccionado(value);
+                                }}
+                                renderInput={params => (
+                                    <TextField
+                                        label="Seleccione uso"
+                                        fullWidth
+                                        variant="filled"
+                                        type="text"
+                                        name="uso"
+                                        color="secondary"
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        error={!!touched.uso && !!errors.uso}
+                                        helperText={touched.uso && errors.uso}
+                                        {...params}
+                                    />
+                                )}
+                            />
+
                             <TextField
                                 fullWidth
                                 variant="filled"
                                 type="text"
-                                label="Lote"
+                                label="Unidad"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 value={values.lote}
@@ -365,7 +429,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 fullWidth
                                 variant="filled"
                                 type="text"
-                                label="Contrucción exclusiva"
+                                label="Construcción exclusiva"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 value={values.construccionExclusiva}
@@ -397,7 +461,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 fullWidth
                                 variant="filled"
                                 type="text"
-                                label="Contrucción común"
+                                label="Construcción común"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 value={values.construccionComun}
@@ -458,36 +522,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 sx={{ gridColumn: "span 2" }}
                             />
 
-                            <Autocomplete
-                                id="uso"
-                                name="uso"
-                                options={usos}
-                                getOptionLabel={option => option}
-                                value={usoSeleccionado}
-                                size="small"
-                                sx={{ gridColumn: "span 2" }}
-                                onChange={(e, value) => {
-                                    setFieldValue(
-                                        "uso", value !== null ? value : initialValues.uso
-                                    );
-                                    setUsoSeleccionado(value);
-                                }}
-                                renderInput={params => (
-                                    <TextField
-                                        label="Seleccione uso"
-                                        fullWidth
-                                        variant="filled"
-                                        type="text"
-                                        name="uso"
-                                        color="secondary"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        error={!!touched.uso && !!errors.uso}
-                                        helperText={touched.uso && errors.uso}
-                                        {...params}
-                                    />
-                                )}
-                            />
+
 
                             <TextField
                                 fullWidth
@@ -505,36 +540,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 sx={{ gridColumn: "span 2" }}
                             />
 
-                            <Autocomplete
-                                id="tipoUnidad"
-                                name="tipoUnidad"
-                                options={tiposUnidad}
-                                getOptionLabel={option => option}
-                                value={tipoUnidadSeleccionado}
-                                sx={{ gridColumn: "span 2" }}
-                                size="small"
-                                onChange={(e, value) => {
-                                    setFieldValue(
-                                        "tipoUnidad", value !== null ? value : initialValues.tipoUnidad
-                                    );
-                                    setTipoUnidadSeleccionado(value);
-                                }}
-                                renderInput={params => (
-                                    <TextField
-                                        label="Seleccione tipo"
-                                        fullWidth
-                                        variant="filled"
-                                        type="text"
-                                        name="tipoUnidad"
-                                        color="secondary"
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        error={!!touched.tipoUnidad && !!errors.tipoUnidad}
-                                        helperText={touched.tipoUnidad && errors.tipoUnidad}
-                                        {...params}
-                                    />
-                                )}
-                            />
+
 
 
 
@@ -561,7 +567,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
 
 const checkoutSchema = yup.object().shape({
     lote: yup.number().required("required"),
-    numeroCatastral: yup.number().required("required"),
+    numeroCatastral: yup.number(),
     //finca: yup.string().required("required"),
     tablaje: yup.number().required("required"),
     //colonia: yup.string().required("required"),

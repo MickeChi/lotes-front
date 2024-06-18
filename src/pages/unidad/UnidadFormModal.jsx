@@ -86,6 +86,13 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
         setCurrentTab(1);
     }
 
+    const handleEditUnidad = (unidadEdit) => {
+        if(unidadEdit != null){
+            setCurrentTab(2);
+        }
+        handleEditRow(unidadEdit);
+    }
+
     const isValidTypePreview = (type) => ArchivosProps.FILE_TYPES_PREVIEW.includes(type);
 
     const createFilePreview = (file, isFileInput) => {
@@ -147,7 +154,11 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
                                     <Divider />
                                     <Box mt="20px">
                                         {currentTab === 1 && (
-                                            <UnidadForm proyectoId={proyectoId} unidad={unidad} handleEditRow={handleEditRow} handleFilePreview={createFilePreview}/>
+                                            <UnidadForm proyectoId={proyectoId}
+                                                        unidad={unidad}
+                                                        handleEditRow={handleEditUnidad}
+                                                        handleFilePreview={createFilePreview}
+                                            />
                                         )}
                                         {(currentTab === 2 && unidadId) && (
                                             <CotaTab unidadId={unidadId} showVertical={true} />

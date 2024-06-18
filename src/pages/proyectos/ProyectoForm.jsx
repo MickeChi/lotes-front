@@ -43,7 +43,7 @@ const initialValues = {
     estado: "",
     municipio: "",
     localidad: "",
-    subtotal: "",
+    subtotal: 0,
     tipoDesarrollo: "",
     archivo: "",
     uso: "",
@@ -52,13 +52,13 @@ const initialValues = {
     documento: "",
     estatus: Estatus.ACTIVO,
 
-    totalUnidades: "",
-    terrenoTotal: "",
-    terrenoExclusivoTotal: "",
-    terrenoComunTotal: "",
-    construccionTotal: "",
-    construccionExclusivoTotal: "",
-    construccionComunTotal: ""
+    totalUnidades: 0,
+    terrenoTotal: 0,
+    terrenoExclusivoTotal: 0,
+    terrenoComunTotal: 0,
+    construccionTotal: 0,
+    construccionExclusivoTotal: 0,
+    construccionComunTotal: 0
 
 };
 const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
@@ -98,7 +98,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
             const proyectoState = {...proyecto};
             for(const key in proyectoState){
                 if(initialValues.hasOwnProperty(key) && (proyectoState[key] === null || proyectoState[key] === undefined)){
-                    proyectoState[key] = "";
+                    proyectoState[key] = initialValues[key];
                 }
             }
             setPuntoPartidaSelect(proyecto.puntoPartida);
@@ -640,7 +640,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
-                                                label="Contrucción total"
+                                                label="Construcción total"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 value={values.construccionTotal}
@@ -672,7 +672,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
-                                                label="Contrucción exclusiva total"
+                                                label="Construcción exclusiva total"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 value={values.construccionExclusivoTotal}
@@ -704,7 +704,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
-                                                label="Contrucción común total"
+                                                label="Construcción común total"
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 value={values.construccionComunTotal}
@@ -720,7 +720,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 fullWidth
                                                 variant="filled"
                                                 type="file"
-                                                label="Seleccione autorización del proyecto"
+                                                label="Seleccione autorización oficial del proyecto"
                                                 InputLabelProps={{ shrink: true }}
                                                 onBlur={handleBlur}
                                                 name="documento"

@@ -22,6 +22,7 @@ import Checkbox from "@mui/material/Checkbox";
 import {CheckBox, CheckBoxOutlineBlank} from "@mui/icons-material";
 import {Estatus} from "../../utils/constantes.js";
 import {addColindanciaCota, getAllColindancias, setColindancias} from "../../store/slices/colindanciaSlice.js";
+import {toDecimals} from "../../utils/Utils.js";
 
 const initialValues = {
     //"orden": "",
@@ -130,7 +131,7 @@ const CotaForm = ({cota, unidadId, handleUnidadSelect, handleEditRow}) => {
         const actionSubmit = esEditar ? updateCota : createCota;
         let colindanciaDescript = values.colindanciaId === 0 ? values.colindanciaNueva : colindanciaSelect.descripcion;
         const colindanciaReq = {...colindanciaSelect, descripcion: colindanciaDescript};
-        let request = {...values, unidadId: unidadSelect.id, colindancia: colindanciaReq}
+        let request = {...values, unidadId: unidadSelect.id, colindancia: colindanciaReq, medida: toDecimals(values.medida)}
         delete request.colindanciaNueva;
 
         console.log("esEditar: " + esEditar + ", cotaRequest: ", request);
@@ -207,7 +208,7 @@ const CotaForm = ({cota, unidadId, handleUnidadSelect, handleEditRow}) => {
                                         }}
                                         renderInput={params => (
                                             <TextField
-                                                label="Seleccione tipo de linea"
+                                                label="Tipo de linea"
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
@@ -241,7 +242,7 @@ const CotaForm = ({cota, unidadId, handleUnidadSelect, handleEditRow}) => {
                                         }}
                                         renderInput={params => (
                                             <TextField
-                                                label="Seleccione el rumbo"
+                                                label="Rumbo"
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
@@ -280,7 +281,7 @@ const CotaForm = ({cota, unidadId, handleUnidadSelect, handleEditRow}) => {
                                         name="colindanciaId"
                                         options={colindanciasForm}
                                         getOptionLabel={option => {
-                                            let labeltxt = option.id === 0 ? option.descripcion : `Id: ${option.id} - ${option.descripcion}`;
+                                            let labeltxt = option.id === 0 ? option.descripcion : `${option.id} - ${option.descripcion}`;
                                             return labeltxt;
                                         }}
                                         value={colindanciaSelect}
@@ -293,7 +294,7 @@ const CotaForm = ({cota, unidadId, handleUnidadSelect, handleEditRow}) => {
                                         }}
                                         renderInput={params => (
                                             <TextField
-                                                label="Seleccion una colindancia"
+                                                label="Colindancia"
                                                 fullWidth
                                                 variant="filled"
                                                 type="text"
