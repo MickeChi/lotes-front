@@ -26,6 +26,7 @@ import {toDecimals} from "../../utils/Utils.js";
 
 const initialValues = {
     //"orden": "",
+    "codigo": "",
     "tipoLinea": "",
     "orientacion": "",
     "medida": "",

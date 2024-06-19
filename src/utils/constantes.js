@@ -35,3 +35,9 @@ export const ArchivosProps = Object.freeze({
     BATCH_SIZE: 5,
     MAX_FILES_SELECTED: 100
 });
+
+export const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
+
+export const usos = ["HABITACIONAL", "COMERCIAL", "COMUN", "SOLAR"];
+
+export const tiposUnidad = ["PARCELA", "VIALIDAD", "LOTE"];

@@ -32,7 +32,7 @@ import UnidadExternaTable from "./UnidadExternaTable.jsx";
 import {AddCircle} from "@mui/icons-material";
 import UnidadExternaModal from "./UnidadExternaModal.jsx";
 import {deleteUnidad} from "../../store/slices/UnidadSlice.js";
-import {ArchivosProps, Estatus} from "../../utils/constantes.js";
+import {ArchivosProps, Estatus, usos} from "../../utils/constantes.js";
 import {getTiposDesarrollos} from "../../store/slices/catalogoSlice.js";
 import ArchivosProyectoModal from "./ArchivosProyectoModal.jsx";
 import {addArchivo, getAllArchivos, setArchivos} from "../../store/slices/archivoSlice.js";
@@ -48,14 +48,15 @@ const initialValues = {
     archivo: "",
     uso: "",
     clase: "",
-    puntoPartida: "",
     documento: "",
     estatus: Estatus.ACTIVO,
 
     totalUnidades: 0,
+
     terrenoTotal: 0,
     terrenoExclusivoTotal: 0,
     terrenoComunTotal: 0,
+
     construccionTotal: 0,
     construccionExclusivoTotal: 0,
     construccionComunTotal: 0
@@ -86,10 +87,8 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const [urlDocumento, setUrlDocumento] = useState(null);
 
     const regexpNums = /^\d*$/;
-    const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
-    const [puntoPartidaSelect, setPuntoPartidaSelect] = useState(null);
+    //const [puntoPartidaSelect, setPuntoPartidaSelect] = useState(null);
 
-    const usos = ["HABITACIONAL", "COMERCIAL", "COMUN"];
     const [usoSeleccionado, setUsoSeleccionado] = useState(null);
 
     useEffect(() => {
@@ -101,7 +100,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                     proyectoState[key] = initialValues[key];
                 }
             }
-            setPuntoPartidaSelect(proyecto.puntoPartida);
+            //setPuntoPartidaSelect(proyecto.puntoPartida);
             setUsoSeleccionado(proyecto.uso);
             let nombreDocumento = proyecto.archivo ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + proyecto.archivo.nombre : null ;
             setUrlDocumento(nombreDocumento);
@@ -150,10 +149,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
         };
     }, []);
 
-    /*useEffect(() => {
-        cargaArchivosProyecto();
-    }, [archivos]);
-*/
 
     useEffect(() => {
         if(estados.length === 0){
@@ -541,7 +536,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 }}
                                                 renderInput={params => (
                                                     <TextField
-                                                        label="Seleccione uso"
+                                                        label="Uso general"
                                                         fullWidth
                                                         variant="filled"
                                                         type="text"
@@ -569,37 +564,6 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 color="secondary"
                                                 error={!!touched.clase && !!errors.clase}
                                                 helperText={touched.clase && errors.clase}
-                                            />
-                                        </Grid>
-
-                                        <Grid item md={6}>
-                                            <Autocomplete
-                                                id="puntoPartida"
-                                                name="puntoPartida"
-                                                options={orientaciones}
-                                                getOptionLabel={option => option}
-                                                value={puntoPartidaSelect}
-                                                onChange={(e, value) => {
-                                                    setFieldValue(
-                                                        "puntoPartida", value !== null ? value : initialValues.puntoPartida
-                                                    );
-                                                    setPuntoPartidaSelect(value);
-                                                }}
-                                                renderInput={params => (
-                                                    <TextField
-                                                        label="Seleccione el punto de partida"
-                                                        fullWidth
-                                                        variant="filled"
-                                                        type="text"
-                                                        name="puntoPartida"
-                                                        color="secondary"
-                                                        onBlur={handleBlur}
-                                                        onChange={handleChange}
-                                                        error={!!touched.puntoPartida && !!errors.puntoPartida}
-                                                        helperText={touched.puntoPartida && errors.puntoPartida}
-                                                        {...params}
-                                                    />
-                                                )}
                                             />
                                         </Grid>
 
@@ -780,7 +744,6 @@ const checkoutSchema = yup.object().shape({
     //subtotal: yup.number().required("required"),
     uso: yup.string().required("required"),
     clase: yup.string().required("required"),
-    puntoPartida: yup.string().required("required"),
 
     tipoDesarrollo: yup.mixed().required("required"),
     totalUnidades: yup.number().required("required"),

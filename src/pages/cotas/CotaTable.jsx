@@ -49,8 +49,8 @@ const CotaTable = ({unidadId, handleEditRow}) => {
             align: "left",
         },*/
         {
-            field: "unidadId",
-            headerName: "Unidad",
+            field: "codigo",
+            headerName: "Código",
             flex: 1,
             cellClassName: "name-column--cell",
         },

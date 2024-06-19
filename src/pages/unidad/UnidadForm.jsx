@@ -18,7 +18,7 @@ import withReactContent from 'sweetalert2-react-content'
 import {useDispatch, useSelector} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {createUnidad, updateUnidad} from "../../store/slices/unidadSlice.js";
-import {Estatus} from "../../utils/constantes.js";
+import {Estatus, orientaciones, tiposUnidad, usos} from "../../utils/constantes.js";
 import {addArchivo, getAllArchivos} from "../../store/slices/archivoSlice.js";
 
 const initialValues = {
@@ -28,12 +28,13 @@ const initialValues = {
     tablaje: 0,
     colonia:"",
     folioElectronico: 0,
+    puntoPartida: "",
 
-    superficieTerreno: 0,
+    //superficieTerreno: 0,
     terrenoExclusivo: 0,
     terrenoComun:  0,
 
-    superficieConstruccion: 0,
+    //superficieConstruccion: 0,
     construccionExclusiva: 0,
     construccionComun:  0,
     cuotaPaIn:  0,
@@ -57,15 +58,16 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
     const dispatch = useDispatch();
     const [esEditar, setEsEditar] = useState(false);
 
-    const tiposUnidad = ["PARCELA", "VIALIDAD", "LOTE"];
     const [tipoUnidadSeleccionado, setTipoUnidadSeleccionado] = useState(null);
 
-    const usos = ["HABITACIONAL", "COMERCIAL", "COMUN"];
     const [usoSeleccionado, setUsoSeleccionado] = useState(null);
     const [showHeader, setShowHeader] = useState(false);
 
     const archivos = useSelector(state => state.archivos.archivos);
     const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
+
+    const [puntoPartidaSelect, setPuntoPartidaSelect] = useState(null);
+
 
     useEffect(() => {
         const generaFormState = () =>{
@@ -80,6 +82,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
             console.log("generaFormState: ", unidadState);
             setEsEditar(true);
             setFormState(unidadState);
+            setPuntoPartidaSelect(unidadState.puntoPartida);
             setUsoSeleccionado(unidadState.uso);
             setTipoUnidadSeleccionado(unidadState.tipoUnidad);
             cargaArchivosProyecto();
@@ -280,7 +283,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 }}
                                 renderInput={params => (
                                     <TextField
-                                        label="Seleccione uso"
+                                        label="Uso específico"
                                         fullWidth
                                         variant="filled"
                                         type="text"
@@ -490,7 +493,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                             />
 
 
-                            <TextField
+                            {/*<TextField
                                 fullWidth
                                 variant="filled"
                                 type="text"
@@ -504,7 +507,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 error={!!touched.superficieTerreno && !!errors.superficieTerreno}
                                 helperText={touched.superficieTerreno && errors.superficieTerreno}
                                 sx={{ gridColumn: "span 2" }}
-                            />
+                            />*/}
 
                             <TextField
                                 fullWidth
@@ -538,6 +541,37 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 error={!!touched.clase && !!errors.clase}
                                 helperText={touched.clase && errors.clase}
                                 sx={{ gridColumn: "span 2" }}
+                            />
+
+                            <Autocomplete
+                                id="puntoPartida"
+                                name="puntoPartida"
+                                options={orientaciones}
+                                getOptionLabel={option => option}
+                                value={puntoPartidaSelect}
+                                size="small"
+                                sx={{ gridColumn: "span 2" }}
+                                onChange={(e, value) => {
+                                    setFieldValue(
+                                        "puntoPartida", value !== null ? value : initialValues.puntoPartida
+                                    );
+                                    setPuntoPartidaSelect(value);
+                                }}
+                                renderInput={params => (
+                                    <TextField
+                                        label="Seleccione el punto de partida"
+                                        fullWidth
+                                        variant="filled"
+                                        type="text"
+                                        name="puntoPartida"
+                                        color="secondary"
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        error={!!touched.puntoPartida && !!errors.puntoPartida}
+                                        helperText={touched.puntoPartida && errors.puntoPartida}
+                                        {...params}
+                                    />
+                                )}
                             />
 
 
@@ -587,6 +621,8 @@ const checkoutSchema = yup.object().shape({
     construccionExclusiva: yup.number().required("required"),
     construccionComun: yup.number().required("required"),
     cuotaPaIn: yup.number().required("required"),
+    puntoPartida: yup.string().required("required"),
+
 
     documento: yup.mixed()
         //.required("required")
