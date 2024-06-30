@@ -31,7 +31,7 @@ const ProyectoCard = ({proy}) =>{
                     <Typography variant="h6" fontWeight="600" sx={{ mt: "15px" }}>
                         - Ubicación: {proyinfo.municipio + ', ' +proyinfo.estado} <br/>
                         - Total unidades: {proyinfo.totalUnidades} <br/>
-                        - Uso: {proyinfo.uso} <br/>
+                        - Uso: {proyinfo.uso.descripcion} <br/>
                         - Clase: {proyinfo.clase} <br/>
                     </Typography>
                 </CardContent>

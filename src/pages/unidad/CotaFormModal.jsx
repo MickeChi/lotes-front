@@ -23,7 +23,7 @@ import UnidadForm from "./UnidadForm.jsx";
 import CotaTab from "../cotas/CotaTab.jsx";
 import PreviewFile from "../proyectos/PreviewFile.jsx";
 
-const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseModal}) => {
+const CotaFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseModal}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -72,7 +72,7 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
             setUnidadId(null);
         }
 
-    }, [unidad]);
+    }, [proyectoId]);
 
     useEffect(() => {
         console.log("unidadId effect: ", unidadId);
@@ -96,15 +96,10 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
 
     const isValidTypePreview = (type) => ArchivosProps.FILE_TYPES_PREVIEW.includes(type);
 
-    const createFilePreview = (file, isFileInput) => {
+    const createFilePreview = (file) => {
         setUrlDocumento(null);
-        if(file && isFileInput && isValidTypePreview(file.type)){
-            setUrlDocumento(URL.createObjectURL(file));
-        }else {
-            console.log("createFilePreview SHOW: ", file);
-            setUrlDocumento(file && isValidTypePreview(file.tipo) ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + file.nombre : null);
-
-        }
+        console.log("createFilePreview SHOW: ", file);
+        setUrlDocumento(file && isValidTypePreview(file.tipo) ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + file.nombre : null);
     }
 
     return (
@@ -128,7 +123,7 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
                         <CardHeader sx={{
                             borderBottom: '1px solid #555'
                         }}
-                                    title={ esEditar ? "Editando Unidad" : "Nueva Unidad"}
+                                    title="Cotas incompletas"
                         />
                         <CardContent>
                             <Grid container spacing={3} sx={{maxHeight: 750, overflowY: 'auto',}}>
@@ -138,7 +133,7 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
                                         value={currentTab}
                                         onChange={handleChangeTab}
                                         textColor="primary"
-                                        indicatorColor="secondary"
+                                        indicatorColor="default"
                                         sx={{
                                             backgroundColor: colors.blueAccent[700],
                                             ".Mui-selected": {
@@ -147,23 +142,18 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
                                             },
                                         }}
                                     >
-                                        <Tab value={1} label="Unidad" />
-                                        {(unidadId) && (
-                                            <Tab value={2} label="Cotas" />
-                                        )}
+                                        <Tab value={1} label="Editar Cota" />
+
                                     </Tabs>
+
+
                                     <Divider />
                                     <Box mt="20px">
-                                        {currentTab === 1 && (
-                                            <UnidadForm proyectoId={proyectoId}
-                                                        unidad={unidad}
-                                                        handleEditRow={handleEditUnidad}
-                                                        handleFilePreview={createFilePreview}
-                                            />
-                                        )}
-                                        {(currentTab === 2 && unidadId) && (
-                                            <CotaTab unidadId={unidadId} showVertical={true} />
-                                        )}
+                                        <CotaTab unidadId={unidadId}
+                                                 proyectoId={proyectoId}
+                                                 showVertical={true}
+                                                 handleFilePreview={createFilePreview}
+                                        />
                                     </Box>
 
                                 </Grid>
@@ -195,4 +185,4 @@ const UnidadFormModal = ({proyectoId, handleEditRow, unidad, openModal, onCloseM
 };
 
 
-export default UnidadFormModal;
+export default CotaFormModal;

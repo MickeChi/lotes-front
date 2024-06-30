@@ -14,7 +14,7 @@ import {createCota, deleteCota, updateCota} from "../../store/slices/cotaSlice.j
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 
-const CotaTab = ({unidadId, showVertical}) => {
+const CotaTab = ({unidadId, proyectoId, showVertical, handleFilePreview}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -49,8 +49,11 @@ const CotaTab = ({unidadId, showVertical}) => {
             //setCotaUpdate(null);
         }else{
             console.log("handlerEditCota: ", cotaEdit);
+            if(proyectoId){ //Si existe proyectoId es que se esta en la ventana de cotas sin colindancia
+                console.log("handleFilePreview cotaSinColindanca: ", cotaEdit);
+                handleFilePreview(cotaEdit ? cotaEdit.unidad.archivo : null);
+            }
             setCotaUpdate(cotaEdit);
-
         }
     }
 
@@ -73,34 +76,15 @@ const CotaTab = ({unidadId, showVertical}) => {
     return (
         <Grid container spacing={3}>
             <Grid item md={showVertical ? 12 : 5}>
-                <CotaForm handleUnidadSelect={handleUnidadSelect} cota={cotaUpdate} unidadId={unidadId} handleEditRow={handlerEditCota}/>
+                <CotaForm handleUnidadSelect={handleUnidadSelect}
+                          cota={cotaUpdate}
+                          unidadId={unidadId}
+                          proyectoId={proyectoId}
+                          handleEditRow={handlerEditCota}/>
             </Grid>
             <Grid item md={showVertical ? 12: 7}>
                 <CotaTable unidadId={unidadId} handleEditRow={handlerEditCota}/>
             </Grid>
-
-            {/*<Dialog
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"Use Google's location service?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Let Google help apps determine location. This means sending anonymous
-                        location data to Google, even when no apps are running.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Disagree</Button>
-                    <Button onClick={handleClose} autoFocus>
-                        Agree
-                    </Button>
-                </DialogActions>
-            </Dialog>*/}
         </Grid>
     );
 };

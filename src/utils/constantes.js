@@ -38,6 +38,49 @@ export const ArchivosProps = Object.freeze({
 
 export const orientaciones = ["NORTE", "SUR", "ESTE", "OESTE", "NOROESTE", "NORESTE", "SUROESTE", "SURESTE"];
 
-export const usos = ["HABITACIONAL", "COMERCIAL", "COMUN", "SOLAR"];
+//export const usos = ["HABITACIONAL", "COMERCIAL", "COMUN", "SOLAR"];
 
-export const tiposUnidad = ["PARCELA", "VIALIDAD", "LOTE"];
+//export const tiposUnidad = ["PARCELA", "VIALIDAD", "LOTE"];
+
+export const ValidacionesDoc = {
+
+    validacionesBase: {
+        terrenoTotal: 0,
+        terrenoExclusivoTotal: 0,
+        terrenoComunTotal: 0,
+        construccionTotal: 0,
+        construccionExclusivoTotal: 0,
+        construccionComunTotal: 0,
+        cuotaPaInTotal: 0,
+        totalUnidades: 0,
+        unidadesIncompletas: 0,
+        cotasIncompletas: 0
+    },
+    tiposDesarrollo: [
+        {
+            id: 1,
+            tipoDesarrollo: "Condominio",
+            validaciones: ()=> {
+                return {...ValidacionesDoc.validacionesBase};
+            }
+        },
+        {
+            id: 2,
+            tipoDesarrollo: "Tablaje",
+            validaciones: ()=> {
+                let vBase = {...ValidacionesDoc.validacionesBase};
+                delete vBase.cuotaPaInTotal;
+                return vBase;
+            }
+        },
+        {
+            id: 3,
+            tipoDesarrollo: "Fracción",
+            validaciones: ()=> {
+                let vBase = {...ValidacionesDoc.validacionesBase};
+                delete vBase.cuotaPaInTotal;
+                return vBase;
+            }
+        }
+    ]
+}

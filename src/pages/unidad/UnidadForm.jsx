@@ -18,8 +18,9 @@ import withReactContent from 'sweetalert2-react-content'
 import {useDispatch, useSelector} from "react-redux";
 import {setLoader} from "../../store/slices/generalSlice.js";
 import {createUnidad, updateUnidad} from "../../store/slices/unidadSlice.js";
-import {Estatus, orientaciones, tiposUnidad, usos} from "../../utils/constantes.js";
-import {addArchivo, getAllArchivos} from "../../store/slices/archivoSlice.js";
+import {Estatus, orientaciones} from "../../utils/constantes.js";
+import {addArchivo, getAllArchivos, setArchivos} from "../../store/slices/archivoSlice.js";
+import {getTiposUnidades, getUsos} from "../../store/slices/catalogoSlice.js";
 
 const initialValues = {
     lote: 0,
@@ -42,7 +43,7 @@ const initialValues = {
     valorCatastral: 0,
     uso:"",
     clase:"",
-    tipoUnidad:"PARCELA",
+    tipoUnidad:"",
     colindanciaProyecto: false,
     numeroParcela: 0,
     documento: "",
@@ -54,16 +55,18 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const archivos = useSelector(state => state.archivos.archivos);
+    const tiposUnidades = useSelector(state => state.catalogos.tiposUnidades);
+    const usos = useSelector(state => state.catalogos.usos);
+
     const [formState, setFormState] = useState(initialValues);
     const dispatch = useDispatch();
     const [esEditar, setEsEditar] = useState(false);
 
     const [tipoUnidadSeleccionado, setTipoUnidadSeleccionado] = useState(null);
-
     const [usoSeleccionado, setUsoSeleccionado] = useState(null);
     const [showHeader, setShowHeader] = useState(false);
 
-    const archivos = useSelector(state => state.archivos.archivos);
     const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
 
     const [puntoPartidaSelect, setPuntoPartidaSelect] = useState(null);
@@ -83,9 +86,11 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
             setEsEditar(true);
             setFormState(unidadState);
             setPuntoPartidaSelect(unidadState.puntoPartida);
-            setUsoSeleccionado(unidadState.uso);
-            setTipoUnidadSeleccionado(unidadState.tipoUnidad);
+            //setUsoSeleccionado(unidadState.uso);
+            //setTipoUnidadSeleccionado(unidadState.tipoUnidad);
             cargaArchivosProyecto();
+            cargaTiposUnidades();
+            cargaUsos();
         }
 
         if(unidad){
@@ -99,20 +104,73 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
     const cargaArchivosProyecto = () => {
         if(archivos.length === 0){
             dispatch(getAllArchivos({proyectoId: proyectoId})).then((resp) => {
-                if(unidad.archivo){
+                if(unidad && unidad.archivo){
                     let archivoSel = resp.payload.find(t => t.id === unidad.archivo.id);
                     setArchivoSeleccionado(archivoSel);
                 }
             });
         }else{
 
-            if(unidad.archivo && esEditar){
+            if(unidad && unidad.archivo){
                 let archivoSel = archivos.find(t => t.id === unidad.archivo.id);
                 setArchivoSeleccionado(archivoSel);
             }
 
         }
     }
+
+    const cargaUsos = () => {
+        if(usos.length === 0){
+            dispatch(getUsos()).then((resp) => {
+                console.log("cargaUsos: ", usos);
+
+                if(unidad && unidad.uso){
+                    let usoSel = resp.payload.find(t => t.id === unidad.uso.id);
+                    console.log("cargaUsos: ", usoSel);
+                    setUsoSeleccionado(usoSel);
+                }
+            });
+        }else{
+            if(unidad && unidad.uso){
+                console.log("cargaUsos else: ", usos);
+                let usoSel = usos.find(t => t.id === unidad.uso.id);
+                console.log("cargaUsos usoSel else: ", usoSel);
+                setUsoSeleccionado(usoSel);
+            }
+        }
+    }
+
+    const cargaTiposUnidades = () => {
+        if(tiposUnidades.length === 0){
+
+            dispatch(getTiposUnidades()).then((resp) => {
+                console.log("cargaTiposUnidades: ", tiposUnidades);
+                if(unidad && unidad.tipoUnidad){
+                    let tipoUnidSel = resp.payload.find(t => t.id === unidad.tipoUnidad.id);
+                    console.log("cargaTiposUnidades: ", tipoUnidSel);
+                    setTipoUnidadSeleccionado(tipoUnidSel);
+                }
+            });
+        }else{
+            if(unidad && unidad.tipoUnidad){
+                console.log("cargaTiposUnidades else: ", tiposUnidades);
+
+                let tipoUnidSel = tiposUnidades.find(t => t.id === unidad.tipoUnidad.id);
+                console.log("cargaTiposUnidades tipoUnidSel else: ", tipoUnidSel);
+                setTipoUnidadSeleccionado(tipoUnidSel);
+            }
+        }
+    }
+
+    useEffect(() => {
+        cargaArchivosProyecto();
+        cargaTiposUnidades();
+        cargaUsos();
+
+        return () => {
+            dispatch(setArchivos([]));
+        };
+    }, []);
 
 
 
@@ -236,11 +294,30 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 )}
                             />
 
+                            <TextField
+                                fullWidth
+                                variant="filled"
+                                type="text"
+                                label="Unidad"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                value={values.lote}
+                                name="lote"
+                                error={!!touched.lote && !!errors.lote}
+                                helperText={touched.lote && errors.lote}
+                                color="secondary"
+                                size="small"
+                                sx={{ gridColumn: "span 2" }}
+                            />
+
                             <Autocomplete
                                 id="tipoUnidad"
                                 name="tipoUnidad"
-                                options={tiposUnidad}
-                                getOptionLabel={option => option}
+                                options={tiposUnidades}
+                                getOptionLabel={option => option.descripcion}
+                                isOptionEqualToValue={(option, selectedValue) => {
+                                    return option.id === selectedValue.id;
+                                }}
                                 value={tipoUnidadSeleccionado}
                                 sx={{ gridColumn: "span 2" }}
                                 size="small"
@@ -271,7 +348,10 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 id="uso"
                                 name="uso"
                                 options={usos}
-                                getOptionLabel={option => option}
+                                getOptionLabel={option => option.descripcion}
+                                isOptionEqualToValue={(option, selectedValue) => {
+                                    return option.id === selectedValue.id;
+                                }}
                                 value={usoSeleccionado}
                                 size="small"
                                 sx={{ gridColumn: "span 2" }}
@@ -298,21 +378,7 @@ const UnidadForm = ({proyectoId, handleEditRow, unidad, handleFilePreview}) => {
                                 )}
                             />
 
-                            <TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                label="Unidad"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.lote}
-                                name="lote"
-                                error={!!touched.lote && !!errors.lote}
-                                helperText={touched.lote && errors.lote}
-                                color="secondary"
-                                size="small"
-                                sx={{ gridColumn: "span 2" }}
-                            />
+
 
                             <TextField
                                 fullWidth
@@ -607,9 +673,9 @@ const checkoutSchema = yup.object().shape({
     //colonia: yup.string().required("required"),
     folioElectronico: yup.number(),
     valorCatastral: yup.number(),
-    uso: yup.string().required("required"),
+    uso: yup.mixed().required("required"),
     clase: yup.string().required("required"),
-    tipoUnidad: yup.string().required("required"),
+    tipoUnidad: yup.mixed().required("required"),
     //colindanciaProyecto: yup.bool().required("required"),
     numeroParcela: yup.number(),
 

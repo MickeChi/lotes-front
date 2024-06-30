@@ -32,8 +32,8 @@ import UnidadExternaTable from "./UnidadExternaTable.jsx";
 import {AddCircle} from "@mui/icons-material";
 import UnidadExternaModal from "./UnidadExternaModal.jsx";
 import {deleteUnidad} from "../../store/slices/UnidadSlice.js";
-import {ArchivosProps, Estatus, usos} from "../../utils/constantes.js";
-import {getTiposDesarrollos} from "../../store/slices/catalogoSlice.js";
+import {ArchivosProps, Estatus} from "../../utils/constantes.js";
+import {getTiposDesarrollos, getUsos} from "../../store/slices/catalogoSlice.js";
 import ArchivosProyectoModal from "./ArchivosProyectoModal.jsx";
 import {addArchivo, getAllArchivos, setArchivos} from "../../store/slices/archivoSlice.js";
 import PreviewFile from "./PreviewFile.jsx";
@@ -74,7 +74,11 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const estados = useSelector(state => state.general.estados);
     const municipios = useSelector(state => state.general.municipios);
     const tiposDesarrollos = useSelector(state => state.catalogos.tiposDesarrollos);
+    const usos = useSelector(state => state.catalogos.usos);
+
     const [tipoDesarrolloSeleccionado, setTipoDesarrolloSeleccionado] = useState(null);
+    const [usoSeleccionado, setUsoSeleccionado] = useState(null);
+
     const archivos = useSelector(state => state.archivos.archivos);
     const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
 
@@ -89,7 +93,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const regexpNums = /^\d*$/;
     //const [puntoPartidaSelect, setPuntoPartidaSelect] = useState(null);
 
-    const [usoSeleccionado, setUsoSeleccionado] = useState(null);
+    //const [usoSeleccionado, setUsoSeleccionado] = useState(null);
 
     useEffect(() => {
         if(proyecto){
@@ -101,7 +105,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                 }
             }
             //setPuntoPartidaSelect(proyecto.puntoPartida);
-            setUsoSeleccionado(proyecto.uso);
+            //setUsoSeleccionado(proyecto.uso);
             let nombreDocumento = proyecto.archivo ? import.meta.env.VITE_APP_API_BASE + "/docfiles/" + proyecto.archivo.nombre : null ;
             setUrlDocumento(nombreDocumento);
             if(proyecto && proyecto.archivo){
@@ -127,15 +131,31 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     const cargaTiposDedesarrollo = () => {
         if(tiposDesarrollos.length === 0){
             dispatch(getTiposDesarrollos()).then((resp) => {
-                if(esEditar){
+                if(proyecto && proyecto.tipoDesarrollo){
                     let tipoDesSel = resp.payload.find(t => t.id === proyecto.tipoDesarrollo.id);
                     setTipoDesarrolloSeleccionado(tipoDesSel);
                 }
             });
         }else{
-            if(esEditar){
+            if(proyecto && proyecto.tipoDesarrollo){
                 let tipoDesSel = tiposDesarrollos.find(t => t.id === proyecto.tipoDesarrollo.id);
                 setTipoDesarrolloSeleccionado(tipoDesSel);
+            }
+        }
+    }
+
+    const cargaUsos = () => {
+        if(usos.length === 0){
+            dispatch(getUsos()).then((resp) => {
+                if(proyecto && proyecto.uso){
+                    let usoSel = resp.payload.find(t => t.id === proyecto.uso.id);
+                    setUsoSeleccionado(usoSel);
+                }
+            });
+        }else{
+            if(proyecto && proyecto.uso){
+                let usoSel = usos.find(t => t.id === proyecto.uso.id);
+                setUsoSeleccionado(usoSel);
             }
         }
     }
@@ -143,6 +163,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
     useEffect(() => {
         cargaArchivosProyecto();
         cargaTiposDedesarrollo();
+        cargaUsos();
 
         return () => {
             dispatch(setArchivos([]));
@@ -323,7 +344,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                 <Box display="flex" justifyContent="space-between">
                     <Header subtitle="Documento de autorización"/>
                     <Box>
-                        {proyecto.id && <Button
+                        {proyecto && proyecto.id && <Button
                             size="small"
                             color="warning"
                             variant="contained"
@@ -396,7 +417,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 }}
                                                 renderInput={params => (
                                                     <TextField
-                                                        label="Seleccione un documento"
+                                                        label="Seleccione autorización oficial del proyecto"
                                                         fullWidth
                                                         variant="filled"
                                                         type="text"
@@ -409,6 +430,25 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                         {...params}
                                                     />
                                                 )}
+                                            />
+                                        </Grid>
+                                        <Grid item md={12}>
+                                            <TextField
+                                                fullWidth
+                                                variant="filled"
+                                                type="file"
+                                                label="Agregar nueva autorización oficial del proyecto"
+                                                InputLabelProps={{ shrink: true }}
+                                                onBlur={handleBlur}
+                                                name="documento"
+                                                color="secondary"
+                                                error={!!touched.documento && !!errors.documento}
+                                                helperText={touched.documento && errors.documento}
+                                                onChange={(e) => {
+                                                    setFieldValue("documento", e.currentTarget.files[0]);
+                                                    console.log("documento: ", e.currentTarget.files[0]);
+                                                    createFilePreview(e.currentTarget.files[0], true);
+                                                }}
                                             />
                                         </Grid>
                                         <Grid item md={6}>
@@ -525,7 +565,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                                 id="uso"
                                                 name="uso"
                                                 options={usos}
-                                                getOptionLabel={option => option}
+                                                getOptionLabel={option => option.descripcion}
                                                 value={usoSeleccionado}
                                                 sx={{ gridColumn: "span 2" }}
                                                 onChange={(e, value) => {
@@ -679,25 +719,7 @@ const ProyectoForm = ({esEditar, proyecto, handleEditProy}) => {
                                             />
                                         </Grid>
 
-                                        <Grid item md={12}>
-                                            <TextField
-                                                fullWidth
-                                                variant="filled"
-                                                type="file"
-                                                label="Seleccione autorización oficial del proyecto"
-                                                InputLabelProps={{ shrink: true }}
-                                                onBlur={handleBlur}
-                                                name="documento"
-                                                color="secondary"
-                                                error={!!touched.documento && !!errors.documento}
-                                                helperText={touched.documento && errors.documento}
-                                                onChange={(e) => {
-                                                    setFieldValue("documento", e.currentTarget.files[0]);
-                                                    console.log("documento: ", e.currentTarget.files[0]);
-                                                    createFilePreview(e.currentTarget.files[0], true);
-                                                }}
-                                            />
-                                        </Grid>
+
 
                                     </Grid>
                                     <Grid item md={12} display="flex" justifyContent="end" mt="20px">
@@ -742,7 +764,7 @@ const checkoutSchema = yup.object().shape({
     municipio: yup.string().required("required"),
     localidad: yup.string().required("required"),
     //subtotal: yup.number().required("required"),
-    uso: yup.string().required("required"),
+    uso: yup.mixed().required("required"),
     clase: yup.string().required("required"),
 
     tipoDesarrollo: yup.mixed().required("required"),

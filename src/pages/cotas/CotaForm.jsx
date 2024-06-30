@@ -39,7 +39,7 @@ const initialValues = {
 const icon = <CheckBoxOutlineBlank fontSize="small" />;
 const checkedIcon = <CheckBox fontSize="small" />;
 
-const CotaForm = ({cota, unidadId, handleUnidadSelect, handleEditRow}) => {
+const CotaForm = ({cota, unidadId, proyectoId, handleUnidadSelect, handleEditRow}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -61,23 +61,27 @@ const CotaForm = ({cota, unidadId, handleUnidadSelect, handleEditRow}) => {
 
 
     useEffect(() => {
-        const cargarColindancias = (unidadId)=>{
-            let unidadCurrent = unidades.find(u => u.id === unidadId);
-            if(unidadCurrent != null) {
+        const cargarColindancias = ()=>{
+            let proyectoIdSel = proyectoId ? proyectoId : null;
+            if(unidadId) {
+                let unidadCurrent = unidadId ? unidades.find(u => u.id === unidadId) : null;
                 setUnidadSelect(unidadCurrent);
+                proyectoIdSel = unidadCurrent.proyectoId;
+            }
+            if(proyectoIdSel != null) {
                 dispatch(setLoader(true));
-                dispatch(getAllColindancias({proyectoId: unidadCurrent.proyectoId})).then(resp => {
+                dispatch(getAllColindancias({proyectoId: proyectoIdSel})).then(resp => {
                     dispatch(setLoader(false));
                 });
             }
         }
 
-        if(unidadId) {
-            cargarColindancias(unidadId);
+        if(unidadId || proyectoId) {
+            cargarColindancias();
         }else{
             dispatch(setColindancias([]));
         }
-    }, [unidadId]);
+    }, [unidadId, proyectoId]);
 
     useEffect(() => {
         let colNuevaOp = {
@@ -130,8 +134,18 @@ const CotaForm = ({cota, unidadId, handleUnidadSelect, handleEditRow}) => {
 
     const handleFormSubmit = (values, actions) => {
         const actionSubmit = esEditar ? updateCota : createCota;
-        let colindanciaDescript = values.colindanciaId === 0 ? values.colindanciaNueva : colindanciaSelect.descripcion;
-        const colindanciaReq = {...colindanciaSelect, descripcion: colindanciaDescript};
+        //Si es crear y hay proyectoId, no se debe permitir ya que esto significa que se estan mostrando
+        //las cotas sin colindancia y en ese flujo no es posible crear
+        if(!esEditar && proyectoId){
+            console.log("No es posible crear cotas en vista de cotas sin colindancia");
+            return false;
+        }
+        let colindanciaReq = null;
+        if(colindanciaSelect != null){
+            let colindanciaDescript = values.colindanciaId === 0 ? values.colindanciaNueva : colindanciaSelect.descripcion;
+            colindanciaReq = {...colindanciaSelect, descripcion: colindanciaDescript};
+        }
+
         let request = {...values, unidadId: unidadSelect.id, colindancia: colindanciaReq, medida: toDecimals(values.medida)}
         delete request.colindanciaNueva;
 
@@ -357,15 +371,14 @@ const checkoutSchema = yup.object().shape({
     //"orden": yup.number().required("required"),
     "tipoLinea": yup.string().required("required"),
     "orientacion": yup.string().required("required"),
-    "medida": yup.number().required("required"),
+    "medida": yup.number().required("required")
     //"unidadId": yup.number().required("required"),
-    "colindanciaId": yup.number().required("required"),
-    //"colindanciaNueva": yup.string().required("required")
+    /*"colindanciaId": yup.number().required("required"),
     "colindanciaNueva": yup.string().when("colindanciaId", {
         is: (val) => val === 0,
         then: yup.string().required('required'),
         otherwise: yup.string().notRequired()
-    })
+    })*/
     // "colindanciasIds": yup.array().min(1, "al menos 1").max(1, "máximo 1").required("required"),
 });
 

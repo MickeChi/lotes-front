@@ -6,18 +6,20 @@ import {useDispatch, useSelector} from "react-redux";
 import {Edit, Visibility, AllOut} from "@mui/icons-material";
 import {useEffect} from "react";
 import {setLoader} from "../../store/slices/generalSlice.js";
-import {getAllCotas, setCotas} from "../../store/slices/cotaSlice.js";
+import {getAllCotas, getCotasSinColindancia, setCotas, setCotasSinColindancia} from "../../store/slices/cotaSlice.js";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import {Estatus} from "../../utils/constantes.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import {setUnidades} from "../../store/slices/unidadSlice.js";
 
-const CotaTable = ({unidadId, handleEditRow}) => {
+const CotaTable = ({unidadId, proyectoId, handleEditRow}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const dispatch = useDispatch();
     const cotas = useSelector(state => state.cotas.cotas);
+    const cotasSinColindancia = useSelector(state => state.cotas.cotasSinColindancia);
+
 
     useEffect(() => {
         console.log("CotaTable unidadID: ", unidadId);
@@ -39,6 +41,27 @@ const CotaTable = ({unidadId, handleEditRow}) => {
         };
 
     }, [unidadId]);
+
+    useEffect(() => {
+        console.log("CotaTable unidadID: ", unidadId);
+        const cargarCotasSinColindancia = ()=>{
+            dispatch(setLoader(true));
+            dispatch(getCotasSinColindancia({proyectoId: proyectoId})).then(resp => {
+                dispatch(setLoader(false));
+            })
+        }
+        if(proyectoId) {
+            cargarCotasSinColindancia();
+        }else{
+            dispatch(setCotasSinColindancia([]));
+        }
+
+        return () => {
+            console.log("callback setCotasSinColindancia: ", cotasSinColindancia);
+            dispatch(setCotasSinColindancia([]));
+        };
+
+    }, [proyectoId]);
 
     const columns = [
         /*{
@@ -110,6 +133,8 @@ const CotaTable = ({unidadId, handleEditRow}) => {
         handleEditRow(cotaEdit);
     }
 
+    const getRows = unidadId ? cotas : cotasSinColindancia;
+
     return (
         <Box>
             {/*<Header subtitle="Cotas" />*/}
@@ -145,7 +170,7 @@ const CotaTable = ({unidadId, handleEditRow}) => {
                     }
                 }}
             >
-                <DataGrid rows={cotas} columns={columns} />
+                <DataGrid rows={getRows} columns={columns} />
             </Box>
         </Box>
     );

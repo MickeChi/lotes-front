@@ -17,7 +17,8 @@ import {getAllUnidades, setUnidades} from "../../store/slices/unidadSlice.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import {setCotas} from "../../store/slices/cotaSlice.js";
-import {Estatus} from "../../utils/constantes.js";
+import {Estatus, ValidacionesDoc} from "../../utils/constantes.js";
+import {toDecimals} from "../../utils/Utils.js";
 
 
 const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
@@ -27,6 +28,7 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
     const [tituloDoc, setTituloDoc] = useState("");
     const [docGenerado, setDocGenerado] = useState(null);
     const unidades = useSelector(state => state.unidades.unidades);
+    const [cotas, setCotas] = useState([]);
 
 
     useEffect(() => {
@@ -37,6 +39,7 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
         }
 
     }, [unidades]);
+
 
 
     useEffect(() => {
@@ -50,6 +53,16 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
                 .then(resp => {
                     dispatch(setLoader(false));
                     console.log("2.1- after carga unidades - cant unidades: ", unidades.length);
+                    let cotasAll = [];
+                    resp.payload.forEach(u => {
+                        if(u.cotas != null && u.cotas.length > 0) {
+                            let cotasActivas = u.cotas.filter(c => c.estatus === Estatus.ACTIVO);
+                            console.log("cotasActivas: ", cotasActivas);
+                            cotasAll.push(...cotasActivas);
+                        }
+                    });
+                    console.log("cotasAll: ", cotasAll);
+                    setCotas(cotasAll);
 
                     //validarUnidades();
                 });
@@ -61,62 +74,68 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
         };
     }, []);
 
+    const isValidNumber = (num) => {
+        let esVacio = num === null || num === "" || num === undefined;
+        return (esVacio || isNaN(num)) ? 0 : toDecimals(num);
+    }
+
     const validarUnidades = () => {
 
         console.log("validarUnidades -unidades: ", unidades);
         console.log("validarUnidades - proyecto: ", proyecto);
+        console.log("validarUnidades - cotas: ", cotas);
 
-        let unidadSuma = {
-            terrenoTotal: 0,
-            terrenoExclusivoTotal: 0,
-            terrenoComunTotal: 0,
-            construccionTotal: 0,
-            construccionExclusivoTotal: 0,
-            construccionComunTotal: 0,
-            cuotaPaInTotal: 0,
-            totalUnidades: 0,
-            unidadesIncompletas: 0
+        let tipoDesarrollo = ValidacionesDoc.tiposDesarrollo.find(tp => tp.id === proyecto.tipoDesarrollo.id);
+
+        let validacionesSumas = {...tipoDesarrollo.validaciones}
+
+        validacionesSumas.terrenoExclusivoTotal = unidades.reduce((sum, u) => {
+            return sum + isValidNumber(u.terrenoExclusivo)
+        }, 0);
+
+        validacionesSumas.terrenoComunTotal = unidades.reduce((sum, u) => {
+            return sum + isValidNumber(u.terrenoComun)
+        }, 0);
+
+        validacionesSumas.terrenoTotal = validacionesSumas.terrenoExclusivoTotal + validacionesSumas.terrenoComunTotal;
+
+        validacionesSumas.construccionExclusivoTotal = unidades.reduce((sum, u) => {
+            return sum + isValidNumber(u.construccionExclusiva)
+        }, 0);
+
+        validacionesSumas.construccionComunTotal = unidades.reduce((sum, u) => {
+            return sum + isValidNumber(u.construccionComun)
+        }, 0);
+
+        validacionesSumas.construccionTotal = validacionesSumas.construccionExclusivoTotal + validacionesSumas.construccionComunTotal;
+
+        if(validacionesSumas["cuotaPaInTotal"] !== undefined){
+            validacionesSumas.cuotaPaInTotal = unidades.reduce((sum, u) => {
+                return sum + isValidNumber(u.cuotaPaIn)
+            }, 0);
         }
 
-        unidadSuma.terrenoExclusivoTotal = unidades.reduce((sum, u) => {
-            return sum + Number(u.terrenoExclusivo)
-        }, 0);
 
-        unidadSuma.terrenoComunTotal = unidades.reduce((sum, u) => {
-            return sum + Number(u.terrenoComun)
-        }, 0);
+        validacionesSumas.totalUnidades = unidades.length;
 
-        unidadSuma.terrenoTotal = unidadSuma.terrenoExclusivoTotal + unidadSuma.terrenoComunTotal;
-
-        unidadSuma.construccionExclusivoTotal = unidades.reduce((sum, u) => {
-            return sum + Number(u.construccionExclusiva)
-        }, 0);
-
-        unidadSuma.construccionComunTotal = unidades.reduce((sum, u) => {
-            return sum + Number(u.construccionComun)
-        }, 0);
-
-        unidadSuma.construccionTotal = unidadSuma.construccionExclusivoTotal + unidadSuma.construccionComunTotal;
-
-        unidadSuma.cuotaPaInTotal = unidades.reduce((sum, u) => {
-            return sum + Number(u.cuotaPaIn)
-        }, 0);
-
-        unidadSuma.totalUnidades = unidades.length;
-
-        unidadSuma.unidadesIncompletas = unidades.filter(u => {
+        validacionesSumas.unidadesIncompletas = unidades.filter(u => {
             return (u.cotas.filter(c => c.estatus === Estatus.ACTIVO).length < 3)
         }).length;
 
-        //console.log("unidadSuma: ", unidadSuma);
+        validacionesSumas.cotasIncompletas = (cotas.filter(c => c.colindanciaId === null)).length ;
+
+        console.log("validacionesSumas: ", validacionesSumas);
         //console.log("proyecto: ", proyecto);
 
 
-        return Object.entries(unidadSuma).some(([key, value]) => {
+        return Object.entries(validacionesSumas).some(([key, value]) => {
             let error = false;
             let message = null;
             if(['unidadesIncompletas'].includes(key)){
-                message = mensajeUnidadesCotas(key, value);
+                message = mensajeUnidadeIncompletas(key, value);
+                error = (value > 0);
+            }else if(['cotasIncompletas'].includes(key)){
+                message = mensajeCotasIncompletas(key, value);
                 error = (value > 0);
             }else if(['cuotaPaInTotal'].includes(key)){
                 message = mensajeCuotaPain(key, value);
@@ -126,7 +145,7 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
                 error = (value !== proyecto[key]);
             }else{
                 message = mensajeTerrenoContruccion(key, value);
-                error = (value !== proyecto[key]);
+                error = (value !== proyecto[key] && Math.abs((proyecto[key] - value)) > 1);
             }
             console.log(error, message);
 
@@ -154,7 +173,8 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
         construccionComunTotal: 'Construcción Común Total',
         cuotaPaInTotal: 'Cuota Participacion Indiviso',
         totalUnidades: 'Total Unidades',
-        unidadesIncompletas: 'Unidades Incompletas'
+        unidadesIncompletas: 'Unidades Incompletas',
+        cotasIncompletas: 'Cotas Incompletas'
     }
 
     const mensajeTerrenoContruccion = (key, value) => `Se le informa que el proyecto ${proyecto.titulo}  tiene un ${validacionesNombres[key]} de ${proyecto[key]} m2,
@@ -163,8 +183,9 @@ const ProyectoDocumentos = ({proyecto, proyectoTitulo}) => {
 
     const mensajeTotalUnidades = (key, value) => `El proyecto ${proyecto.titulo} tiene un total de ${proyecto[key]} unidades sin embargo se han cargado ${value} `;
 
-    const mensajeUnidadesCotas = (key, value) => `El proyecto ${proyecto.titulo} tiene un total de ${value} unidades con menos de 3 cotas`;
+    const mensajeUnidadeIncompletas = (key, value) => `El proyecto ${proyecto.titulo} tiene un total de ${value} unidades con menos de 3 cotas`;
 
+    const mensajeCotasIncompletas = (key, value) => `El proyecto ${proyecto.titulo} tiene un total de ${value} cota(s) sin colindancia`;
 
     const mensajeCuotaPain = (key, value) => `Se le informa que el proyecto ${proyecto.titulo} no alcanza el 100% de cuota de 
     participación (${value}). 

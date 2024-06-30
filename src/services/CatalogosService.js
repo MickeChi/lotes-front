@@ -6,9 +6,24 @@ const getTiposDesarrollos = (request) => {
     });
 }
 
+const getUsos = (request) => {
+    return axiosClient.get(`catalogos/usos`, {
+        params: request
+    });
+}
+
+const getTiposUnidades = (request) => {
+    return axiosClient.get(`catalogos/tipos-unidades`, {
+        params: request
+    });
+}
+
+
 
 const CotalogosService =  {
-    getTiposDesarrollos
+    getTiposDesarrollos,
+    getUsos,
+    getTiposUnidades
 }
 
 export default CotalogosService;

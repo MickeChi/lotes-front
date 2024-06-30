@@ -1,1 +1,1 @@
-export const toDecimals = num => (Math.ceil(Number(num)*100)/100).toFixed(2);
+export const toDecimals = num => Number((Math.ceil(Number(num)*100)/100).toFixed(2));

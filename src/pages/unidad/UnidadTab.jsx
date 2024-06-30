@@ -8,7 +8,7 @@ import UnidadForm from "./UnidadForm.jsx";
 import UnidadTable from "./UnidadTable.jsx";
 import {useEffect, useState} from "react";
 import {setLoader} from "../../store/slices/generalSlice.js";
-import {deleteCota} from "../../store/slices/cotaSlice.js";
+import {deleteCota, getCotasSinColindancia} from "../../store/slices/cotaSlice.js";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import {useDispatch, useSelector} from "react-redux";
@@ -16,6 +16,9 @@ import {deleteUnidad, removeCotaUnidad} from "../../store/slices/unidadSlice.js"
 import Header from "../../components/Header.jsx";
 import UnidadFormModal from "./UnidadFormModal.jsx";
 import Avatar from "@mui/material/Avatar";
+import {Estatus} from "../../utils/constantes.js";
+import ButtonChip from "../../components/ButtonChip.jsx";
+import CotaFormModal from "./CotaFormModal.jsx";
 
 const UnidadTab = ({proyecto}) => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -24,14 +27,52 @@ const UnidadTab = ({proyecto}) => {
     const navigate = useNavigate();
     const [unidadUpdate, setUnidadUpdate] = useState(null);
     const [openModal, setOpenModal] = useState(false);
+    const [openModalCota, setOpenModalCota] = useState(false);
+
     const dispatch = useDispatch();
     const unidades = useSelector(state => state.unidades.unidades);
-    const [cantUnidadesValidas, setCantUnidadesValidas] = useState(true);
+    const cotasSinColindancia = useSelector(state => state.cotas.cotasSinColindancia);
+    const cotas = useSelector(state => state.cotas.cotas);
+    const [isCantUnidadesValidas, setIsCantUnidadesValidas] = useState(true);
+    const [unidadesIncompletas, setUnidadesIncompletas] = useState(null);
+    const [cotasIncompletas, setCotasIncompletas] = useState(null);
+    const [cantUnidadesFaltantes, setCantUnidadesFaltantes] = useState(null);
+
+
 
 
     useEffect(() => {
-        setCantUnidadesValidas(unidades.length < proyecto.totalUnidades );
+        setIsCantUnidadesValidas(unidades.length < proyecto.totalUnidades );
+
+        let uniIncompletas = unidades.filter(u => {
+            return (u.cotas.filter(c => c.estatus === Estatus.ACTIVO).length < 3)
+        }).length;
+
+        setCantUnidadesFaltantes(proyecto.totalUnidades - unidades.length);
+        setUnidadesIncompletas(uniIncompletas);
     }, [unidades]);
+
+    useEffect(() => {
+
+        dispatch(setLoader(true));
+        dispatch(getCotasSinColindancia({proyectoId: proyecto.id})).then((resp) =>{
+            dispatch(setLoader(false));
+            console.log("cotasIncompletas payload: ", resp.payload);
+        });
+
+        /*return () => {
+            console.log("callback chip: ", openModal);
+            setCantUnidadesFaltantes(null);
+            setUnidadesIncompletas(null);
+            setCotasIncompletas(null);
+        };*/
+
+    }, [cotas, unidades]);
+
+    useEffect(() => {
+        console.log("cotasIncompletas: ", cotasSinColindancia);
+        setCotasIncompletas(cotasSinColindancia.length);
+    }, [cotasSinColindancia]);
 
 
     const handlerEditunidad = (unidadEdit, eliminar = false) => {
@@ -43,6 +84,15 @@ const UnidadTab = ({proyecto}) => {
             console.log("handlerEditunidad: ", unidadEdit);
             setUnidadUpdate(unidadEdit);
             setOpenModal(true);
+        }
+    }
+
+    const handlerEditCota = (cotaEdit, eliminar = false) => {
+
+        if(eliminar){
+            console.log("handlerEditCota ELIMINAR: ", cotaEdit, eliminar);
+        }else{
+            console.log("handlerEditCota: ", cotaEdit);
         }
     }
 
@@ -62,13 +112,42 @@ const UnidadTab = ({proyecto}) => {
         })
     };
 
+    const showErrorUnidadesInc = () => unidadesIncompletas != null && unidadesIncompletas > 0;
+    const showErrorCotasInc = () => cotasIncompletas > 0 /*|| showErrorUnidadesInc()*/;
+
+    const handlerBtnChip = () => {
+        setOpenModalCota(true);
+    }
+
+
     return (
         <Grid container spacing={3}>
             <Grid item md={12}>
                 <Box display="flex" justifyContent="space-between">
                     <Header subtitle="Unidades" />
-                    <Box>
-                        {cantUnidadesValidas && <Button
+                    <Box >
+
+                        {unidades.length > 0 && <ButtonChip info={unidadesIncompletas}
+                                     labelError={"Unidades incompletas"}
+                                     labelSuccess={"Unidades completas"}
+                                     showError={showErrorUnidadesInc()}
+                        />}
+
+                        {unidades.length > 0 &&  <ButtonChip info={cotasIncompletas}
+                                     labelError={"Cotas incompletas"}
+                                     labelSuccess={"Cotas completas"}
+                                     showError={showErrorCotasInc()}
+                                     handlerBtnChip={handlerBtnChip}
+
+                        />}
+
+                        {unidades.length > 0 && <ButtonChip info={ cantUnidadesFaltantes }
+                                    labelError={"Unidades faltantes"}
+                                    labelSuccess={"Cantidad unidades"}
+                                    showError={isCantUnidadesValidas}/>}
+
+
+                        {isCantUnidadesValidas && <Button
                             size="small"
                             color="warning"
                             variant="contained"
@@ -80,24 +159,6 @@ const UnidadTab = ({proyecto}) => {
                             Agregar unidad
                         </Button>}
 
-                        {!cantUnidadesValidas && <Chip
-                            sx={{
-                                '.MuiChip-deleteIcon': {
-                                    color: "#fff",
-                                }
-                            }}
-                            color="success" label="Unidades completas"
-                            onClick={()=>{}}
-                            onDelete={()=>{}}
-                            deleteIcon={<CheckCircle />}
-                        />}
-
-                         {/*<Chip color="success" label="Unidades completas"
-                               avatar={<Avatar sx={{
-                                   backgroundColor: "#fff",
-                                   color: `#000 !important`,
-                                   fontWeight: `bold`
-                               }}>{unidades.length}</Avatar>}/>*/}
 
 
                         {/*<Header subtitle="Se ha completado el número de unidades" error="true"/>*/}
@@ -117,10 +178,16 @@ const UnidadTab = ({proyecto}) => {
             </Grid>
 
             <UnidadFormModal openModal={openModal}
-                        proyectoId={proyecto.id}
-                        unidad={unidadUpdate}
-                        handleEditRow={handlerEditunidad}
-                        onCloseModal={setOpenModal}
+                             proyectoId={proyecto.id}
+                             unidad={unidadUpdate}
+                             handleEditRow={handlerEditunidad}
+                             onCloseModal={setOpenModal}
+            />
+            <CotaFormModal openModal={openModalCota}
+                             proyectoId={proyecto.id}
+                             unidad={unidadUpdate}
+                             handleEditRow={handlerEditCota}
+                             onCloseModal={setOpenModalCota}
             />
         </Grid>
     );

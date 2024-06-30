@@ -60,8 +60,8 @@ const UnidadTable = ({proyectoId, handleEditRow}) => {
             flex: 1,
         },
         {
-            field: "superficieTerreno",
-            headerName: "Sup. terreno",
+            field: "terrenoExclusivo",
+            headerName: "Terreno exclusivo",
             flex: 1,
         },
         {
@@ -69,10 +69,14 @@ const UnidadTable = ({proyectoId, handleEditRow}) => {
             headerName: "Valor catastral",
             flex: 1,
         },
+
         {
-            field: "uso",
-            headerName: "Uso",
+            field: 'uso',
+            headerName: 'Uso',
             flex: 1,
+            valueGetter: (value, row) => {
+                return value.value.descripcion;
+            },
         },
         {
             field: "clase",

@@ -3,6 +3,7 @@ import CotaService from "../../services/CotaService.js";
 
 const initialState = {
     cotas: [],
+    cotasSinColindancia: [],
     cotaActivo: null,
 }
 
@@ -46,6 +47,14 @@ export const setCotaActivoById = createAsyncThunk(
     }
 );
 
+export const getCotasSinColindancia = createAsyncThunk(
+    "cotas/getCotasSinColindancia",
+    async (request) => {
+        const res = await CotaService.getAll(request);
+        return res.data;
+    }
+);
+
 const cotaSlice = createSlice({
     name: "cotas",
     initialState,
@@ -60,6 +69,12 @@ const cotaSlice = createSlice({
             return {
                 ...state,
                 cotas: action.payload
+            }
+        },
+        setCotasSinColindancia: (state, action) => {
+            return {
+                ...state,
+                cotasSinColindancia: action.payload
             }
         }
 
@@ -88,6 +103,9 @@ const cotaSlice = createSlice({
             .addCase(setCotaActivoById.fulfilled, (state, action) => {
                 state.cotaActivo = action.payload
             })
+            .addCase(getCotasSinColindancia.fulfilled, (state, action) => {
+                state.cotasSinColindancia = action.payload;
+            })
     }
 
 })
@@ -95,4 +113,4 @@ const cotaSlice = createSlice({
 const { reducer } = cotaSlice;
 export default reducer;
 
-export const {setCotaActivo, setCotas} = cotaSlice.actions;
+export const {setCotaActivo, setCotas, setCotasSinColindancia} = cotaSlice.actions;
