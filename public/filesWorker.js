@@ -144,7 +144,10 @@ const uploadFileToServer = (fileInfo) => {
 
     return new Promise((resolve, reject) => {
 
-        fetch('http://localhost:8081/api/archivo', {
+        const url_files = 'http://140.84.165.208/lotes-backend/archivo'; //PROD
+        //const url_files = 'http://localhost:8081/api/archivo'; //LOCAL
+
+        fetch(url_files, {
             method: 'POST',
             body: formData
         })
